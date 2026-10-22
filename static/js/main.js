@@ -355,9 +355,9 @@ function ensureViewElementsExist() {
             const div = document.createElement('div');
             div.id = `view-${vId}`;
             div.className = 'app-view';
-            if(vId === 'cook-dashboard') div.innerHTML = '<div id="cook-dashboard-content"></div>';
-            if(vId === 'manager-dashboard') div.innerHTML = '<div id="manager-dashboard-content"></div>';
-            if(vId === 'cook-training') div.innerHTML = '<h2 id="training-view-heading"></h2><div id="training-modules-list" style="display:flex; flex-direction:column; gap:12px;"></div>';
+            if(vId === 'cook-dashboard') div.innerHTML = '<h2>Cook Personal Performance & Bonus Tracker</h2><div id="cook-dashboard-content"></div>';
+            if(vId === 'manager-dashboard') div.innerHTML = '<h2>Shift Manager Oversight Dashboard</h2><div id="manager-dashboard-content"></div>';
+            if(vId === 'cook-training') div.innerHTML = '<h2 id="training-view-heading">Training Modules & Mandatory Certifications</h2><div class="card"><div id="training-modules-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;"></div></div>';
             wrapper.appendChild(div);
         }
     });
@@ -1097,12 +1097,17 @@ function renderCookDashboard() {
     if(!container) return;
     const isEs = currentLanguage === 'es';
 
+    if(!currentUser) {
+        container.innerHTML = `<p style="color: #64748b;">${isEs ? 'Por favor inicia sesión para ver tu panel.' : 'Please log in to view your dashboard.'}</p>`;
+        return;
+    }
+
     const myShifts = shiftLogsList.filter(s => s.empId === currentUser.id);
 
     container.innerHTML = `
-        <div class="card">
-            <h3>${isEs ? 'Tus Registros de Turno Recientes y Rendimiento' : 'Your Recent Shift Submissions & Performance'} (${currentUser.name})</h3>
-            <table class="data-table">
+        <div class="card" style="margin-top: 1rem;">
+            <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? 'Tus Registros de Turno Recientes y Rendimiento' : 'Your Recent Shift Submissions & Performance'} (${currentUser.name})</h3>
+            <table class="data-table" style="margin-top: 1rem;">
                 <thead><tr>
                     <th>${isEs ? 'Fecha' : 'Date'}</th>
                     <th>${isEs ? 'Horario de Turno' : 'Shift Time Slot'}</th>
@@ -1111,8 +1116,16 @@ function renderCookDashboard() {
                     <th>${isEs ? 'Notas' : 'Notes'}</th>
                 </tr></thead>
                 <tbody>
-                    ${myShifts.length === 0 ? `<tr><td colspan="5">${isEs ? 'No se encontraron registros de turno para tu cuenta.' : 'No shift logs found for your account.'}</td></tr>` :
-                      myShifts.map(s => `<tr><td>${s.date}</td><td>${s.timeSlot}</td><td><strong>${s.scorePct}\%</strong></td><td>${s.scorePct>=95?'Tier 3':s.scorePct>=90?'Tier 2':s.scorePct>=85?'Tier 1':(isEs?'No elegible':'Ineligible')}</td><td>-</td></tr>`).join('')}
+                    ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">${isEs ? 'No se encontraron registros de turno para tu cuenta.' : 'No shift logs found for your account.'}</td></tr>` :
+                      myShifts.map(s => `
+                        <tr>
+                            <td>${s.date}</td>
+                            <td>${s.timeSlot}</td>
+                            <td><strong>${s.scorePct}%</strong></td>
+                            <td>${s.scorePct >= 95 ? 'Tier 3' : s.scorePct >= 90 ? 'Tier 2' : s.scorePct >= 85 ? 'Tier 1' : (isEs ? 'No elegible' : 'Ineligible')}</td>
+                            <td>-</td>
+                        </tr>
+                    `).join('')}
                 </tbody>
             </table>
         </div>
