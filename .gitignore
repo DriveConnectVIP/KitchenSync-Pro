@@ -1,24 +1,12 @@
-# Python bytecode & cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environment
-.venv/
-venv/
-ENV/
-
-# Local database and data files
-data/
-
-# Generated PDF reports and logs
-reports/
-
-# Local environment variables & credentials
-.env
-
-# IDE specific configurations (PyCharm / VS Code)
+# IDE / Editor configurations
 .idea/
 .vscode/
 *.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Python virtual environment (if leftover)
+.venv/
+__pycache__/
