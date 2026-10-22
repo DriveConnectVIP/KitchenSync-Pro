@@ -68,14 +68,17 @@ def save_data(file_path, data):
         json.dump(data, f, indent=2)
 
 
-# GMAIL SMTP HELPER FUNCTION WITH APP PASSWORD
+# GMAIL SMTP HELPER FUNCTION WITH APP PASSWORD & TIMEOUT SAFETY
 def send_email_via_gmail(sender_email, recipient_email, subject, body, attachment_path=None):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    app_password = "crrd nhzv lkgf wlyy"
+
+    # Securely retrieve from environment variables with fallback
+    username = os.environ.get('MAIL_USERNAME', sender_email)
+    app_password = os.environ.get('MAIL_PASSWORD', "crrd nhzv lkgf wlyy")
 
     msg = MIMEMultipart()
-    msg['From'] = sender_email
+    msg['From'] = username
     msg['To'] = recipient_email
     msg['Subject'] = subject
 
@@ -88,10 +91,11 @@ def send_email_via_gmail(sender_email, recipient_email, subject, body, attachmen
             msg.attach(p)
 
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
+        # Added explicit 10-second timeout to prevent worker freezes
+        server = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
         server.starttls()
-        server.login(sender_email, app_password)
-        server.sendmail(sender_email, recipient_email, msg.as_string())
+        server.login(username, app_password)
+        server.sendmail(username, recipient_email, msg.as_string())
         server.quit()
         return True
     except Exception as e:
@@ -185,62 +189,72 @@ def update_shift(shift_id):
     return jsonify({"success": False, "error": "Shift log not found."}), 404
 
 
-# TOTAL SHIFT REPORT EMAIL DISPATCH
+# TOTAL SHIFT REPORT EMAIL DISPATCH WITH EXCEPTION SAFETY
 @app.route('/api/shifts/report-total', methods=['POST'])
 def report_total():
-    req = request.json
-    target_date = req.get('date')
-    time_slot = req.get('timeSlot')
+    try:
+        req = request.json or {}
+        target_date = req.get('date')
+        time_slot = req.get('timeSlot')
 
-    shifts = load_data(SHIFTS_FILE)
-    matching = [s for s in shifts if s.get('date') == target_date]
+        shifts = load_data(SHIFTS_FILE)
+        matching = [s for s in shifts if s.get('date') == target_date]
 
-    body = f"KitchenSync Pro - Total Shift Report\n"
-    body += f"Date: {target_date}\n"
-    body += f"Time Slot: {time_slot}\n"
-    body += f"Total Employee Logs: {len(matching)}\n\n"
+        body = f"KitchenSync Pro - Total Shift Report\n"
+        body += f"Date: {target_date}\n"
+        body += f"Time Slot: {time_slot}\n"
+        body += f"Total Employee Logs: {len(matching)}\n\n"
 
-    for m in matching:
-        body += f"- {m.get('empName')} ({m.get('role', 'staff').upper()}): Score {m.get('scorePct')}%, Manager on Duty: {m.get('managerOnDuty')}\n"
-        if m.get('notes'):
-            for tid, note in m.get('notes').items():
-                body += f"    * Note [{tid}]: {note}\n"
+        for m in matching:
+            body += f"- {m.get('empName')} ({m.get('role', 'staff').upper()}): Score {m.get('scorePct')}%, Manager on Duty: {m.get('managerOnDuty')}\n"
+            if m.get('notes'):
+                for tid, note in m.get('notes').items():
+                    body += f"    * Note [{tid}]: {note}\n"
 
-    sender = "kitchensync.pro@gmail.com"
-    recipient = "management.kitchensync@gmail.com"
-    success = send_email_via_gmail(sender, recipient, f"Total Shift Report - {target_date}", body)
+        sender = os.environ.get('MAIL_USERNAME', "gothicafashions@gmail.com")
+        recipient = "management.kitchensync@gmail.com"
+        success = send_email_via_gmail(sender, recipient, f"Total Shift Report - {target_date}", body)
 
-    if success:
-        return jsonify({"success": True, "count": len(matching)})
-    else:
-        return jsonify({"success": False, "error": "Failed to dispatch email via SMTP."}), 500
+        if success:
+            return jsonify({"success": True, "count": len(matching)})
+        else:
+            return jsonify({"success": False, "error": "Failed to dispatch email via SMTP server."}), 500
+
+    except Exception as e:
+        print(f"Exception in report_total: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-# BI-WEEKLY EMPLOYEE REPORT EMAIL DISPATCH
+# BI-WEEKLY EMPLOYEE REPORT EMAIL DISPATCH WITH EXCEPTION SAFETY
 @app.route('/api/shifts/report-employee-biweekly', methods=['POST'])
 def report_employee_biweekly():
-    req = request.json
-    emp_id = req.get('empId')
-    shifts = req.get('shifts', [])
-    avg_score = req.get('avgScore', 0)
-    bonus_amt = req.get('bonusAmt', 0)
-    tier_label = req.get('tierLabel', 'Ineligible')
+    try:
+        req = request.json or {}
+        emp_id = req.get('empId')
+        shifts = req.get('shifts', [])
+        avg_score = req.get('avgScore', 0)
+        bonus_amt = req.get('bonusAmt', 0)
+        tier_label = req.get('tierLabel', 'Ineligible')
 
-    employees = load_data(EMPLOYEES_FILE)
-    emp = next((e for e in employees if e['id'] == emp_id), None)
-    emp_name = emp['name'] if emp else "Employee"
+        employees = load_data(EMPLOYEES_FILE)
+        emp = next((e for e in employees if e['id'] == emp_id), None)
+        emp_name = emp['name'] if emp else "Employee"
 
-    body = f"KitchenSync Pro - Bi-Weekly Performance Report\n"
-    body += f"Employee: {emp_name}\n"
-    body += f"Average Compliance: {avg_score}%\n"
-    body += f"Bonus Payout Tier: {tier_label} (${bonus_amt})\n"
-    body += f"Total Shifts in Cycle: {len(shifts)}\n"
+        body = f"KitchenSync Pro - Bi-Weekly Performance Report\n"
+        body += f"Employee: {emp_name}\n"
+        body += f"Average Compliance: {avg_score}%\n"
+        body += f"Bonus Payout Tier: {tier_label} (${bonus_amt})\n"
+        body += f"Total Shifts in Cycle: {len(shifts)}\n"
 
-    sender = "kitchensync.pro@gmail.com"
-    recipient = "management.kitchensync@gmail.com"
-    success = send_email_via_gmail(sender, recipient, f"Bi-Weekly Performance Report - {emp_name}", body)
+        sender = os.environ.get('MAIL_USERNAME', "gothicafashions@gmail.com")
+        recipient = "management.kitchensync@gmail.com"
+        success = send_email_via_gmail(sender, recipient, f"Bi-Weekly Performance Report - {emp_name}", body)
 
-    return jsonify({"success": success})
+        return jsonify({"success": success})
+
+    except Exception as e:
+        print(f"Exception in report_employee_biweekly: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route('/api/certifications', methods=['GET', 'POST'])
@@ -292,56 +306,60 @@ def get_reports_by_date():
     return jsonify({"success": True, "date": target_date, "reports": date_shifts})
 
 
-# PDF REPORT GENERATOR (Strictly filters for explicitly approved bonuses only)
+# PDF REPORT GENERATOR WITH EXCEPTION SAFETY
 @app.route('/api/gm/generate-payroll-report', methods=['POST'])
 def generate_payroll_report():
-    approvals = load_data(APPROVALS_FILE)
+    try:
+        approvals = load_data(APPROVALS_FILE)
 
-    pdf_path = os.path.join(REPORTS_DIR, 'BiWeekly_Bonus_Accounting_Report.pdf')
-    doc = SimpleDocTemplate(pdf_path, pagesize=letter)
-    story = []
-    styles = getSampleStyleSheet()
+        pdf_path = os.path.join(REPORTS_DIR, 'BiWeekly_Bonus_Accounting_Report.pdf')
+        doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+        story = []
+        styles = getSampleStyleSheet()
 
-    story.append(Paragraph("<b>KitchenSync Pro - Bi-Weekly Bonus Payroll Report</b>", styles['Title']))
-    story.append(Spacer(1, 10))
-    story.append(Paragraph("Official Accounting & Record Keeping Authorization Document (Approved Bonuses Only)",
-                           styles['Normal']))
-    story.append(Spacer(1, 15))
+        story.append(Paragraph("<b>KitchenSync Pro - Bi-Weekly Bonus Payroll Report</b>", styles['Title']))
+        story.append(Spacer(1, 10))
+        story.append(Paragraph("Official Accounting & Record Keeping Authorization Document (Approved Bonuses Only)",
+                               styles['Normal']))
+        story.append(Spacer(1, 15))
 
-    table_data = [["Employee Name", "Role", "Bonus Tier", "Approved Bonus ($)", "Approval Date"]]
-    total_approved = 0
+        table_data = [["Employee Name", "Role", "Bonus Tier", "Approved Bonus ($)", "Approval Date"]]
+        total_approved = 0
 
-    for a in approvals:
-        table_data.append([
-            a.get('empName', 'Unknown'),
-            a.get('role', 'COOK').upper(),
-            a.get('tierLabel', 'Tier'),
-            f"${a.get('bonusAmt', 0)}",
-            a.get('dateApproved', '')[:10]
-        ])
-        total_approved += a.get('bonusAmt', 0)
+        for a in approvals:
+            table_data.append([
+                a.get('empName', 'Unknown'),
+                a.get('role', 'COOK').upper(),
+                a.get('tierLabel', 'Tier'),
+                f"${a.get('bonusAmt', 0)}",
+                a.get('dateApproved', '')[:10]
+            ])
+            total_approved += a.get('bonusAmt', 0)
 
-    if len(approvals) == 0:
-        table_data.append(["No bonuses have been approved yet.", "", "", "", ""])
+        if len(approvals) == 0:
+            table_data.append(["No bonuses have been approved yet.", "", "", "", ""])
 
-    table_data.append(["", "", "", "Total Authorized Payout:", f"${total_approved}"])
+        table_data.append(["", "", "", "Total Authorized Payout:", f"${total_approved}"])
 
-    t = Table(table_data, colWidths=[140, 70, 90, 90, 110])
-    t.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f1f5f9')),
-        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-    ]))
+        t = Table(table_data, colWidths=[140, 70, 90, 90, 110])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f1f5f9')),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ]))
 
-    story.append(t)
-    doc.build(story)
+        story.append(t)
+        doc.build(story)
 
-    return send_file(pdf_path, as_attachment=True)
+        return send_file(pdf_path, as_attachment=True)
+    except Exception as e:
+        print(f"Exception in generate_payroll_report: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 if __name__ == '__main__':
