@@ -1221,18 +1221,31 @@ function saveNewEmployee(e) {
     e.preventDefault();
     const newEmp = {
         id: `EMP-${Date.now().toString().slice(-4)}`,
-        name: document.getElementById('new-emp-name').value,
+        name: document.getElementById('new-emp-name').value.trim(),
         role: document.getElementById('new-emp-role').value,
-        station: document.getElementById('new-emp-station').value,
-        pin: document.getElementById('new-emp-pin').value,
+        station: document.getElementById('new-emp-station').value.trim(),
+        pin: document.getElementById('new-emp-pin').value.trim(),
         hourlyRate: parseFloat(document.getElementById('new-emp-rate').value),
         active: true
     };
-    employeesList.push(newEmp);
-    closeAddEmployeeModal();
-    renderRosterTable();
-    populateStaffDropdown();
-    alert("New team member added successfully!");
+
+    fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveEmployee', employee: newEmp })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            alert("New team member added and saved to Google Sheets!");
+            closeAddEmployeeModal();
+            document.getElementById('add-employee-form').reset();
+            fetchEmployees();
+        } else {
+            alert("Failed to save employee to spreadsheet.");
+        }
+    })
+    .catch(err => alert("Connection error: " + err));
 }
 
 function openEditEmployeeModal(empId) {
