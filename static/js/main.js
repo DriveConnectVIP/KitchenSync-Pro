@@ -2,32 +2,67 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLUl-5Fx1XvJT6
 
 const CHECKLIST_SPECS = {
     en: {
-        cook: [
+        range: [
             {
-                phase: "PREP & SETUP",
+                phase: "RANGE CLOSING PROCEDURES",
                 tasks: [
-                    { id: "c1", title: "Station Mise En Place", desc: "Set up station fully according to standard build charts and par levels." },
-                    { id: "c2", title: "Recipe Adherence & Portioning", desc: "Prep items using strict scaling and recipe sheets. Never eye-ball portions." },
-                    { id: "c3", title: "FIFO Rotation", desc: "Rotate all stored line ingredients. Ensure older stock is up front and dated." },
-                    { id: "c4", title: "TEAMWORK: Cross-Station Support", desc: "Proactively assist neighboring stations to ensure line opens on time." }
+                    { id: "rng-1", title: "Range Prep & Close Start", desc: "One hour prior to close, break down veg. and poach pans and bring to dish." },
+                    { id: "rng-2", title: "Range Tops & Burners", desc: "Brush down range tops and clean under burners." },
+                    { id: "rng-3", title: "Small Grill & Traps", desc: "Clean traps for range and small grill. Shut down one oven." },
+                    { id: "rng-4", title: "Egg Station Stainless", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table." },
+                    { id: "rng-5", title: "Traulsen Interior & Racks", desc: "Clean interior of traulsen, including wire racks." },
+                    { id: "rng-6", title: "Product Rotation & Cover", desc: "Restock traulsen, ensuring that all product is rotated and covered." },
+                    { id: "rng-7", title: "Oven Foil Liners", desc: "Change foil in oven and wipe/scup interior doors of ovens." },
+                    { id: "rng-8", title: "Top Shelf Liners", desc: "Change foil liners on top shelves as needed." },
+                    { id: "rng-9", title: "Bread Restock", desc: "Restock bread as necessary, rotating product." },
+                    { id: "rng-10", title: "Walk-In Ice & Drains", desc: "Drain and ice fish in the walk-in." },
+                    { id: "rng-11", title: "Thaw Pull & Meats", desc: "Check thaw pull including all meats, fish, and other frozen product." },
+                    { id: "rng-12", title: "Line Sweep & Mop", desc: "TEAMWORK: Assist other cooks to thoroughly sweep, deck brush, and mop the line floor." },
+                    { id: "rng-13", title: "Manager Sign-Out", desc: "Check with a manager prior to clocking out and leaving your shift!" }
                 ]
-            },
+            }
+        ],
+        mid: [
             {
-                phase: "THE RUSH",
+                phase: "MID CLOSING PROCEDURES",
                 tasks: [
-                    { id: "c5", title: "Ticket Execution Speed", desc: "Maintain ticket run-times under 12 mins (lunch) / under 18 mins (dinner)." },
-                    { id: "c6", title: "Food Quality Control", desc: "Visually inspect every plate before it leaves your hands." },
-                    { id: "c7", title: "Clean-As-You-Go Sanitation", desc: "Wipe down cutting boards, clean knives, sweep floor debris mid-shift." },
-                    { id: "c8", title: "TEAMWORK: In-Rush Flexing", desc: "Call out tickets clearly and flex to help slammed teammates." }
+                    { id: "mid-1", title: "Sandwich Unit Utensils", desc: "One hour prior to close, remove all utensils from the sandwich unit." },
+                    { id: "mid-2", title: "Top Unit Interior", desc: "Clean interior (top) of unit under pans and around housing." },
+                    { id: "mid-3", title: "Lower Unit Interior", desc: "Clean interior of lower portion of the unit, including the upper shelf inside." },
+                    { id: "mid-4", title: "Unit Back & Floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it." },
+                    { id: "mid-5", title: "Pans & Rotation", desc: "Flip all pans and restock all items, making sure to properly rotate product." },
+                    { id: "mid-6", title: "Double Stock Policy", desc: "DO NOT double stock product. There should be one full pan of every item." },
+                    { id: "mid-7", title: "Unit Lid Cleaning", desc: "Clean the lid of the unit inside and out." },
+                    { id: "mid-8", title: "Microwave Interior/Exterior", desc: "Clean the microwave inside and out, including the microwave shelf." },
+                    { id: "mid-9", title: "Plates & To-Go Restock", desc: "Restock all plates and to go containers as needed." },
+                    { id: "mid-10", title: "Thaw Pull & Floors", desc: "Assist with thaw pull and floors." },
+                    { id: "mid-11", title: "Sandwich Item Coverage", desc: "Ensure that all sandwich items are covered at the end of your shift." },
+                    { id: "mid-12", title: "Manager Sign-Out", desc: "Check with a manager prior to clocking out and leaving your shift!" }
                 ]
-            },
+            }
+        ],
+        fry: [
             {
-                phase: "SHIFT CLOSE",
+                phase: "GRILL / FRY CLOSING PROCEDURES",
                 tasks: [
-                    { id: "c9", title: "Temperature Logging & Storage", desc: "Record holding temperatures. Transfer line items to clean approved pans." },
-                    { id: "c10", title: "Waste Reporting", desc: "Accurately count and report over-prepared or burned items." },
-                    { id: "c11", title: "Station Deep Clean", desc: "Scrub grills, clean fryers, sanitize low-boys to 90%+ audit standard." },
-                    { id: "c12", title: "TEAMWORK: All-Kitchen Close Out", desc: "Help remaining line stations clean up so whole team leaves together." }
+                    { id: "gf-1", title: "Pancake Batter Prep", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle." },
+                    { id: "gf-2", title: "Batter Gun Maintenance", desc: "Bring the batter gun to dish." },
+                    { id: "gf-3", title: "Lower Grill Shelf & Dials", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials." },
+                    { id: "gf-4", title: "Fryer Crumbs & Particles", desc: "Strain the fryers of excess crumbs and food particles." },
+                    { id: "gf-5", title: "Dividers & Front Panels", desc: "Wipe down the stainless dividers and the front of the fryers." },
+                    { id: "gf-6", title: "Fryolator Close Down", desc: "Close down one fryolator." },
+                    { id: "gf-7", title: "New Fry Pan & Top-Off", desc: "Sift fry flour into a new pan and top off if necessary." },
+                    { id: "gf-8", title: "Steam Tables", desc: "Clean the sink by the steam tables." },
+                    { id: "gf-9", title: "Thorough Steam Table Clean", desc: "Break down and thoroughly clean the steam tables." },
+                    { id: "gf-10", title: "Steam Table Cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart." },
+                    { id: "gf-11", title: "Sausage & Bacon Wrap", desc: "Place left over sausage and bacon with foil, label, and place on lower rack of cart." },
+                    { id: "gf-12", title: "Fryolator Oil Change Note", desc: "Make note if the fryolators need to be changed on the dry erase board." },
+                    { id: "gf-13", title: "Grill & Wall Clean", desc: "At close, clean the grill, grill rails, and wall behind the grill." },
+                    { id: "gf-14", title: "Grease Trap Maintenance", desc: "Clean the grease trap for the grill into a metal German pan." },
+                    { id: "gf-15", title: "Char Broiler & Trap", desc: "Brush down the char broiler and clean the trap." },
+                    { id: "gf-16", title: "Grease Trap to Outside", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight!" },
+                    { id: "gf-17", title: "Freezer Restock", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)." },
+                    { id: "gf-18", title: "Manager Sign-Out", desc: "Check with a manager prior to clocking out and leaving your shift!" }
                 ]
             }
         ],
@@ -62,32 +97,67 @@ const CHECKLIST_SPECS = {
         ]
     },
     es: {
-        cook: [
+        range: [
             {
-                phase: "PREPARACIÓN Y CONFIGURACIÓN",
+                phase: "PROCEDIMIENTOS DE CIERRE - RANGO",
                 tasks: [
-                    { id: "c1", title: "Mise En Place de la Estación", desc: "Preparar completamente la estación según las tablas estándar y niveles de inventario." },
-                    { id: "c2", title: "Cumplimiento de Recetas y Porcionado", desc: "Preparar artículos usando pautas estrictas de recetas. Nunca calcular al ojo." },
-                    { id: "c3", title: "Rotación FIFO", desc: "Rotar todos los ingredientes. Asegurarse de que el stock antiguo esté al frente y fechado." },
-                    { id: "c4", title: "TRABAJO EN EQUIPO: Apoyo Inter-Estaciones", desc: "Ayudar proactivamente a las estaciones vecinas para asegurar que la línea abra a tiempo." }
+                    { id: "rng-1", title: "Preparación de Rango y Inicio", desc: "Una hora antes del cierre, desmontar verduras, bandejas de poach y llevar a lavado." },
+                    { id: "rng-2", title: "Superficies y Quemadores", desc: "Cepillar las superficies del rango y limpiar debajo de los quemadores." },
+                    { id: "rng-3", title: "Parrilla Pequeña y Trampas", desc: "Limpiar trampas del rango y parrilla pequeña. Apagar un horno." },
+                    { id: "rng-4", title: "Acero Inoxidable Estación de Huevo", desc: "Limpiar todo el acero inoxidable, puertas de horno, traulsens y mesa." },
+                    { id: "rng-5", title: "Interior de Traulsen y Parrillas", desc: "Limpiar el interior del traulsen, incluyendo parrillas de alambre." },
+                    { id: "rng-6", title: "Rotación y Cubierta de Producto", desc: "Reabastecer el traulsen asegurando que todo esté rotado y cubierto." },
+                    { id: "rng-7", title: "Revestimientos de Aluminio en Horno", desc: "Cambiar aluminio en el horno y limpiar/tallar puertas interiores." },
+                    { id: "rng-8", title: "Revestimientos Superiores", desc: "Cambiar protectores de aluminio en estantes superiores según sea necesario." },
+                    { id: "rng-9", title: "Reabastecimiento de Pan", desc: "Reabastecer pan según sea necesario, rotando producto." },
+                    { id: "rng-10", title: "Hielo y Drenaje en Walk-In", desc: "Drenar y poner hielo al pescado en el walk-in." },
+                    { id: "rng-11", title: "Extracción y Carnes", desc: "Revisar extracción de carnes, pescado y otros productos congelados." },
+                    { id: "rng-12", title: "Barrido y Mop de Línea", desc: "TRABAJO EN EQUIPO: Ayudar a barrer, cepillar y trapear el piso de la línea." },
+                    { id: "rng-13", title: "Firma del Gerente", desc: "¡Consultar con un gerente antes de registrar salida y dejar su turno!" }
                 ]
-            },
+            }
+        ],
+        mid: [
             {
-                phase: "LA HORA PICO",
+                phase: "PROCEDIMIENTOS DE CIERRE - MID",
                 tasks: [
-                    { id: "c5", title: "Velocidad de Ejecución de Comandas", desc: "Mantener los tiempos de comandas bajo 12 mins (almuerzo) / 18 mins (cena)." },
-                    { id: "c6", title: "Control de Calidad de Alimentos", desc: "Inspeccionar visualmente cada plato antes de que salga de sus manos." },
-                    { id: "c7", title: "Saneamiento Limpiando Sobre la Marcha", desc: "Limpiar tablas, lavar cuchillos y cambiar cubos sanitizantes a mitad de turno." },
-                    { id: "c8", title: "TRABAJO EN EQUIPO: Flexibilidad en Hora Pico", desc: "Cantar comandas claramente y flexionar para ayudar a compañeros abrumados." }
+                    { id: "mid-1", title: "Utensilios de Unidad de Sándwich", desc: "Una hora antes del cierre, retirar todos los utensilios de la unidad." },
+                    { id: "mid-2", title: "Interior Superior de Unidad", desc: "Limpiar el interior superior de la unidad bajo las bandejas y alrededor." },
+                    { id: "mid-3", title: "Interior Inferior de Unidad", desc: "Limpiar la porción inferior de la unidad, incluyendo el estante superior." },
+                    { id: "mid-4", title: "Parte Posterior y Piso", desc: "Sacar la unidad y limpiar la parte trasera y el piso detrás de ella." },
+                    { id: "mid-5", title: "Rotación de Bandejas", desc: "Voltear bandejas y reabastecer artículos rotando adecuadamente." },
+                    { id: "mid-6", title: "Política de Stock Doble", desc: "NO duplicar stock. Debe haber una bandeja llena de cada artículo." },
+                    { id: "mid-7", title: "Limpieza de Tapa", desc: "Limpiar la tapa de la unidad por dentro y por fuera." },
+                    { id: "mid-8", title: "Microondas Interior/Exterior", desc: "Limpiar el microondas por dentro y por fuera, incluyendo su repisa." },
+                    { id: "mid-9", title: "Platos y Contenedores para Llevar", desc: "Reabastecer platos y contenedores para llevar según sea necesario." },
+                    { id: "mid-10", title: "Extracción y Pisos", desc: "Ayudar con la extracción y pisos." },
+                    { id: "mid-11", title: "Cobertura de Sándwiches", desc: "Asegurarse de que todos los artículos estén cubiertos al finalizar el turno." },
+                    { id: "mid-12", title: "Firma del Gerente", desc: "¡Consultar con un gerente antes de registrar salida y dejar su turno!" }
                 ]
-            },
+            }
+        ],
+        fry: [
             {
-                phase: "CIERRE DE TURNO",
+                phase: "PROCEDIMIENTOS DE CIERRE - GRILL / FRY",
                 tasks: [
-                    { id: "c9", title: "Registro de Temperaturas y Almacenamiento", desc: "Registrar temperaturas de mantenimiento. Transferir artículos a bandejas limpias." },
-                    { id: "c10", title: "Reporte de Desperdicios", desc: "Contar y reportar con precisión cualquier artículo preparado en exceso o quemado." },
-                    { id: "c11", title: "Limpieza Profunda de la Estación", desc: "Tallar parrillas, limpiar freidoras y desinfectar refrigeradores al 90%+ de estándar." },
-                    { id: "c12", title: "TRABAJO EN EQUIPO: Cierre General de Cocina", desc: "Ayudar a limpiar las estaciones restantes para que todo el equipo se retire en conjunto." }
+                    { id: "gf-1", title: "Preparación de Masa de Panqueques", desc: "Una hora antes, pasar la masa a un molde de 6to con cucharón." },
+                    { id: "gf-2", title: "Pistola de Masa", desc: "Llevar la pistola de masa a lavado de platos." },
+                    { id: "gf-3", title: "Estante Inferior y Perillas", desc: "Limpiar y tallar el estante inferior del grill y perillas de temperatura." },
+                    { id: "gf-4", title: "Migajas de Freidoras", desc: "Colar las freidoras de exceso de migajas y partículas de comida." },
+                    { id: "gf-5", title: "Divisores y Frente", desc: "Limpiar los divisores de acero inoxidable y el frente de las freidoras." },
+                    { id: "gf-6", title: "Apagado de Freidora", desc: "Apagar una freidora." },
+                    { id: "gf-7", title: "Harina y Relleno", desc: "Tamizar harina en un molde nuevo y rellenar si es necesario." },
+                    { id: "gf-8", title: "Fregadero de Mesas de Vapor", desc: "Limpiar el fregadero junto a las mesas de vapor." },
+                    { id: "gf-9", title: "Limpieza Profunda de Mesas", desc: "Desmontar y limpiar a fondo las mesas de vapor." },
+                    { id: "gf-10", title: "Cambros en Mesas de Vapor", desc: "Colocar producto en diez (10) cambros plásticos en el carrito." },
+                    { id: "gf-11", title: "Empaquetado de Salchicha y Tocino", desc: "Colocar restos de salchicha y tocino con aluminio, etiqueta y en estante." },
+                    { id: "gf-12", title: "Nota de Cambio de Aceite", desc: "Anotar en la pizarra si las freidoras necesitan cambio de aceite." },
+                    { id: "gf-13", title: "Limpieza de Parrilla y Pared", desc: "Al cierre, limpiar la parrilla, rieles y pared detrás de la parrilla." },
+                    { id: "gf-14", title: "Trampa de Grasa", desc: "Limpiar la trampa de grasa del grill hacia una bandeja alemana de metal." },
+                    { id: "gf-15", title: "Asador Char Broiler", desc: "Cepillar el asador char broiler y limpiar la trampa." },
+                    { id: "gf-16", title: "Traslado de Grasa al Exterior", desc: "Llevar grasa a la trampa exterior. ¡NO dejar grasa dentro durante la noche!" },
+                    { id: "gf-17", title: "Reabastecimiento de Congelador", desc: "Reabastecer congelador (papas, pollo, macarrones con queso, etc)." },
+                    { id: "gf-18", title: "Firma del Gerente", desc: "¡Consultar con un gerente antes de registrar salida y dejar su turno!" }
                 ]
             }
         ],
@@ -200,7 +270,7 @@ function handleLogin(e) {
         }
 
         if(data && data.success) {
-            currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook" };
+            currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook", station: "Range" };
             currentRoleSession = data.role;
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('app-wrapper').style.display = 'block';
@@ -288,8 +358,8 @@ function buildNavigationForRole(role) {
     if(role === 'cook') {
         tabs = [
             { id: 'shift-entry', label: currentLanguage === 'es' ? '📝 Mi Lista de Turno' : '📝 My Shift Checklist' },
-            { id: 'cook-dashboard', label: currentLanguage === 'es' ? '⭐ Mi Panel' : '⭐ My Cook Dashboard' },
-            { id: 'cook-training', label: currentLanguage === 'es' ? '🎓 Capacitación y Certs' : '🎓 Training & Certs' }
+            { id: 'cook-dashboard', label: currentLanguage === 'es' ? '⭐ Turnos Completados' : '⭐ Shifts Completed' },
+            { id: 'cook-training', label: currentLanguage === 'es' ? '🎓 Módulos de Capacitación' : '🎓 Training Modules' }
         ];
     } else if(role === 'manager') {
         tabs = [
@@ -451,16 +521,56 @@ function onEmployeeChanged() {
     renderChecklistForm();
 }
 
+function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
+    const specs = CHECKLIST_SPECS[lang] || CHECKLIST_SPECS['en'];
+    if (roleType === 'manager') return specs['manager'];
+
+    let targetStation = 'range';
+    if (currentRoleSession === 'cook' && currentUser) {
+        targetStation = (currentUser.station || 'range').toLowerCase();
+    } else {
+        const selectedOpt = document.getElementById('staff-select')?.selectedOptions[0]?.textContent || '';
+        targetStation = selectedOpt.toLowerCase();
+    }
+
+    const d = new Date(dateStr || Date.now());
+    const dayOfWeek = d.getDay();
+    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+    if (isWeekend) {
+        if (targetStation.includes('mid')) return specs['mid'];
+        if (targetStation.includes('fry') || targetStation.includes('grill')) return specs['fry'];
+        return specs['range'];
+    } else {
+        let combinedSections = [];
+        if (targetStation.includes('mid') || targetStation.includes('fry') || targetStation.includes('grill')) {
+            combinedSections = JSON.parse(JSON.stringify(specs['fry']));
+            const midTasks = specs['mid'][0].tasks;
+            const otherHalfMid = midTasks.slice(Math.ceil(midTasks.length / 2));
+            combinedSections.push({ phase: "MID STATION SPLIT (GRILL/FRY)", tasks: otherHalfMid });
+            return combinedSections;
+        } else {
+            combinedSections = JSON.parse(JSON.stringify(specs['range']));
+            const midTasks = specs['mid'][0].tasks;
+            const halfMid = midTasks.slice(0, Math.ceil(midTasks.length / 2));
+            combinedSections.push({ phase: "MID STATION SPLIT (RANGE)", tasks: halfMid });
+            return combinedSections;
+        }
+    }
+}
+
 function renderChecklistForm() {
     const auditSelect = document.getElementById('gm-shift-audit-select');
     if(auditSelect && auditSelect.value) return;
 
-    const roleType = currentRoleSession === 'cook' ? 'cook' : (document.getElementById('checklist-role-select')?.value || 'cook');
+    const roleType = currentRoleSession === 'cook' ? 'cook' : (document.getElementById('checklist-role-select')?.value || 'range');
+    const shiftDate = document.getElementById('cook-shift-date')?.value || document.getElementById('shift-date')?.value;
+    
     const container = document.getElementById('checklist-container');
     if(!container) return;
     container.innerHTML = '';
 
-    const specs = CHECKLIST_SPECS[currentLanguage][roleType] || CHECKLIST_SPECS[currentLanguage]['cook'];
+    const specs = getActiveChecklistSpecsForDate(shiftDate, roleType, currentLanguage);
 
     specs.forEach(sec => {
         const secDiv = document.createElement('div');
@@ -513,7 +623,7 @@ function loadSubmittedShiftAudit() {
     if(!container) return;
     container.innerHTML = '';
 
-    const specs = CHECKLIST_SPECS[currentLanguage][shift.role] || CHECKLIST_SPECS[currentLanguage]['cook'];
+    const specs = getActiveChecklistSpecsForDate(shift.date, shift.role, currentLanguage);
 
     specs.forEach(sec => {
         const secDiv = document.createElement('div');
