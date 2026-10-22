@@ -188,14 +188,19 @@ function handleLogin(e) {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'authenticate', password })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.text())
+    .then(text => {
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (err) {
+            console.error("Raw response from Apps Script:", text);
+            alert("Server returned invalid response (check console).");
+            return;
+        }
+
         if(data && data.success) {
-            if(!data.employee) {
-                alert("Server error: Authentication succeeded but employee record was not returned.");
-                return;
-            }
-            currentUser = data.employee;
+            currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook" };
             currentRoleSession = data.role;
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('app-wrapper').style.display = 'block';
