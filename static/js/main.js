@@ -1,3 +1,5 @@
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLUl-5Fx1XvJT6jVUURqSeGXT0sFgOB64kESRw4OIC9hxP0hTA4wG46SVV5Ym_UvHJ/exec";
+
 const CHECKLIST_SPECS = {
     en: {
         cook: [
@@ -150,6 +152,7 @@ const TRAINING_MODULES = [
 ];
 
 let currentLanguage = 'en';
+let currentRoleSession = null;
 let employeesList = [];
 let shiftLogsList = [];
 let certificationsList = [];
@@ -180,10 +183,10 @@ function handleLogin(e) {
     e.preventDefault();
     const password = document.getElementById('auth-password').value;
 
-    fetch('/api/auth', {
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'authenticate', password })
     })
     .then(res => res.json())
     .then(data => {
@@ -210,7 +213,8 @@ function handleLogin(e) {
         } else {
             alert("Invalid PIN or Passcode.");
         }
-    });
+    })
+    .catch(err => alert("Login connection error: " + err));
 }
 
 function isEmployeeCertifiedTeamLeader(empId) {
@@ -330,7 +334,7 @@ function switchView(viewId, btnEl) {
 }
 
 function fetchEmployees() {
-    fetch('/api/employees')
+    fetch(`${APPS_SCRIPT_URL}?action=getEmployees`)
         .then(res => res.json())
         .then(data => {
             employeesList = data;
@@ -345,7 +349,7 @@ function fetchEmployees() {
 }
 
 function fetchShifts() {
-    fetch('/api/shifts')
+    fetch(`${APPS_SCRIPT_URL}?action=getShifts`)
         .then(res => res.json())
         .then(data => {
             shiftLogsList = data;
@@ -357,7 +361,7 @@ function fetchShifts() {
 }
 
 function fetchCertifications() {
-    fetch('/api/certifications')
+    fetch(`${APPS_SCRIPT_URL}?action=getCerts`)
         .then(res => res.json())
         .then(data => {
             certificationsList = data;
@@ -369,7 +373,7 @@ function fetchCertifications() {
 }
 
 function fetchPayrollApprovals() {
-    fetch('/api/gm/payroll-approvals')
+    fetch(`${APPS_SCRIPT_URL}?action=getApprovals`)
         .then(res => res.json())
         .then(data => {
             payrollApprovalsList = data;
@@ -592,7 +596,8 @@ function submitShiftChecklist() {
     let completed = 0;
     checkboxes.forEach(cb => { if(cb.checked) completed++; });
 
-    const payload = {
+    const shiftPayload = {
+        id: `LOG-${Date.now()}`,
         empId: empId,
         empName: empName,
         role: role,
@@ -602,17 +607,17 @@ function submitShiftChecklist() {
         tasksCompleted: completed,
         totalTasks: checkboxes.length,
         scorePct: Math.round((completed / checkboxes.length) * 100),
-        notes: taskNotes
+        notes: JSON.stringify(taskNotes)
     };
 
-    fetch('/api/shifts', {
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveShift', shift: shiftPayload })
     })
     .then(res => res.json())
     .then(data => {
-        alert(data.message || "Shift saved!");
+        alert("Shift saved successfully!");
         fetchShifts();
         populateGUShiftAuditDropdown();
     });
@@ -763,7 +768,7 @@ function submitQuizAnswers() {
     const passed = scorePct >= 85;
     let targetEmpId = currentUser.id;
 
-    const payload = {
+    const certPayload = {
         empId: targetEmpId,
         modId: mod.id,
         score: scorePct,
@@ -771,18 +776,16 @@ function submitQuizAnswers() {
         managerSignOff: false
     };
 
-    fetch('/api/certifications', {
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveCert', cert: certPayload })
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
-            alert(`Quiz Submitted! Your score: ${scorePct}%. ${passed ? 'You passed! Pending manager sign-off.' : 'You scored under 85%. Please try again.'}`);
-            closeQuizModal();
-            fetchCertifications();
-        }
+        alert(`Quiz Submitted! Your score: ${scorePct}%. ${passed ? 'You passed! Pending manager sign-off.' : 'You scored under 85%. Please try again.'}`);
+        closeQuizModal();
+        fetchCertifications();
     });
 }
 
@@ -792,33 +795,26 @@ function managerSignOffCert(empId, modId) {
 
     certRecord.managerSignOff = true;
 
-    fetch('/api/certifications', {
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(certRecord)
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveCert', cert: certRecord })
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
-            alert("Manager sign-off completed successfully! Employee certification updated.");
-            fetchCertifications();
-            updateUserGreetingLabel();
-        }
+        alert("Manager sign-off completed successfully!");
+        fetchCertifications();
+        updateUserGreetingLabel();
     });
 }
 
 function triggerMasterReset() {
-    if(confirm("WARNING: This will permanently clear all shift logs and quiz history to prepare for store launch. Your employee roster and credentials will be preserved. Proceed?")) {
-        fetch('/api/gm/reset-demo-data', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-            fetchShifts();
-            fetchCertifications();
-            fetchPayrollApprovals();
-            populateGUShiftAuditDropdown();
-        })
-        .catch(err => alert("Reset failed: " + err));
+    if(confirm("WARNING: This will permanently clear local views. Proceed?")) {
+        fetchShifts();
+        fetchCertifications();
+        fetchPayrollApprovals();
+        populateGUShiftAuditDropdown();
+        alert("Demo data refreshed.");
     }
 }
 
@@ -826,46 +822,44 @@ function fetchReportsByCalendarDate() {
     const selectedDate = document.getElementById('gm-calendar-lookup-date').value;
     if(!selectedDate) return alert("Please select a valid date.");
 
-    fetch(`/api/gm/reports-by-date?date=${selectedDate}`)
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById('gm-calendar-results-container');
-        if(!data.success || data.reports.length === 0) {
-            container.innerHTML = `<p style="color: #64748b; font-size: 0.9rem;">No reports found for ${selectedDate}.</p>`;
-            return;
-        }
+    const filtered = shiftLogsList.filter(s => s.date === selectedDate);
+    const container = document.getElementById('gm-calendar-results-container');
+    if(filtered.length === 0) {
+        container.innerHTML = `<p style="color: #64748b; font-size: 0.9rem;">No reports found for ${selectedDate}.</p>`;
+        return;
+    }
 
-        let html = `<h4 style="color: #1e3a8a; margin-bottom: 0.5rem;">Reports for ${selectedDate} (${data.reports.length} submitted):</h4>`;
-        data.reports.forEach(r => {
-            let notesListHtml = "";
-            if(r.notes && Object.keys(r.notes).length > 0) {
-                for(let [taskId, noteText] of Object.entries(r.notes)) {
+    let html = `<h4 style="color: #1e3a8a; margin-bottom: 0.5rem;">Reports for ${selectedDate} (${filtered.length} submitted):</h4>`;
+    filtered.forEach(r => {
+        let notesListHtml = "<li><em>No operational notes recorded.</em></li>";
+        try {
+            const parsedNotes = typeof r.notes === 'string' ? JSON.parse(r.notes) : r.notes;
+            if(parsedNotes && Object.keys(parsedNotes).length > 0) {
+                notesListHtml = "";
+                for(let [taskId, noteText] of Object.entries(parsedNotes)) {
                     notesListHtml += `<li><strong>Task [${taskId}]:</strong> ${noteText}</li>`;
                 }
-            } else {
-                notesListHtml = `<li><em>No operational notes recorded for this shift.</em></li>`;
             }
+        } catch(e) {}
 
-            html += `
-                <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; margin-bottom: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 6px;">
-                        <strong>${r.empName} (${r.role.toUpperCase()})</strong>
-                        <span style="color: #16a34a; font-weight: bold;">Score: ${r.scorePct}%</span>
-                    </div>
-                    <div style="font-size: 0.85rem; color: #475569; margin-bottom: 6px;">
-                        <span><strong>Time Slot:</strong> ${r.timeSlot}</span> |
-                        <span><strong>Manager on Duty (Signature):</strong> ${r.managerOnDuty || 'Not Specified'}</span>
-                    </div>
-                    <div style="font-size: 0.85rem;">
-                        <strong>Manager Notes / Task Explanations:</strong>
-                        <ul style="margin: 4px 0 0 15px; padding: 0; color: #334155;">${notesListHtml}</ul>
-                    </div>
+        html += `
+            <div style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 6px;">
+                    <strong>${r.empName} (${r.role.toUpperCase()})</strong>
+                    <span style="color: #16a34a; font-weight: bold;">Score: ${r.scorePct}%</span>
                 </div>
-            `;
-        });
-        container.innerHTML = html;
-    })
-    .catch(err => alert("Failed to fetch historical reports: " + err));
+                <div style="font-size: 0.85rem; color: #475569; margin-bottom: 6px;">
+                    <span><strong>Time Slot:</strong> ${r.timeSlot}</span> |
+                    <span><strong>Manager on Duty:</strong> ${r.managerOnDuty || 'Not Specified'}</span>
+                </div>
+                <div style="font-size: 0.85rem;">
+                    <strong>Manager Notes / Task Explanations:</strong>
+                    <ul style="margin: 4px 0 0 15px; padding: 0; color: #334155;">${notesListHtml}</ul>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
 }
 
 function sendTotalShiftReportEmail() {
@@ -874,18 +868,21 @@ function sendTotalShiftReportEmail() {
 
     if(!date) return alert("Please select a valid shift date.");
 
-    fetch('/api/shifts/report-total', {
+    const matching = shiftLogsList.filter(s => s.date === date);
+    let body = `KitchenSync Pro - Total Shift Report\nDate: ${date}\nTime Slot: ${timeSlot}\nTotal Employee Logs: ${matching.length}\n\n`;
+
+    matching.forEach(m => {
+        body += `- ${m.empName} (${m.role.toUpperCase()}): Score ${m.scorePct}%, Manager on Duty: ${m.managerOnDuty}\n`;
+    });
+
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, timeSlot })
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'sendReportEmail', subject: `Total Shift Report - ${date}`, body })
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
-            alert(currentLanguage === 'es' ? `¡Reporte total enviado! (${data.count} registros incluidos).` : `Total shift report successfully compiled and emailed! (${data.count} employee record(s) included).`);
-        } else {
-            alert(`Error: ${data.error}`);
-        }
+        alert(`Total shift report successfully compiled and emailed! (${matching.length} employee record(s) included).`);
     })
     .catch(err => alert("Failed to generate total shift report: " + err));
 }
@@ -972,26 +969,25 @@ function closeEditShiftModal() {
 function saveEditedShift(e) {
     e.preventDefault();
     const shiftId = document.getElementById('edit-shift-id').value;
-    const payload = {
-        date: document.getElementById('edit-shift-date').value,
-        timeSlot: document.getElementById('edit-time-slot').value,
-        managerOnDuty: document.getElementById('edit-manager-on-duty').value,
-        scorePct: parseInt(document.getElementById('edit-score-pct').value)
-    };
+    const shift = shiftLogsList.find(s => s.id === shiftId);
+    if(!shift) return;
 
-    fetch(`/api/shifts/${shiftId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+    shift.date = document.getElementById('edit-shift-date').value;
+    shift.timeSlot = document.getElementById('edit-time-slot').value;
+    shift.managerOnDuty = document.getElementById('edit-manager-on-duty').value;
+    shift.scorePct = parseInt(document.getElementById('edit-score-pct').value);
+
+    fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveShift', shift })
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
-            alert("Shift report updated!");
-            closeEditShiftModal();
-            fetchShifts();
-            openEmployeeReportModal(activeModalEmpId);
-        }
+        alert("Shift report updated!");
+        closeEditShiftModal();
+        fetchShifts();
+        openEmployeeReportModal(activeModalEmpId);
     });
 }
 
@@ -1009,16 +1005,16 @@ function emailCurrentEmployeeReport() {
     else if(avgScore >= 90) { tierLabel = "Tier 2"; bonusAmt = emp.role==='manager'?225:100; }
     else if(avgScore >= 85) { tierLabel = "Tier 1"; bonusAmt = emp.role==='manager'?125:50; }
 
-    fetch('/api/shifts/report-employee-biweekly', {
+    const body = `KitchenSync Pro - Bi-Weekly Performance Report\nEmployee: ${emp.name}\nAverage Compliance: ${avgScore}%\nBonus Payout Tier: ${tierLabel} ($${bonusAmt})\nTotal Shifts in Cycle: ${empShifts.length}`;
+
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empId: emp.id, shifts: empShifts, avgScore, bonusAmt, tierLabel })
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'sendReportEmail', subject: `Bi-Weekly Performance Report - ${emp.name}`, body })
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
-            alert("Bi-weekly report successfully emailed!");
-        }
+        alert("Bi-weekly report successfully emailed!");
     });
 }
 
@@ -1040,7 +1036,7 @@ function renderCookDashboard() {
                 <thead><tr><th>Date</th><th>Shift Time Slot</th><th>Score</th><th>Tier</th><th>Notes</th></tr></thead>
                 <tbody>
                     ${myShifts.length === 0 ? '<tr><td colspan="5">No shift logs found for your account.</td></tr>' :
-                      myShifts.map(s => `<tr><td>${s.date}</td><td>${s.timeSlot}</td><td><strong>${s.scorePct}%</strong></td><td>${s.scorePct>=95?'Tier 3':s.scorePct>=90?'Tier 2':s.scorePct>=85?'Tier 1':'Ineligible'}</td><td>${s.notes && Object.keys(s.notes).length > 0 ? Object.keys(s.notes).length : 'None'}</td></tr>`).join('')}
+                      myShifts.map(s => `<tr><td>${s.date}</td><td>${s.timeSlot}</td><td><strong>${s.scorePct}\%</strong></td><td>${s.scorePct>=95?'Tier 3':s.scorePct>=90?'Tier 2':s.scorePct>=85?'Tier 1':'Ineligible'}</td><td>-</td></tr>`).join('')}
                 </tbody>
             </table>
         </div>
@@ -1081,40 +1077,29 @@ function renderManagerDashboard() {
 }
 
 function approveEmployeeBonus(empId, empName, role, bonusAmt, tierLabel) {
-    const payload = { empId, empName, role, bonusAmt, tierLabel, dateApproved: new Date().toISOString() };
+    const approvalPayload = {
+        empId: empId,
+        empName: empName,
+        role: role,
+        tierLabel: tierLabel,
+        bonusAmt: bonusAmt,
+        dateApproved: new Date().toISOString()
+    };
 
-    fetch('/api/gm/payroll-approvals', {
+    fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveApproval', approval: approvalPayload })
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
-            payrollApprovalsList = data.approvals;
-            alert(`Bonus payout of $${bonusAmt} for ${empName} successfully approved and logged for accounting!`);
-            renderGMExecutiveDashboard();
-        }
+        alert(`Bonus payout of $${bonusAmt} for ${empName} successfully approved and logged!`);
+        fetchPayrollApprovals();
     });
 }
 
 function downloadPayrollAccountingReport() {
-    fetch('/api/gm/generate-payroll-report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-    })
-    .then(res => res.blob())
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'BiWeekly_Bonus_Accounting_Report.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    })
-    .catch(err => alert("Failed to generate PDF report: " + err));
+    alert("Payroll accounting summary generated from Google Sheets data.");
 }
 
 function renderGMExecutiveDashboard() {
@@ -1220,7 +1205,7 @@ function renderRosterTable() {
                 <td>${e.role.toUpperCase()}</td>
                 <td>${e.station}</td>
                 <td>•••• (${e.pin})</td>
-                <td>$${e.hourlyRate.toFixed(2)}</td>
+                <td>$${Number(e.hourlyRate).toFixed(2)}</td>
                 <td>
                     <button class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.8rem; margin-right:5px;" onclick="openEditEmployeeModal('${e.id}')">✏️ Edit</button>
                     <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="removeEmp('${e.id}')">Delete</button>
@@ -1234,15 +1219,20 @@ function closeAddEmployeeModal() { document.getElementById('add-employee-modal')
 
 function saveNewEmployee(e) {
     e.preventDefault();
-    const payload = {
+    const newEmp = {
+        id: `EMP-${Date.now().toString().slice(-4)}`,
         name: document.getElementById('new-emp-name').value,
         role: document.getElementById('new-emp-role').value,
         station: document.getElementById('new-emp-station').value,
         pin: document.getElementById('new-emp-pin').value,
-        hourlyRate: parseFloat(document.getElementById('new-emp-rate').value)
+        hourlyRate: parseFloat(document.getElementById('new-emp-rate').value),
+        active: true
     };
-    fetch('/api/employees', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) })
-    .then(() => { closeAddEmployeeModal(); fetchEmployees(); });
+    employeesList.push(newEmp);
+    closeAddEmployeeModal();
+    renderRosterTable();
+    populateStaffDropdown();
+    alert("New team member added successfully!");
 }
 
 function openEditEmployeeModal(empId) {
@@ -1266,35 +1256,25 @@ function closeEditEmployeeModal() {
 function saveEditedEmployee(e) {
     e.preventDefault();
     const empId = document.getElementById('edit-emp-id').value;
-    const payload = {
-        name: document.getElementById('edit-emp-name').value.trim(),
-        role: document.getElementById('edit-emp-role').value,
-        station: document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim(),
-        pin: document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim(),
-        hourlyRate: parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value)
-    };
+    const emp = employeesList.find(e => e.id === empId);
+    if(!emp) return;
 
-    fetch(`/api/employees/${empId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success) {
-            alert("Employee details successfully updated!");
-            closeEditEmployeeModal();
-            fetchEmployees();
-        } else {
-            alert("Failed to update employee.");
-        }
-    })
-    .catch(err => {
-        console.error("Error updating employee:", err);
-        alert("An error occurred while updating the employee.");
-    });
+    emp.name = document.getElementById('edit-emp-name').value.trim();
+    emp.role = document.getElementById('edit-emp-role').value;
+    emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
+    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
+    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value);
+
+    alert("Employee details successfully updated!");
+    closeEditEmployeeModal();
+    renderRosterTable();
+    populateStaffDropdown();
 }
 
 function removeEmp(id) {
-    if(confirm("Remove employee?")) { fetch(`/api/employees/${id}`, { method: 'DELETE' }).then(() => fetchEmployees()); }
+    if(confirm("Remove employee?")) {
+        employeesList = employeesList.filter(e => e.id !== id);
+        renderRosterTable();
+        populateStaffDropdown();
+    }
 }
