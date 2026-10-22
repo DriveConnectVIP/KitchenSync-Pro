@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitchenSync Pro | Operations & Bi-Weekly Bonus Management</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- PASSWORD AUTHENTICATION OVERLAY -->
+    <div id="auth-modal" class="modal-backdrop" style="display: flex;">
+        <div class="modal-box auth-box">
+            <h2>🔒 KitchenSync Pro Portal</h2>
+            <p>Enter your 4-digit POS PIN (Last 4 of SSN) or GM Master Passcode to log in.</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Enter PIN / Passcode:</label>
+                    <input type="password" id="auth-password" required placeholder="Enter passcode..." style="font-size: 1.2rem; letter-spacing: 2px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Unlock Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" style="display: none;">
+        <header class="app-header">
+            <div class="logo-area">
+                <img src="static/kitchensynclogo.jpg" alt="KitchenSync Pro Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>KitchenSync Pro</h1>
+                    <span class="subtext" id="logged-in-user-label">Logged in securely</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="pay-period-badge">
+                    <span>Pay Period:</span>
+                    <strong>Mon - Sun Cycle</strong>
+                </div>
+                <button class="btn btn-secondary" id="lang-toggle-btn" onclick="toggleLanguage()" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background:#f1f5f9; color:#0f172a;">🇪🇸 Español</button>
+                <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="logoutSession()">🔒 Lock / Logout</button>
+            </div>
+        </header>
+
+        <nav class="nav-tabs" id="nav-tabs-container"></nav>
+
+        <main class="content-container">
+            <!-- VIEW 1: SHIFT ENTRY CHECKLIST -->
+            <section id="view-shift-entry" class="app-view active">
+                <div class="panel-header">
+                    <h2>Daily Operational Checklist & Shift Log</h2>
+                    <div class="btn-group" id="checklist-btn-group"></div>
+                </div>
+
+                <div id="gm-review-selector-card" class="card meta-card" style="display: none; background: #f8fafc; border: 1px solid #cbd5e1; margin-bottom: 1rem;">
+                    <h3 style="margin-top: 0; color: #1e3a8a; font-size: 1.1rem;">🔍 Live & Historical Shift Review Audit</h3>
+                    <p style="font-size: 0.85rem; color: #64748b;">Select a submitted employee shift log below to inspect their exact filled-out checklist, task statuses, and manager-on-duty notes in real-time.</p>
+                    <div class="form-grid-3" style="margin-top: 0.8rem;">
+                        <div class="form-group" style="margin: 0;">
+                            <label>Select Submitted Shift Log:</label>
+                            <select id="gm-shift-audit-select" onchange="loadSubmittedShiftAudit()">
+                                <option value="">-- Choose a submitted shift report --</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button type="button" class="btn btn-secondary" onclick="resetToChecklistEntryMode()">📝 Create / Fill New Checklist</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cook-checklist-header" class="card meta-card" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h3 id="cook-welcome-heading" style="margin: 0; color: #1e3a8a; font-size: 1.4rem;">Hello!</h3>
+                            <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #64748b;">Complete your daily operational checklist below.</p>
+                        </div>
+                        <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                            <div class="form-group" style="margin: 0;">
+                                <label style="font-size: 0.80rem; font-weight: bold; color: #475569;">Shift Date:</label>
+                                <input type="date" id="cook-shift-date" style="padding: 0.4rem; font-size: 0.9rem;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label style="font-size: 0.80rem; font-weight: bold; color: #475569;">Manager on Duty (Signature / Name):</label>
+                                <input type="text" id="cook-manager-signature" placeholder="Manager signature..." style="padding: 0.4rem; font-size: 0.9rem; min-width: 200px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="standard-meta-card" class="card meta-card">
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Role Checklist:</label>
+                            <select id="checklist-role-select" onchange="populateStaffDropdown()">
+                                <option value="cook">Kitchen Cook Operational Checklist</option>
+                                <option value="manager">Shift Manager Operational Checklist</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Employee Name:</label>
+                            <select id="staff-select" onchange="onEmployeeChanged()"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Manager on Duty:</label>
+                            <input type="text" id="manager-on-duty" placeholder="e.g. Sarah Jenkins">
+                        </div>
+                        <div class="form-group">
+                            <label>Shift Time Breakdown:</label>
+                            <select id="shift-time-slot">
+                                <option value="Day Shift (7:00 AM - 2:30 PM)">Day Shift (7:00 AM - 2:30 PM)</option>
+                                <option value="Night Shift Sun-Thu (2:00 PM - 8:30 PM)">Night Shift Sun-Thu (2:00 PM - 8:30 PM)</option>
+                                <option value="Night Shift Fri-Sat (2:00 PM - 9:30 PM)">Night Shift Fri-Sat (2:00 PM - 9:30 PM)</option>
+                                <option value="Double / Mid-Shift Split">Double / Mid-Shift Split (Extended)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Shift Date:</label>
+                            <input type="date" id="shift-date">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="checklist-container" class="checklist-grid"></div>
+
+                <div class="card score-summary-card">
+                    <h3>Shift Execution Score & Goal Progress</h3>
+                    <div class="score-display">
+                        <div class="metric"><span class="label">Completed Tasks</span><span id="score-tasks-count" class="val">0 / 0</span></div>
+                        <div class="metric"><span class="label">Compliance Percentage</span><span id="score-percentage" class="val highlight">0%</span></div>
+                        <div class="metric"><span class="label">Shift Bonus Tier</span><span id="score-bonus-tier" class="val badge">Tier 0 (Ineligible)</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 2: COOK DASHBOARD -->
+            <section id="view-cook-dashboard" class="app-view">
+                <h2>Cook Personal Performance & Bonus Tracker</h2>
+                <div id="cook-dashboard-content"></div>
+            </section>
+
+            <!-- VIEW 3: TRAINING & CERTIFICATION -->
+            <section id="view-cook-training" class="app-view">
+                <h2 id="training-view-heading">Training Modules & Mandatory Certifications</h2>
+                <div class="card">
+                    <div id="training-modules-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;"></div>
+                </div>
+            </section>
+
+            <!-- VIEW 4: SHIFT MANAGER DASHBOARD -->
+            <section id="view-manager-dashboard" class="app-view">
+                <h2>Shift Manager Oversight Dashboard</h2>
+                <div id="manager-dashboard-content"></div>
+            </section>
+
+            <!-- VIEW 5: GENERAL MANAGER EXECUTIVE DASHBOARD -->
+            <section id="view-gm-dashboard" class="app-view">
+                <div class="panel-header">
+                    <h2>General Manager Executive Suite & Live Readiness</h2>
+                    <button class="btn btn-danger" style="background:#dc2626; color:white;" onclick="triggerMasterReset()">⚠️ Master Reset (Clear Demo Data)</button>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
+                    <h3 style="margin-top: 0; color: #1e3a8a;">📅 Historical Report & Manager Notes Calendar Lookup</h3>
+                    <p style="font-size: 0.85rem; color: #64748b;">Select any calendar date to review submitted shift reports, compliance scores, and notes left by managers on duty.</p>
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem; flex-wrap: wrap;">
+                        <div class="form-group" style="margin: 0;">
+                            <label>Select Date:</label>
+                            <input type="date" id="gm-calendar-lookup-date" style="padding: 0.4rem; font-size: 0.9rem;">
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 1.2rem;" onclick="fetchReportsByCalendarDate()">🔍 Load Date Reports</button>
+                    </div>
+                    <div id="gm-calendar-results-container" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="card chart-card">
+                        <h3>14-Day Store Compliance Trend (%)</h3>
+                        <canvas id="chart-execution"></canvas>
+                    </div>
+                    <div class="card chart-card">
+                        <h3>Bi-Weekly Bonus Pool Payout Allocation</h3>
+                        <canvas id="chart-bonus"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Bi-Weekly Payroll Summary & Bonus Authorization</h3>
+                        <button class="btn btn-primary" style="background: #16a34a;" onclick="downloadPayrollAccountingReport()">📥 Download Accounting Bonus PDF Report</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Employee</th><th>Role</th><th>Shifts Logged</th><th>Avg Compliance</th><th>Bonus Payout Tier</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="gm-payroll-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 6: ROSTER MANAGEMENT (GM ONLY) -->
+            <section id="view-roster" class="app-view">
+                <div class="panel-header">
+                    <h2>Staff Roster & Credential Onboarding (GM Only)</h2>
+                    <button class="btn btn-primary" onclick="openAddEmployeeModal()">➕ Onboard New Team Member</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>ID</th><th>Full Name</th><th>Role</th><th>Station</th><th>POS PIN (Last 4 SSN)</th><th>Base Rate</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="roster-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: QUIZ INTERACTIVE POPUP -->
+    <div id="quiz-modal" class="modal-backdrop">
+        <div class="modal-box report-modal-box">
+            <div class="modal-header">
+                <h3 id="quiz-modal-title">Training Quiz</h3>
+                <button class="close-btn" onclick="closeQuizModal()">&times;</button>
+            </div>
+            <div id="quiz-modal-body" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
+            <div class="modal-footer" style="margin-top: 1rem; text-align: right;">
+                <button type="button" class="btn btn-secondary" onclick="closeQuizModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitQuizAnswers()">Submit Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EMPLOYEE PERFORMANCE REPORT -->
+    <div id="employee-report-modal" class="modal-backdrop">
+        <div class="modal-box report-modal-box">
+            <div class="modal-header">
+                <h3 id="report-modal-title">Bi-Weekly Employee Performance Report</h3>
+                <button class="close-btn" onclick="closeEmployeeReportModal()">&times;</button>
+            </div>
+            <div id="employee-report-body" style="max-height: 65vh; overflow-y: auto; padding-right: 5px;"></div>
+            <div class="modal-footer" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 0.8rem;">
+                <button type="button" class="btn" style="background:#dbeafe; color:#1e40af;" onclick="emailCurrentEmployeeReport()">📧 Email Bi-Weekly Report</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEmployeeReportModal()">Close Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT SHIFT REPORT -->
+    <div id="edit-shift-modal" class="modal-backdrop">
+        <div class="modal-box report-modal-box">
+            <div class="modal-header">
+                <h3>Edit Shift Report</h3>
+                <button class="close-btn" onclick="closeEditShiftModal()">&times;</button>
+            </div>
+            <form onsubmit="saveEditedShift(event)">
+                <input type="hidden" id="edit-shift-id">
+                <div class="form-group"><label>Employee:</label><input type="text" id="edit-emp-name" readonly style="background:#f1f5f9;"></div>
+                <div class="form-group"><label>Date:</label><input type="date" id="edit-shift-date" required></div>
+                <div class="form-group"><label>Time Slot:</label>
+                    <select id="edit-time-slot">
+                        <option value="Day Shift (7:00 AM - 2:30 PM)">Day Shift (7:00 AM - 2:30 PM)</option>
+                        <option value="Night Shift Sun-Thu (2:00 PM - 8:30 PM)">Night Shift Sun-Thu (2:00 PM - 8:30 PM)</option>
+                        <option value="Night Shift Fri-Sat (2:00 PM - 9:30 PM)">Night Shift Fri-Sat (2:00 PM - 9:30 PM)</option>
+                        <option value="Double / Mid-Shift Split">Double / Mid-Shift Split (Extended)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Manager on Duty:</label><input type="text" id="edit-manager-on-duty" required></div>
+                <div class="form-group"><label>Compliance Score (%):</label><input type="number" min="0" max="100" id="edit-score-pct" required></div>
+                <div class="form-group"><label>Notes / Explanations:</label><textarea id="edit-notes-text" rows="4" style="width:100%; padding:0.5rem;"></textarea></div>
+                <div class="modal-footer" style="margin-top:1rem; text-align:right;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditShiftModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TASK NOTE POP-UP -->
+    <div id="task-note-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-task-title-heading">Add Note</h3>
+                <button class="close-btn" onclick="closeTaskNoteModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Operational Note / Explanation:</label>
+                <textarea id="task-note-textarea" rows="4" placeholder="Enter details, temperature logs, or explanation..." style="width:100%; padding:0.5rem; border:1px solid var(--card-border); border-radius:4px;"></textarea>
+            </div>
+            <div class="modal-footer" style="margin-top:1rem; display:flex; justify-content:flex-end; gap:0.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeTaskNoteModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveTaskNote()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Onboard New Employee (GM Only) -->
+    <div id="add-employee-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Onboard New Team Member & Create Login</h3>
+                <button class="close-btn" type="button" onclick="closeAddEmployeeModal()">&times;</button>
+            </div>
+            <form id="add-employee-form" onsubmit="saveNewEmployee(event)">
+                <div class="form-group"><label>Full Name:</label><input type="text" id="new-emp-name" required></div>
+                <div class="form-group"><label>Role:</label>
+                    <select id="new-emp-role" required>
+                        <option value="cook">Kitchen Cook</option>
+                        <option value="manager">Shift Manager</option>
+                        <option value="gm">General Manager</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Station:</label><input type="text" id="new-emp-station" required placeholder="Grill / Line"></div>
+
+                <div class="form-group">
+                    <label>4-Digit POS Login (Last 4 of SSN):</label>
+                    <input type="password" maxlength="4" id="new-emp-pin" required placeholder="e.g. 1980" style="letter-spacing: 2px;">
+                    <small style="color: #64748b; font-size: 0.75rem;">This serves as the employee's secure portal access PIN.</small>
+                </div>
+
+                <div class="form-group"><label>Hourly Rate ($):</label><input type="number" step="0.25" id="new-emp-rate" required></div>
+
+                <div class="modal-footer" style="margin-top:1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddEmployeeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save & Create Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT EMPLOYEE (GM ONLY) -->
+    <div id="edit-employee-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Edit Team Member Credentials</h3>
+                <button class="close-btn" type="button" onclick="closeEditEmployeeModal()">&times;</button>
+            </div>
+            <form id="edit-employee-form" onsubmit="saveEditedEmployee(event)">
+                <input type="hidden" id="edit-emp-id">
+                <div class="form-group"><label>Full Name:</label><input type="text" id="edit-emp-name" required></div>
+                <div class="form-group"><label>Role:</label>
+                    <select id="edit-emp-role" required>
+                        <option value="cook">Kitchen Cook</option>
+                        <option value="manager">Shift Manager</option>
+                        <option value="gm">General Manager</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Station:</label><input type="text" id="edit-emp-station" required></div>
+                <div class="form-group">
+                    <label>4-Digit POS Login (Last 4 of SSN):</label>
+                    <input type="password" maxlength="4" id="edit-emp-pin" required style="letter-spacing: 2px;">
+                </div>
+                <div class="form-group"><label>Hourly Rate ($):</label><input type="number" step="0.25" id="edit-emp-rate" required></div>
+                <div class="modal-footer" style="margin-top:1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditEmployeeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="static/js/main.js"></script>
+</body>
+</html>
