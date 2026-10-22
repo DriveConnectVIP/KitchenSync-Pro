@@ -190,7 +190,11 @@ function handleLogin(e) {
     })
     .then(res => res.json())
     .then(data => {
-        if(data.success) {
+        if(data && data.success) {
+            if(!data.employee) {
+                alert("Server error: Authentication succeeded but employee record was not returned.");
+                return;
+            }
             currentUser = data.employee;
             currentRoleSession = data.role;
             document.getElementById('auth-modal').style.display = 'none';
@@ -211,12 +215,11 @@ function handleLogin(e) {
 
             buildNavigationForRole(currentRoleSession);
         } else {
-            alert("Invalid PIN or Passcode.");
+            alert(data && data.error ? data.error : "Invalid PIN or Passcode.");
         }
     })
     .catch(err => alert("Login connection error: " + err));
 }
-
 function isEmployeeCertifiedTeamLeader(empId) {
     const empCerts = certificationsList.filter(c => c.empId === empId);
     if(empCerts.length < TRAINING_MODULES.length) return false;
