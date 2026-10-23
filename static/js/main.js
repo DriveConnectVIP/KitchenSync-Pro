@@ -533,8 +533,15 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         targetStation = selectedOpt.toLowerCase();
     }
 
-    const d = new Date(dateStr || Date.now());
-    const dayOfWeek = d.getDay();
+    let dayOfWeek = new Date().getDay();
+    if (dateStr) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            const localDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            dayOfWeek = localDate.getDay();
+        }
+    }
+    
     const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
 
     if (isWeekend) {
@@ -557,6 +564,35 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
             return combinedSections;
         }
     }
+}
+
+function assignCookStation(stationName) {
+    if (!currentUser) return;
+    const isEs = currentLanguage === 'es';
+
+    currentUser.station = stationName;
+    const empRecord = employeesList.find(e => e.id === currentUser.id);
+    if (empRecord) {
+        empRecord.station = stationName;
+    }
+
+    fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveEmployee', employee: currentUser })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(isEs ? `¡Estación asignada exitosamente a ${stationName}!` : `Station successfully assigned to ${stationName}!`);
+        renderCookDashboard();
+        renderChecklistForm();
+        updateUserGreetingLabel();
+    })
+    .catch(err => alert((isEs ? "Error al guardar la estación: " : "Failed to save station: ") + err));
+}
+
+function clearCookStation() {
+    assignCookStation("");
 }
 
 function renderChecklistForm() {
@@ -1213,31 +1249,79 @@ function renderCookDashboard() {
     }
 
     const myShifts = shiftLogsList.filter(s => s.empId === currentUser.id);
+    const assignedStation = currentUser.station ? currentUser.station.trim() : "";
+
+    let stationAssignmentHtml = "";
+
+    if (!assignedStation) {
+        stationAssignmentHtml = `
+            <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 2px dashed #cbd5e1;">
+                <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? '📍 Selecciona y Asigna Tu Estación de Turno' : '📍 Select & Assign Your Shift Station'}</h3>
+                <p style="font-size: 0.9rem; color: #475569;">${isEs ? 'Haz clic en "Asignar a Mí" en la sección en la que trabajarás hoy para fijar tu lista de verificación.' : 'Click "Assign to Me" on the section you are working today to lock in your checklist view.'}</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                        <h4 style="color: #1e3a8a; margin-top: 0;">🍳 Range Station</h4>
+                        <p style="font-size: 0.8rem; color: #64748b;">${isEs ? 'Procedimientos de cierre de rango y huevos' : 'Range tops, egg station & ovens closing checklist'}</p>
+                        <button class="btn btn-primary" onclick="assignCookStation('Range')">${isEs ? 'Asignar a Mí 📌' : 'Assign to Me 📌'}</button>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                        <h4 style="color: #1e3a8a; margin-top: 0;">🥪 Mid Station</h4>
+                        <p style="font-size: 0.8rem; color: #64748b;">${isEs ? 'Unidad de sándwich y microondas' : 'Sandwich unit, microwaves & line prep'}</p>
+                        <button class="btn btn-primary" onclick="assignCookStation('Mid')">${isEs ? 'Asignar a Mí 📌' : 'Assign to Me 📌'}</button>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                        <h4 style="color: #1e3a8a; margin-top: 0;">🍟 Grill / Fry Station</h4>
+                        <p style="font-size: 0.8rem; color: #64748b;">${isEs ? 'Parrilla, freidoras y trampa de grasa' : 'Fryolators, grill rails, and grease traps'}</p>
+                        <button class="btn btn-primary" onclick="assignCookStation('Grill/Fry')">${isEs ? 'Asignar a Mí 📌' : 'Assign to Me 📌'}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        stationAssignmentHtml = `
+            <div class="card" style="margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3 style="margin: 0; color: #166534;">${isEs ? '✅ Estación Asignada Activa' : '✅ Active Assigned Station'}: ${assignedStation}</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'Tu lista de verificación de turno está configurada exclusivamente para esta sección.' : 'Your shift checklist view is currently locked to this section.'}</p>
+                    </div>
+                    <button class="btn btn-secondary" style="background: white; color: #dc2626; border: 1px solid #fecaca;" onclick="clearCookStation()">${isEs ? 'Cambiar Estación 🔄' : 'Change Station 🔄'}</button>
+                </div>
+            </div>
+        `;
+    }
 
     container.innerHTML = `
-        <div class="card" style="margin-top: 1rem;">
-            <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? 'Tus Registros de Turno Recientes y Rendimiento' : 'Your Recent Shift Submissions & Performance'} (${currentUser.name})</h3>
-            <table class="data-table" style="margin-top: 1rem;">
-                <thead><tr>
-                    <th>${isEs ? 'Fecha' : 'Date'}</th>
-                    <th>${isEs ? 'Horario de Turno' : 'Shift Time Slot'}</th>
-                    <th>${isEs ? 'Puntaje' : 'Score'}</th>
-                    <th>${isEs ? 'Nivel' : 'Tier'}</th>
-                    <th>${isEs ? 'Notas' : 'Notes'}</th>
-                </tr></thead>
-                <tbody>
-                    ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">${isEs ? 'No se encontraron registros de turno para tu cuenta.' : 'No shift logs found for your account.'}</td></tr>` :
-                      myShifts.map(s => `
-                        <tr>
-                            <td>${s.date}</td>
-                            <td>${s.timeSlot}</td>
-                            <td><strong>${s.scorePct}%</strong></td>
-                            <td>${s.scorePct >= 95 ? 'Tier 3' : s.scorePct >= 90 ? 'Tier 2' : s.scorePct >= 85 ? 'Tier 1' : (isEs ? 'No elegible' : 'Ineligible')}</td>
-                            <td>-</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 1rem;">
+            ${stationAssignmentHtml}
+
+            <div class="card">
+                <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? 'Tus Registros de Turno Recientes y Rendimiento' : 'Your Recent Shift Submissions & Performance'} (${currentUser.name})</h3>
+                <table class="data-table" style="margin-top: 1rem;">
+                    <thead><tr>
+                        <th>${isEs ? 'Fecha' : 'Date'}</th>
+                        <th>${isEs ? 'Horario de Turno' : 'Shift Time Slot'}</th>
+                        <th>${isEs ? 'Puntaje' : 'Score'}</th>
+                        <th>${isEs ? 'Nivel' : 'Tier'}</th>
+                        <th>${isEs ? 'Notas' : 'Notes'}</th>
+                    </tr></thead>
+                    <tbody>
+                        ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">${isEs ? 'No se encontraron registros de turno para tu cuenta.' : 'No shift logs found for your account.'}</td></tr>` :
+                          myShifts.map(s => `
+                            <tr>
+                                <td>${s.date}</td>
+                                <td>${s.timeSlot}</td>
+                                <td><strong>${s.scorePct}%</strong></td>
+                                <td>${s.scorePct >= 95 ? 'Tier 3' : s.scorePct >= 90 ? 'Tier 2' : s.scorePct >= 85 ? 'Tier 1' : (isEs ? 'No elegible' : 'Ineligible')}</td>
+                                <td>-</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         </div>
     `;
 }
