@@ -251,7 +251,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function handleLogin(e) {
     e.preventDefault();
-    const password = document.getElementById('auth-password').value;
+    const password = document.getElementById('auth-password').value.trim();
+
+    const matchedEmp = employeesList.find(emp => String(emp.pin).trim() === password && emp.active);
+    if (matchedEmp) {
+        currentUser = matchedEmp;
+        currentRoleSession = matchedEmp.role ? matchedEmp.role.toLowerCase() : 'cook';
+        
+        document.getElementById('auth-modal').style.display = 'none';
+        document.getElementById('app-wrapper').style.display = 'block';
+
+        updateUserGreetingLabel();
+
+        const cookHeader = document.getElementById('cook-checklist-header');
+        const standardMeta = document.getElementById('standard-meta-card');
+
+        if(currentRoleSession === 'cook') {
+            if(cookHeader) cookHeader.style.display = 'block';
+            if(standardMeta) standardMeta.style.display = 'none';
+        } else {
+            if(cookHeader) cookHeader.style.display = 'none';
+            if(standardMeta) standardMeta.style.display = 'block';
+        }
+
+        buildNavigationForRole(currentRoleSession);
+        return;
+    }
 
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -271,7 +296,7 @@ function handleLogin(e) {
 
         if(data && data.success) {
             currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook", station: "" };
-            currentRoleSession = data.role;
+            currentRoleSession = data.role ? data.role.toLowerCase() : 'cook';
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('app-wrapper').style.display = 'block';
 
@@ -536,7 +561,6 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         targetStation = selectedOpt.toLowerCase();
     }
 
-    // Strict filtering: return ONLY the assigned station checklist with no extra merged splits
     if (targetStation.includes('mid')) {
         return specs['mid'];
     } else if (targetStation.includes('fry') || targetStation.includes('grill')) {
@@ -629,7 +653,6 @@ function renderChecklistForm() {
     let shiftEntryView = document.getElementById('view-shift-entry');
     if(!shiftEntryView) return;
 
-    // Render station selector widget at the top of the My Shift Checklist tab for cooks
     let widgetWrapper = document.getElementById('cook-station-selector-widget');
     if (currentRoleSession === 'cook') {
         if (!widgetWrapper) {
@@ -1367,5 +1390,3 @@ function renderManagerDashboard() {
         </div>
     `;
 }
-
-<FollowUp>Would you like to test pasting this updated `main.js` file into your project now?</FollowUp>
