@@ -186,7 +186,7 @@ const CHECKLIST_SPECS = {
                     { id: "m9", title: "Inspección de Línea PM", desc: "Realizar segunda revisión de calidad y controles de temperatura antes de la cena." },
                     { id: "m10", title: "Registro Diario de Desperdicios", desc: "Revisar e ingresar registro de desperdicios e investigar errores excesivos." },
                     { id: "m11", title: "Auditoría Final de Cierre de Cocina", desc: "Completar recorrido de cierre, verificar estaciones limpias y etiquetas FIFO." },
-                    { id: "m12", title: "P&L y Resumen de Turno", desc: "Cerrar finanzas, depositivo efectivo y redactar informe de resumen." }
+                    { id: "m12", title: "P&L y Resumen de Turno", desc: "Cerrar finanzas, depositar efectivo y redactar informe de resumen." }
                 ]
             }
         ]
@@ -358,7 +358,7 @@ function buildNavigationForRole(role) {
     if(role === 'cook') {
         tabs = [
             { id: 'shift-entry', label: currentLanguage === 'es' ? '📝 Mi Lista de Turno' : '📝 My Shift Checklist' },
-            { id: 'cook-dashboard', label: currentLanguage === 'es' ? '⭐ Tablero y Estaciones' : '⭐ Cook & Stations' },
+            { id: 'cook-dashboard', label: currentLanguage === 'es' ? '⭐ Turnos Completados' : '⭐ Shifts Completed' },
             { id: 'cook-training', label: currentLanguage === 'es' ? '🎓 Módulos de Capacitación' : '🎓 Training Modules' }
         ];
     } else if(role === 'manager') {
@@ -425,7 +425,7 @@ function ensureViewElementsExist() {
             const div = document.createElement('div');
             div.id = `view-${vId}`;
             div.className = 'app-view';
-            if(vId === 'cook-dashboard') div.innerHTML = '<h2>Cook Personal Performance & Station Assignment</h2><div id="cook-dashboard-content"></div>';
+            if(vId === 'cook-dashboard') div.innerHTML = '<h2>Cook Personal Performance & Bonus Tracker</h2><div id="cook-dashboard-content"></div>';
             if(vId === 'manager-dashboard') div.innerHTML = '<h2>Shift Manager Oversight Dashboard</h2><div id="manager-dashboard-content"></div>';
             if(vId === 'cook-training') div.innerHTML = '<h2 id="training-view-heading">Training Modules & Mandatory Certifications</h2><div class="card"><div id="training-modules-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;"></div></div>';
             wrapper.appendChild(div);
@@ -533,40 +533,13 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         targetStation = selectedOpt.toLowerCase();
     }
 
-    if (!targetStation) {
-        return specs['range'];
-    }
-
-    let dayOfWeek = new Date().getDay();
-    if (dateStr) {
-        const parts = dateStr.split('-');
-        if (parts.length === 3) {
-            const localDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-            dayOfWeek = localDate.getDay();
-        }
-    }
-    
-    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-
-    if (isWeekend) {
-        if (targetStation.includes('mid')) return specs['mid'];
-        if (targetStation.includes('fry') || targetStation.includes('grill')) return specs['fry'];
-        return specs['range'];
+    // Strict filtering: return ONLY the assigned station checklist with no extra merged splits
+    if (targetStation.includes('mid')) {
+        return specs['mid'];
+    } else if (targetStation.includes('fry') || targetStation.includes('grill')) {
+        return specs['fry'];
     } else {
-        let combinedSections = [];
-        if (targetStation.includes('mid') || targetStation.includes('fry') || targetStation.includes('grill')) {
-            combinedSections = JSON.parse(JSON.stringify(specs['fry']));
-            const midTasks = specs['mid'][0].tasks;
-            const otherHalfMid = midTasks.slice(Math.ceil(midTasks.length / 2));
-            combinedSections.push({ phase: "MID STATION SPLIT (GRILL/FRY)", tasks: otherHalfMid });
-            return combinedSections;
-        } else {
-            combinedSections = JSON.parse(JSON.stringify(specs['range']));
-            const midTasks = specs['mid'][0].tasks;
-            const halfMid = midTasks.slice(0, Math.ceil(midTasks.length / 2));
-            combinedSections.push({ phase: "MID STATION SPLIT (RANGE)", tasks: halfMid });
-            return combinedSections;
-        }
+        return specs['range'];
     }
 }
 
@@ -588,7 +561,6 @@ function assignCookStation(stationName) {
     .then(res => res.json())
     .then(data => {
         alert(isEs ? `¡Estación asignada exitosamente a ${stationName}!` : `Station successfully assigned to ${stationName}!`);
-        renderCookStationSelectorWidget();
         renderChecklistForm();
         updateUserGreetingLabel();
     })
@@ -609,20 +581,20 @@ function renderCookStationSelectorWidget() {
         container.innerHTML = `
             <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 2px dashed #2563eb;">
                 <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? '📍 Selecciona y Asigna Tu Estación de Turno' : '📍 Select & Assign Your Shift Station'}</h3>
-                <p style="font-size: 0.9rem; color: #475569;">${isEs ? 'Haz clic en "Asignar a Mí" en la sección en la que trabajarás hoy para mostrar su lista de verificación abajo.' : 'Click "Assign to Me" on your workstation below to load that station checklist into your shift view.'}</p>
+                <p style="font-size: 0.9rem; color: #475569;">${isEs ? 'Haz clic en "Asignar a Mí" en la sección en la que trabajarás hoy para mostrar únicamente su lista de verificación abajo.' : 'Click "Assign to Me" on your workstation below to lock your shift checklist view to that specific station.'}</p>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
                         <h4 style="color: #1e3a8a; margin-top: 0;">🍳 Range Station</h4>
                         <button class="btn btn-primary" onclick="assignCookStation('Range')">${isEs ? 'Asignar a Mí 📌' : 'Assign to Me 📌'}</button>
                     </div>
 
-                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
                         <h4 style="color: #1e3a8a; margin-top: 0;">🥪 Mid Station</h4>
                         <button class="btn btn-primary" onclick="assignCookStation('Mid')">${isEs ? 'Asignar a Mí 📌' : 'Assign to Me 📌'}</button>
                     </div>
 
-                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
                         <h4 style="color: #1e3a8a; margin-top: 0;">🍟 Grill / Fry Station</h4>
                         <button class="btn btn-primary" onclick="assignCookStation('Grill/Fry')">${isEs ? 'Asignar a Mí 📌' : 'Assign to Me 📌'}</button>
                     </div>
@@ -635,7 +607,7 @@ function renderCookStationSelectorWidget() {
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h3 style="margin: 0; color: #166534;">${isEs ? '✅ Estación Asignada Activa' : '✅ Active Assigned Station'}: ${assignedStation}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo corresponde exclusivamente a esta sección.' : 'The checklist below is filtered to your assigned station.'}</p>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo muestra exclusivamente las tareas de esta estación.' : 'The checklist below displays exclusively your assigned station tasks.'}</p>
                     </div>
                     <button class="btn btn-secondary" style="background: white; color: #dc2626; border: 1px solid #fecaca;" onclick="clearCookStation()">${isEs ? 'Cambiar Estación 🔄' : 'Change Station 🔄'}</button>
                 </div>
@@ -654,7 +626,7 @@ function renderChecklistForm() {
     const container = document.getElementById('checklist-container');
     if(!container) return;
     
-    // Inject or update the station selection widget right above the checklist when logged in as a cook
+    // Render station selector widget at the top of the My Shift Checklist tab for cooks
     let widgetWrapper = document.getElementById('cook-station-selector-widget');
     if (currentRoleSession === 'cook') {
         if (!widgetWrapper) {
@@ -1603,7 +1575,7 @@ function saveEditedEmployee(e) {
     emp.name = document.getElementById('edit-emp-name').value.trim();
     emp.role = document.getElementById('edit-emp-role').value;
     emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
-    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-employee-form-pin').value.trim();
+    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
     emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value);
 
     alert(isEs ? "¡Detalles del empleado actualizados con éxito!" : "Employee details successfully updated!");
@@ -1619,4 +1591,4 @@ function removeEmp(id) {
         renderRosterTable();
         populateStaffDropdown();
     }
-} 
+}
