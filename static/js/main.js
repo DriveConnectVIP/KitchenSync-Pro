@@ -1325,7 +1325,6 @@ function renderCookDashboard() {
         </div>
     `;
 }
-
 function renderManagerDashboard() {
     const container = document.getElementById('manager-dashboard-content');
     if(!container) return;
