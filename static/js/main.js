@@ -380,7 +380,10 @@ function buildNavigationForRole(role) {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`;
         btn.textContent = t.label;
-        btn.onclick = () => switchView(t.id, btn);
+        btn.onclick = () => {
+            switchView(t.id, btn);
+            if(t.id === 'shift-entry') renderChecklistForm();
+        };
         navContainer.appendChild(btn);
     });
 
@@ -623,22 +626,24 @@ function renderChecklistForm() {
     const roleType = currentRoleSession === 'cook' ? 'cook' : (document.getElementById('checklist-role-select')?.value || 'range');
     const shiftDate = document.getElementById('cook-shift-date')?.value || document.getElementById('shift-date')?.value;
     
-    const container = document.getElementById('checklist-container');
-    if(!container) return;
-    
+    let shiftEntryView = document.getElementById('view-shift-entry');
+    if(!shiftEntryView) return;
+
     // Render station selector widget at the top of the My Shift Checklist tab for cooks
     let widgetWrapper = document.getElementById('cook-station-selector-widget');
     if (currentRoleSession === 'cook') {
         if (!widgetWrapper) {
             widgetWrapper = document.createElement('div');
             widgetWrapper.id = 'cook-station-selector-widget';
-            container.parentNode.insertBefore(widgetWrapper, container);
+            shiftEntryView.insertBefore(widgetWrapper, shiftEntryView.firstChild);
         }
         renderCookStationSelectorWidget();
     } else if (widgetWrapper) {
         widgetWrapper.remove();
     }
 
+    const container = document.getElementById('checklist-container');
+    if(!container) return;
     container.innerHTML = '';
 
     if (currentRoleSession === 'cook' && (!currentUser || !currentUser.station)) {
@@ -1363,232 +1368,4 @@ function renderManagerDashboard() {
     `;
 }
 
-function approveEmployeeBonus(empId, empName, role, bonusAmt, tierLabel) {
-    const isEs = currentLanguage === 'es';
-    const approvalPayload = {
-        empId: empId,
-        empName: empName,
-        role: role,
-        tierLabel: tierLabel,
-        bonusAmt: bonusAmt,
-        dateApproved: new Date().toISOString()
-    };
-
-    fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'saveApproval', approval: approvalPayload })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(isEs ? `¡Pago de bono de $${bonusAmt} para ${empName} aprobado y registrado con éxito!` : `Bonus payout of $${bonusAmt} for ${empName} successfully approved and logged!`);
-        fetchPayrollApprovals();
-    });
-}
-
-function downloadPayrollAccountingReport() {
-    const isEs = currentLanguage === 'es';
-    alert(isEs ? "Resumen contable de nómina generado desde datos de Google Sheets." : "Payroll accounting summary generated from Google Sheets data.");
-}
-
-function renderGMExecutiveDashboard() {
-    const tbody = document.getElementById('gm-payroll-tbody');
-    if(!tbody) return;
-    tbody.innerHTML = '';
-    const isEs = currentLanguage === 'es';
-
-    let tierCounts = { "Tier 3": 0, "Tier 2": 0, "Tier 1": 0, "Ineligible": 0 };
-
-    employeesList.forEach(emp => {
-        const empShifts = shiftLogsList.filter(s => s.empId === emp.id && isWithinBiWeeklyPayrollCycle(s.date));
-        const avgScore = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+b.scorePct,0)/empShifts.length) : 0;
-
-        let bonus = 0;
-        let tierLabel = "Ineligible";
-        if(avgScore >= 95) { tierLabel = "Tier 3"; bonus = emp.role==='manager'?350:150; tierCounts["Tier 3"]++; }
-        else if(avgScore >= 90) { tierLabel = "Tier 2"; bonus = emp.role==='manager'?225:100; tierCounts["Tier 2"]++; }
-        else if(avgScore >= 85) { tierLabel = "Tier 1"; bonus = emp.role==='manager'?125:50; tierCounts["Tier 1"]++; }
-        else { tierCounts["Ineligible"]++; }
-
-        const isCertified = isEmployeeCertifiedTeamLeader(emp.id);
-        const nameDisplay = `${emp.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
-
-        const isAlreadyApproved = payrollApprovalsList.some(a => a.empId === emp.id);
-        let actionCell = `<button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem; background:#16a34a;" onclick="approveEmployeeBonus('${emp.id}', '${emp.name}', '${emp.role}', ${bonus}, '${tierLabel}')">${isEs ? `Aprobar Bono ($${bonus})` : `Approve Bonus ($${bonus})`}</button>`;
-
-        if(isAlreadyApproved) {
-            actionCell = `<span style="color:#16a34a; font-weight:bold; font-size:0.85rem;">${isEs ? '✅ Aprobado y Registrado' : '✅ Approved & Logged'}</span>`;
-        }
-
-        tbody.innerHTML += `
-            <tr>
-                <td><strong>${nameDisplay}</strong></td>
-                <td>${emp.role.toUpperCase()}</td>
-                <td>${empShifts.length}</td>
-                <td><strong class="highlight">${avgScore}%</strong></td>
-                <td>$${bonus} (${tierLabel})</td>
-                <td>${actionCell}</td>
-            </tr>
-        `;
-    });
-
-    renderCharts(tierCounts);
-}
-
-function renderCharts(tierCounts) {
-    const ctxExec = document.getElementById('chart-execution');
-    const isEs = currentLanguage === 'es';
-    if(ctxExec) {
-        if(employeeChartInstance) employeeChartInstance.destroy();
-
-        const recentDates = [...new Set(shiftLogsList.map(s => s.date))].sort();
-        const avgScoresByDate = recentDates.map(date => {
-            const dayShifts = shiftLogsList.filter(s => s.date === date);
-            return Math.round(dayShifts.reduce((a,b) => a + b.scorePct, 0) / dayShifts.length);
-        });
-
-        employeeChartInstance = new Chart(ctxExec, {
-            type: 'line',
-            data: {
-                labels: recentDates.length > 0 ? recentDates : [isEs ? 'Sin Datos' : 'No Data'],
-                datasets: [{
-                    label: isEs ? 'Cumplimiento Promedio Diario (%)' : 'Daily Avg Compliance (%)',
-                    data: avgScoresByDate.length > 0 ? avgScoresByDate : [0],
-                    borderColor: '#1e3a8a',
-                    backgroundColor: 'rgba(30, 58, 138, 0.1)',
-                    fill: true,
-                    tension: 0.2
-                }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
-        });
-    }
-
-    const ctxBonus = document.getElementById('chart-bonus');
-    if(ctxBonus) {
-        if(window.bonusChartInstance) window.bonusChartInstance.destroy();
-
-        window.bonusChartInstance = new Chart(ctxBonus, {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    isEs ? 'Nivel 3 (Máx)' : 'Tier 3 (Max)', 
-                    isEs ? 'Nivel 2 (Estándar)' : 'Tier 2 (Standard)', 
-                    isEs ? 'Nivel 1 (Inicial)' : 'Tier 1 (Entry)', 
-                    isEs ? 'No elegible (<85%)' : 'Ineligible (<85%)'
-                ],
-                datasets: [{
-                    data: [tierCounts["Tier 3"], tierCounts["Tier 2"], tierCounts["Tier 1"], tierCounts["Ineligible"]],
-                    backgroundColor: ['#16a34a', '#2563eb', '#d97706', '#dc2626']
-                }]
-            },
-            options: { responsive: true }
-        });
-    }
-}
-
-function renderRosterTable() {
-    const tbody = document.getElementById('roster-table-body');
-    if(!tbody) return;
-    tbody.innerHTML = '';
-    const isEs = currentLanguage === 'es';
-
-    employeesList.forEach(e => {
-        const isCertified = isEmployeeCertifiedTeamLeader(e.id);
-        const nameDisplay = `${e.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
-        tbody.innerHTML += `
-            <tr>
-                <td>${e.id}</td>
-                <td><strong>${nameDisplay}</strong></td>
-                <td>${e.role.toUpperCase()}</td>
-                <td>${e.station}</td>
-                <td>•••• (${e.pin})</td>
-                <td>$${Number(e.hourlyRate).toFixed(2)}</td>
-                <td>
-                    <button class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.8rem; margin-right:5px;" onclick="openEditEmployeeModal('${e.id}')">✏️ ${isEs ? 'Editar' : 'Edit'}</button>
-                    <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="removeEmp('${e.id}')">${isEs ? 'Eliminar' : 'Delete'}</button>
-                </td>
-            </tr>`;
-    });
-}
-
-function openAddEmployeeModal() { document.getElementById('add-employee-modal').style.display = 'flex'; }
-function closeAddEmployeeModal() { document.getElementById('add-employee-modal').style.display = 'none'; }
-
-function saveNewEmployee(e) {
-    e.preventDefault();
-    const isEs = currentLanguage === 'es';
-    const newEmp = {
-        id: `EMP-${Date.now().toString().slice(-4)}`,
-        name: document.getElementById('new-emp-name').value.trim(),
-        role: document.getElementById('new-emp-role').value,
-        station: document.getElementById('new-emp-station').value.trim(),
-        pin: document.getElementById('new-emp-pin').value.trim(),
-        hourlyRate: parseFloat(document.getElementById('new-emp-rate').value),
-        active: true
-    };
-
-    fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'saveEmployee', employee: newEmp })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success) {
-            alert(isEs ? "¡Nuevo miembro del equipo agregado y guardado en Google Sheets!" : "New team member added and saved to Google Sheets!");
-            closeAddEmployeeModal();
-            document.getElementById('add-employee-form').reset();
-            fetchEmployees();
-        } else {
-            alert(isEs ? "Error al guardar el empleado en la hoja de cálculo." : "Failed to save employee to spreadsheet.");
-        }
-    })
-    .catch(err => alert((isEs ? "Error de conexión: " : "Connection error: ") + err));
-}
-
-function openEditEmployeeModal(empId) {
-    const emp = employeesList.find(e => e.id === empId);
-    if(!emp) return;
-
-    document.getElementById('edit-emp-id').value = emp.id;
-    document.getElementById('edit-emp-name').value = emp.name;
-    document.getElementById('edit-emp-role').value = emp.role;
-    document.getElementById('edit-emp-station').value = emp.station;
-    document.getElementById('edit-emp-pin').value = emp.pin;
-    document.getElementById('edit-emp-rate').value = emp.hourlyRate;
-
-    document.getElementById('edit-employee-modal').style.display = 'flex';
-}
-
-function closeEditEmployeeModal() {
-    document.getElementById('edit-employee-modal').style.display = 'none';
-}
-
-function saveEditedEmployee(e) {
-    e.preventDefault();
-    const empId = document.getElementById('edit-emp-id').value;
-    const emp = employeesList.find(e => e.id === empId);
-    if(!emp) return;
-    const isEs = currentLanguage === 'es';
-
-    emp.name = document.getElementById('edit-emp-name').value.trim();
-    emp.role = document.getElementById('edit-emp-role').value;
-    emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
-    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
-    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value);
-
-    alert(isEs ? "¡Detalles del empleado actualizados con éxito!" : "Employee details successfully updated!");
-    closeEditEmployeeModal();
-    renderRosterTable();
-    populateStaffDropdown();
-}
-
-function removeEmp(id) {
-    const isEs = currentLanguage === 'es';
-    if(confirm(isEs ? "¿Eliminar empleado?" : "Remove employee?")) {
-        employeesList = employeesList.filter(e => e.id !== id);
-        renderRosterTable();
-        populateStaffDropdown();
-    }
-}
+<FollowUp>Would you like to test pasting this updated `main.js` file into your project now?</FollowUp>
