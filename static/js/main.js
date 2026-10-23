@@ -270,7 +270,7 @@ function handleLogin(e) {
         }
 
         if(data && data.success) {
-            currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook", station: "Range" };
+            currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook", station: "" };
             currentRoleSession = data.role;
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('app-wrapper').style.display = 'block';
@@ -358,7 +358,7 @@ function buildNavigationForRole(role) {
     if(role === 'cook') {
         tabs = [
             { id: 'shift-entry', label: currentLanguage === 'es' ? '📝 Mi Lista de Turno' : '📝 My Shift Checklist' },
-            { id: 'cook-dashboard', label: currentLanguage === 'es' ? '⭐ Turnos Completados' : '⭐ Shifts Completed' },
+            { id: 'cook-dashboard', label: currentLanguage === 'es' ? '⭐ Tablero de Cocinero y Estación' : '⭐ Cook & Station Dashboard' },
             { id: 'cook-training', label: currentLanguage === 'es' ? '🎓 Módulos de Capacitación' : '🎓 Training Modules' }
         ];
     } else if(role === 'manager') {
@@ -425,7 +425,7 @@ function ensureViewElementsExist() {
             const div = document.createElement('div');
             div.id = `view-${vId}`;
             div.className = 'app-view';
-            if(vId === 'cook-dashboard') div.innerHTML = '<h2>Cook Personal Performance & Bonus Tracker</h2><div id="cook-dashboard-content"></div>';
+            if(vId === 'cook-dashboard') div.innerHTML = '<h2>Cook Personal Performance & Station Assignment</h2><div id="cook-dashboard-content"></div>';
             if(vId === 'manager-dashboard') div.innerHTML = '<h2>Shift Manager Oversight Dashboard</h2><div id="manager-dashboard-content"></div>';
             if(vId === 'cook-training') div.innerHTML = '<h2 id="training-view-heading">Training Modules & Mandatory Certifications</h2><div class="card"><div id="training-modules-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;"></div></div>';
             wrapper.appendChild(div);
@@ -527,10 +527,15 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
 
     let targetStation = 'range';
     if (currentRoleSession === 'cook' && currentUser) {
-        targetStation = (currentUser.station || 'range').toLowerCase();
+        targetStation = (currentUser.station || '').toLowerCase();
     } else {
         const selectedOpt = document.getElementById('staff-select')?.selectedOptions[0]?.textContent || '';
         targetStation = selectedOpt.toLowerCase();
+    }
+
+    // If cook hasn't selected a station yet, default to showing Range or an empty guide
+    if (!targetStation) {
+        return specs['range'];
     }
 
     let dayOfWeek = new Date().getDay();
@@ -605,6 +610,18 @@ function renderChecklistForm() {
     const container = document.getElementById('checklist-container');
     if(!container) return;
     container.innerHTML = '';
+
+    // If cook has no assigned station yet, prompt them to pick one on their dashboard first
+    if (currentRoleSession === 'cook' && (!currentUser || !currentUser.station)) {
+        container.innerHTML = `
+            <div class="card" style="text-align: center; padding: 2rem; background: #eff6ff; border: 1px solid #bfdbfe;">
+                <h3 style="color: #1e3a8a; margin-top: 0;">⚠️ ${currentLanguage === 'es' ? 'Ninguna Estación Asignada' : 'No Station Assigned'}</h3>
+                <p style="color: #475569; margin-bottom: 1.5rem;">${currentLanguage === 'es' ? 'Por favor ve al <strong>Tablero de Cocinero</strong> y selecciona tu estación (Range, Mid o Grill/Fry) para ver tu lista de verificación.' : 'Please go to the <strong>Cook & Station Dashboard</strong> tab and assign your station (Range, Mid, or Grill/Fry) to view your checklist.'}</p>
+                <button class="btn btn-primary" onclick="switchView('cook-dashboard', document.querySelectorAll('.tab-btn')[1])">${currentLanguage === 'es' ? 'Ir al Tablero de Cocinero 🚀' : 'Go to Cook Dashboard 🚀'}</button>
+            </div>
+        `;
+        return;
+    }
 
     const specs = getActiveChecklistSpecsForDate(shiftDate, roleType, currentLanguage);
 
@@ -1325,6 +1342,7 @@ function renderCookDashboard() {
         </div>
     `;
 }
+
 function renderManagerDashboard() {
     const container = document.getElementById('manager-dashboard-content');
     if(!container) return;
