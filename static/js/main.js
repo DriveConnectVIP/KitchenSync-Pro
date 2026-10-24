@@ -1,4 +1,5 @@
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLUl-5Fx1XvJT6jVUURqSeGXT0sFgOB64kESRw4OIC9hxP0hTA4wG46SVV5Ym_UvHJ/exec";
+const GM_MASTER_PASSCODE = "9999";
 
 const CHECKLIST_SPECS = {
     en: {
@@ -253,31 +254,24 @@ function handleLogin(e) {
     e.preventDefault();
     const password = document.getElementById('auth-password').value.trim();
 
+    // 1. Hardcoded GM Master Passcode Override
+    if (password === GM_MASTER_PASSCODE) {
+        currentUser = { id: "GM-ADMIN", name: "General Manager", role: "gm", station: "All Stations" };
+        currentRoleSession = "gm";
+        finalizeSuccessfulLogin();
+        return;
+    }
+
+    // 2. Local Employee PIN Match (Cooks & Managers)
     const matchedEmp = employeesList.find(emp => String(emp.pin).trim() === password && emp.active);
     if (matchedEmp) {
         currentUser = matchedEmp;
         currentRoleSession = matchedEmp.role ? matchedEmp.role.toLowerCase() : 'cook';
-        
-        document.getElementById('auth-modal').style.display = 'none';
-        document.getElementById('app-wrapper').style.display = 'block';
-
-        updateUserGreetingLabel();
-
-        const cookHeader = document.getElementById('cook-checklist-header');
-        const standardMeta = document.getElementById('standard-meta-card');
-
-        if(currentRoleSession === 'cook') {
-            if(cookHeader) cookHeader.style.display = 'block';
-            if(standardMeta) standardMeta.style.display = 'none';
-        } else {
-            if(cookHeader) cookHeader.style.display = 'none';
-            if(standardMeta) standardMeta.style.display = 'block';
-        }
-
-        buildNavigationForRole(currentRoleSession);
+        finalizeSuccessfulLogin();
         return;
     }
 
+    // 3. Backend Fallback
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -297,28 +291,32 @@ function handleLogin(e) {
         if(data && data.success) {
             currentUser = data.employee || { id: "EMP-UNKNOWN", name: "Employee", role: data.role || "cook", station: "" };
             currentRoleSession = data.role ? data.role.toLowerCase() : 'cook';
-            document.getElementById('auth-modal').style.display = 'none';
-            document.getElementById('app-wrapper').style.display = 'block';
-
-            updateUserGreetingLabel();
-
-            const cookHeader = document.getElementById('cook-checklist-header');
-            const standardMeta = document.getElementById('standard-meta-card');
-
-            if(currentRoleSession === 'cook') {
-                if(cookHeader) cookHeader.style.display = 'block';
-                if(standardMeta) standardMeta.style.display = 'none';
-            } else {
-                if(cookHeader) cookHeader.style.display = 'none';
-                if(standardMeta) standardMeta.style.display = 'block';
-            }
-
-            buildNavigationForRole(currentRoleSession);
+            finalizeSuccessfulLogin();
         } else {
             alert(data && data.error ? data.error : "Invalid PIN or Passcode.");
         }
     })
     .catch(err => alert("Login connection error: " + err));
+}
+
+function finalizeSuccessfulLogin() {
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'block';
+
+    updateUserGreetingLabel();
+
+    const cookHeader = document.getElementById('cook-checklist-header');
+    const standardMeta = document.getElementById('standard-meta-card');
+
+    if(currentRoleSession === 'cook') {
+        if(cookHeader) cookHeader.style.display = 'block';
+        if(standardMeta) standardMeta.style.display = 'none';
+    } else {
+        if(cookHeader) cookHeader.style.display = 'none';
+        if(standardMeta) standardMeta.style.display = 'block';
+    }
+
+    buildNavigationForRole(currentRoleSession);
 }
 
 function isEmployeeCertifiedTeamLeader(empId) {
@@ -561,15 +559,15 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         targetStation = selectedOpt.toLowerCase();
     }
 
-    // 1. Full Mid Station
+    // 1. 3-Cook Open: Dedicated Mid Station
     if (targetStation === 'mid') {
         return specs['mid'];
     } 
-    // 2. Full Fry / Grill Station
+    // 2. 3-Cook Open: Dedicated Grill/Fry Station
     else if (targetStation === 'fry' || targetStation === 'grill' || targetStation === 'grill/fry') {
         return specs['fry'];
     } 
-    // 3. Weekday Split: Range + First Half of Mid
+    // 3. 2-Cook Open (Weekday Split): Range + First Half of Mid
     else if (targetStation === 'range + mid split') {
         let combined = JSON.parse(JSON.stringify(specs['range']));
         const midTasks = specs['mid'][0].tasks;
@@ -577,7 +575,7 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         combined.push({ phase: "MID STATION SPLIT (PART 1 - RANGE)", tasks: halfMid });
         return combined;
     } 
-    // 4. Weekday Split: Grill/Fry + Second Half of Mid
+    // 4. 2-Cook Open (Weekday Split): Grill/Fry + Second Half of Mid
     else if (targetStation === 'grill/fry + mid split' || targetStation === 'fry + mid split') {
         let combined = JSON.parse(JSON.stringify(specs['fry']));
         const midTasks = specs['mid'][0].tasks;
@@ -629,31 +627,31 @@ function renderCookStationSelectorWidget() {
         container.innerHTML = `
             <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 2px solid #cbd5e1;">
                 <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? '📍 Selecciona y Asigna Tu Estación de Turno' : '📍 Select & Assign Your Shift Station'}</h3>
-                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">${isEs ? 'Elige tu estación para fin de semana (3 cocineros) o tu división para días de semana (2 cocineros compartiendo Mid):' : 'Choose your weekend station (3 cooks) or your weekday split assignment (2 cooks sharing Mid duties):'}</p>
+                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">${isEs ? 'Selecciona tu modo de apertura (3 Cocineros o 2 Cocineros con Mid compartido):' : 'Select your opening mode below (3-Cook Open or 2-Cook Open with shared Mid duties):'}</p>
                 
-                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">⭐ Weekend / 3-Cook Setup</div>
+                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">⭐ 3 Cook Open (Dedicated Stations)</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
                     <div style="background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
-                        <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 0.95rem;">🍳 Range Station</h4>
+                        <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 0.95rem;">🍳 Range Opener</h4>
                         <button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Range')">${isEs ? 'Asignar 📌' : 'Assign 📌'}</button>
                     </div>
 
                     <div style="background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
-                        <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 0.95rem;">🥪 Mid Station</h4>
+                        <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 0.95rem;">🥪 Mid Opener</h4>
                         <button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Mid')">${isEs ? 'Asignar 📌' : 'Assign 📌'}</button>
                     </div>
 
                     <div style="background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
-                        <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 0.95rem;">🍟 Grill / Fry</h4>
+                        <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 0.95rem;">🍟 Grill/Fry Opener</h4>
                         <button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Grill/Fry')">${isEs ? 'Asignar 📌' : 'Assign 📌'}</button>
                     </div>
                 </div>
 
-                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🏢 Weekday / 2-Cook Split Mode (Mid Duties Shared)</div>
+                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🏢 2 Cook Open (Mid Duties Split)</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
                     <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
                         <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍳 Range + Mid Split (Pt 1)</h4>
-                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range duties + first half of Mid tasks</p>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range + first half of Mid tasks</p>
                         <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Range + Mid Split')">${isEs ? 'Asignar Split 📌' : 'Assign Split 📌'}</button>
                     </div>
 
@@ -671,7 +669,7 @@ function renderCookStationSelectorWidget() {
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h3 style="margin: 0; color: #166534;">${isEs ? '✅ Estación Asignada Activa' : '✅ Active Assigned Station'}: ${assignedStation}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo incluye tus tareas asignadas.' : 'The checklist below displays exclusively your assigned station and split duties.'}</p>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo incluye tus tareas de apertura asignadas.' : 'The checklist below displays your assigned opening duties.'}</p>
                     </div>
                     <button class="btn btn-secondary" style="background: white; color: #dc2626; border: 1px solid #fecaca;" onclick="clearCookStation()">${isEs ? 'Cambiar Estación 🔄' : 'Change Station 🔄'}</button>
                 </div>
@@ -710,7 +708,7 @@ function renderChecklistForm() {
         container.innerHTML = `
             <div class="card" style="text-align: center; padding: 2rem; background: #eff6ff; border: 1px solid #bfdbfe;">
                 <h3 style="color: #1e3a8a; margin-top: 0;">👆 ${currentLanguage === 'es' ? 'Selecciona una Estación Arriba' : 'Select a Station Above'}</h3>
-                <p style="color: #475569; margin-bottom: 0;">${currentLanguage === 'es' ? 'Haz clic en "Asignar" en tu estación o división de días de semana para cargar tu lista de verificación.' : 'Click "Assign" on your weekend station or weekday split mode above to load your closing checklist tasks.'}</p>
+                <p style="color: #475569; margin-bottom: 0;">${currentLanguage === 'es' ? 'Haz clic en "Asignar" en tu opción de apertura de 2 o 3 cocineros para cargar la lista.' : 'Click "Assign" on your 2-cook open or 3-cook open choice above to load your opening checklist tasks.'}</p>
             </div>
         `;
         return;
@@ -1431,3 +1429,101 @@ function renderManagerDashboard() {
 function renderRosterTable() {
     const tbody = document.getElementById('roster-table-body');
     if(!tbody) return;
+    tbody.innerHTML = '';
+    const isEs = currentLanguage === 'es';
+
+    employeesList.forEach(e => {
+        const isCertified = isEmployeeCertifiedTeamLeader(e.id);
+        const nameDisplay = `${e.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
+        tbody.innerHTML += `
+            <tr>
+                <td>${e.id}</td>
+                <td><strong>${nameDisplay}</strong></td>
+                <td>${e.role.toUpperCase()}</td>
+                <td>${e.station}</td>
+                <td>•••• (${e.pin})</td>
+                <td>$${Number(e.hourlyRate).toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.8rem; margin-right:5px;" onclick="openEditEmployeeModal('${e.id}')">✏️ ${isEs ? 'Editar' : 'Edit'}</button>
+                    <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="removeEmp('${e.id}')">${isEs ? 'Eliminar' : 'Delete'}</button>
+                </td>
+            </tr>`;
+    });
+}
+
+function openAddEmployeeModal() { document.getElementById('add-employee-modal').style.display = 'flex'; }
+function closeAddEmployeeModal() { document.getElementById('add-employee-modal').style.display = 'none'; }
+
+function saveNewEmployee(e) {
+    e.preventDefault();
+    const isEs = currentLanguage === 'es';
+    const newEmp = {
+        id: `EMP-${Date.now().toString().slice(-4)}`,
+        name: document.getElementById('new-emp-name').value.trim(),
+        role: document.getElementById('new-emp-role').value,
+        station: document.getElementById('new-emp-station').value.trim(),
+        pin: document.getElementById('new-emp-pin').value.trim(),
+        hourlyRate: parseFloat(document.getElementById('new-emp-rate').value),
+        active: true
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveEmployee', employee: newEmp })
+    })
+    .then(res => res.text())
+    .then(text => {
+        alert(isEs ? "¡Nuevo miembro del equipo agregado!" : "New team member added!");
+        closeAddEmployeeModal();
+        document.getElementById('add-employee-form').reset();
+        fetchEmployees();
+    })
+    .catch(err => alert((isEs ? "Error de conexión: " : "Connection error: ") + err));
+}
+
+function openEditEmployeeModal(empId) {
+    const emp = employeesList.find(e => e.id === empId);
+    if(!emp) return;
+
+    document.getElementById('edit-emp-id').value = emp.id;
+    document.getElementById('edit-emp-name').value = emp.name;
+    document.getElementById('edit-emp-role').value = emp.role;
+    document.getElementById('edit-emp-station').value = emp.station;
+    document.getElementById('edit-emp-pin').value = emp.pin;
+    document.getElementById('edit-emp-rate').value = emp.hourlyRate;
+
+    document.getElementById('edit-employee-modal').style.display = 'flex';
+}
+
+function closeEditEmployeeModal() {
+    document.getElementById('edit-employee-modal').style.display = 'none';
+}
+
+function saveEditedEmployee(e) {
+    e.preventDefault();
+    const empId = document.getElementById('edit-emp-id').value;
+    const emp = employeesList.find(e => e.id === empId);
+    if(!emp) return;
+    const isEs = currentLanguage === 'es';
+
+    emp.name = document.getElementById('edit-emp-name').value.trim();
+    emp.role = document.getElementById('edit-emp-role').value;
+    emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
+    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
+    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value);
+
+    alert(isEs ? "¡Detalles del empleado actualizados con éxito!" : "Employee details successfully updated!");
+    closeEditEmployeeModal();
+    renderRosterTable();
+    populateStaffDropdown();
+}
+
+function removeEmp(id) {
+    const isEs = currentLanguage === 'es';
+    if(confirm(isEs ? "¿Eliminar empleado?" : "Remove employee?")) {
+        employeesList = employeesList.filter(e => e.id !== id);
+        renderRosterTable();
+        populateStaffDropdown();
+    }
+}
