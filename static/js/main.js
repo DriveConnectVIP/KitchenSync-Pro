@@ -166,28 +166,28 @@ const CHECKLIST_SPECS = {
             {
                 phase: "APERTURA AM",
                 tasks: [
-                    { id: "m1", title: "Auditoría de Caja Fuerte y Efectivo", desc: "Contar caja fuerte, registrar efectivo inicial y verificar gavetas de cajas." },
-                    { id: "m2", title: "Inspección de Instalaciones", desc: "Recorrer exterior/interior. Revisar iluminación, música, temperatura y línea." },
-                    { id: "m3", title: "Hoja de Preparación y Auditoría de Inventario", desc: "Revisar hojas de preparación diaria contra niveles actuales y proteínas costosas." },
-                    { id: "m4", title: "Organización de Personal y Presupuesto", desc: "Revisar lista de personal diaria y comparar ventas con horas programadas." }
+                    { id: "m1", title: "Auditoría de Caja Fuerte y Efectivo", desc: "Contar safe, log opening cash, and verify register tills match starting balances." },
+                    { id: "m2", title: "Facilities Inspection", desc: "Walk exterior/interior. Check FOH lighting, music, temp, and prep line." },
+                    { id: "m3", title: "Prep Sheet & Inventory Audit", desc: "Review daily kitchen prep sheets against current pars and protein counts." },
+                    { id: "m4", title: "Labor Lineup & Budgeting", desc: "Review daily roster. Compare forecasted sales with scheduled hours." }
                 ]
             },
             {
                 phase: "PRE-TURNO Y MEDIA JORNADA",
                 tasks: [
-                    { id: "m5", title: "Reunión Pre-Turno Gerente-Cocinero", desc: "Realizar junta de 5 mins con el equipo. Alinear sobre especiales y metas." },
-                    { id: "m6", title: "Inspección Obligatoria de Línea BOH", desc: "Auditar línea de cocina. Probar calidad y revisar temperaturas." },
-                    { id: "m7", title: "Gestión Activa del Salón", desc: "Liderar picos en el salón, monitorear satisfacción y optimizar rotación." },
-                    { id: "m8", title: "Recortes de Personal a Media Jornada", desc: "Evaluar porcentaje de mano de obra y reducir horas si las ventas bajan." }
+                    { id: "m5", title: "Manager-Cook Pre-Shift Meeting", desc: "Run 5-min huddle with kitchen crew. Align on daily specials & targets." },
+                    { id: "m6", title: "Mandatory BOH Line Check", desc: "Audit kitchen line. Taste items, check hot/cold temperatures." },
+                    { id: "m7", title: "Active Floor Management", desc: "Lead peak rushes on floor. Monitor guest satisfaction & table turn times." },
+                    { id: "m8", title: "Mid-Day Labor Cuts", desc: "Evaluate labor %. Cut hours dynamically if sales drop below forecast." }
                 ]
             },
             {
-                phase: "PM / CIERRE",
+                phase: "PM / CLOSE",
                 tasks: [
-                    { id: "m9", title: "Inspección de Línea PM", desc: "Realizar segunda revisión de calidad y controles de temperatura antes de la cena." },
-                    { id: "m10", title: "Registro Diario de Desperdicios", desc: "Revisar e ingresar registro de desperdicios e investigar errores excesivos." },
-                    { id: "m11", title: "Auditoría Final de Cierre de Cocina", desc: "Completar recorrido de cierre, verificar estaciones limpias y etiquetas FIFO." },
-                    { id: "m12", title: "P&L y Resumen de Turno", desc: "Cerrar finanzas, deposit efectivo y redactar informe de resumen." }
+                    { id: "m9", title: "PM Kitchen Line Check", desc: "Conduct secondary check on line item quality and station pars." },
+                    { id: "m10", title: "Daily Food Waste Logging", desc: "Review and input kitchen waste log. Investigate excessive errors." },
+                    { id: "m11", title: "Final Kitchen Close Audit", desc: "Walkthrough kitchen close. Verify clean stations and FIFO labels." },
+                    { id: "m12", title: "P&L & Shift Summary", desc: "Close out financials, deposit cash, and write summary log." }
                 ]
             }
         ]
@@ -498,6 +498,9 @@ function fetchShifts() {
                 renderManagerDashboard();
                 populateGUShiftAuditDropdown();
             }
+            if(currentRoleSession === 'cook') {
+                renderCookDashboard();
+            }
         });
 }
 
@@ -578,17 +581,17 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         combined.push({ phase: "MID CLOSING SPLIT (PART 2 - GRILL/FRY)", tasks: otherHalfMid });
         return combined;
     } 
-    else if (targetStation === 'range + mid split') {
+    else if (targetStation === 'range + mid split' || targetStation === 'range + mid open split') {
         let combined = JSON.parse(JSON.stringify(specs['range']));
         const midTasks = specs['mid'][0].tasks;
         const halfMid = midTasks.slice(0, Math.ceil(midTasks.length / 2));
-        combined.push({ phase: "MID STATION SPLIT (PART 1 - RANGE)", tasks: halfMid });
+        combined.push({ phase: "MID OPENING SPLIT (PART 1 - RANGE)", tasks: halfMid });
         return combined;
-    } else if (targetStation === 'grill/fry + mid split' || targetStation === 'fry + mid split') {
+    } else if (targetStation === 'grill/fry + mid split' || targetStation === 'fry + mid open split' || targetStation === 'grill/fry + mid open split') {
         let combined = JSON.parse(JSON.stringify(specs['fry']));
         const midTasks = specs['mid'][0].tasks;
         const otherHalfMid = midTasks.slice(Math.ceil(midTasks.length / 2));
-        combined.push({ phase: "MID STATION SPLIT (PART 2 - GRILL/FRY)", tasks: otherHalfMid });
+        combined.push({ phase: "MID OPENING SPLIT (PART 2 - GRILL/FRY)", tasks: otherHalfMid });
         return combined;
     } else {
         return specs['range'];
@@ -653,8 +656,23 @@ function renderCookStationSelectorWidget() {
                     </div>
                 </div>
 
-                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🌙 2 Cook Close (Mid Closing Duties Split)</div>
+                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🏢 2 Cook Open (Mid Opening Duties Split)</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+                    <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
+                        <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍳 Range + Mid Open Split (Pt 1)</h4>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range open + first half of Mid open</p>
+                        <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Range + Mid Split')">${isEs ? 'Asignar Apertura 📌' : 'Assign Open 📌'}</button>
+                    </div>
+
+                    <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
+                        <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍟 Grill/Fry + Mid Open Split (Pt 2)</h4>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Grill/Fry open + second half of Mid open</p>
+                        <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Grill/Fry + Mid Split')">${isEs ? 'Asignar Apertura 📌' : 'Assign Open 📌'}</button>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🌙 2 Cook Close (Mid Closing Duties Split)</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
                     <div style="background: #fff7ed; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
                         <h4 style="color: #c2410c; margin: 0 0 4px 0; font-size: 0.95rem;">🍳 Range Closer (Mid Pt 1)</h4>
                         <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range close + first half of Mid close</p>
@@ -1129,15 +1147,15 @@ function submitQuizAnswers() {
         managerSignOff: false
     };
 
-    const existingIndex = certificationsList.findIndex(c => String(c.empId).trim() === String(targetEmpId).trim() && String(c.modId).trim() === String(mod.id).trim());
+    const existingIndex = certificationsList.findIndex(c => String(c.empId || c.EMPID || '').trim() === String(targetEmpId).trim() && String(c.modId || c.MODID || '').trim() === String(mod.id).trim());
     if(existingIndex >= 0) {
         certificationsList[existingIndex] = certPayload;
     } else {
         certificationsList.push(certPayload);
     }
     
-    renderTrainingModulesView();
     closeQuizModal();
+    renderTrainingModulesView();
 
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -1146,7 +1164,6 @@ function submitQuizAnswers() {
     })
     .then(res => res.text())
     .then(text => {
-        alert(isEs ? `¡Cuestionario enviado! Tu puntaje: ${scorePct}%. ${passed ? '¡Aprobaste! Pendiente de firma del gerente.' : 'Obtuviste menos del 85%. Por favor intenta nuevamente.'}` : `Quiz Submitted! Your score: ${scorePct}%. ${passed ? 'You passed! Pending manager sign-off.' : 'You scored under 85%. Please try again.'}`);
         fetchCertifications();
     })
     .catch(err => {
@@ -1155,9 +1172,8 @@ function submitQuizAnswers() {
 }
 
 function managerSignOffCert(empId, modId) {
-    const certRecord = certificationsList.find(c => String(c.empId).trim() === String(empId).trim() && String(c.modId).trim() === String(modId).trim());
+    const certRecord = certificationsList.find(c => String(c.empId || c.EMPID || '').trim() === String(empId).trim() && String(c.modId || c.MODID || '').trim() === String(modId).trim());
     if(!certRecord) return;
-    const isEs = currentLanguage === 'es';
 
     certRecord.managerSignOff = true;
     renderTrainingModulesView();
@@ -1169,7 +1185,6 @@ function managerSignOffCert(empId, modId) {
     })
     .then(res => res.text())
     .then(text => {
-        alert(isEs ? "¡Aprobación gerencial completada con éxito!" : "Manager sign-off completed successfully!");
         fetchCertifications();
         updateUserGreetingLabel();
     });
@@ -1412,7 +1427,7 @@ function renderCookDashboard() {
         return;
     }
 
-    const myShifts = shiftLogsList.filter(s => s.empId === currentUser.id);
+    const myShifts = shiftLogsList.filter(s => String(s.empId || s.EMPID || '').trim() === String(currentUser.id).trim());
 
     container.innerHTML = `
         <div class="card" style="margin-top: 1rem;">
@@ -1462,14 +1477,14 @@ function renderManagerDashboard() {
                 <tbody>
                     ${employeesList.length === 0 ? `<tr><td colspan="5">${isEs ? 'No se encontraron empleados.' : 'No employees found.'}</td></tr>` :
                       employeesList.map(emp => {
-                        const empShifts = shiftLogsList.filter(s => s.empId === emp.id && isWithinBiWeeklyPayrollCycle(s.date));
-                        const avg = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+b.scorePct,0)/empShifts.length) : 0;
+                        const empShifts = shiftLogsList.filter(s => String(s.empId || s.EMPID || '').trim() === String(emp.id).trim() && isWithinBiWeeklyPayrollCycle(s.date));
+                        const avg = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+Number(b.scorePct),0)/empShifts.length) : 0;
                         const isCertified = isEmployeeCertifiedTeamLeader(emp.id);
                         const nameDisplay = `${emp.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
                         return `
                             <tr>
                                 <td><span class="clickable-emp-name" onclick="openEmployeeReportModal('${emp.id}')">${nameDisplay}</span></td>
-                                <td>${emp.role.toUpperCase()}</td>
+                                <td>${String(emp.role || '').toUpperCase()}</td>
                                 <td>${emp.station}</td>
                                 <td>${empShifts.length}</td>
                                 <td><strong class="highlight">${avg}%</strong></td>
