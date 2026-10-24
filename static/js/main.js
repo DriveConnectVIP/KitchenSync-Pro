@@ -451,6 +451,7 @@ function ensureViewElementsExist() {
             if(vId === 'cook-dashboard') div.innerHTML = '<h2>Cook Personal Performance & Bonus Tracker</h2><div id="cook-dashboard-content"></div>';
             if(vId === 'manager-dashboard') div.innerHTML = '<h2>Shift Manager Oversight Dashboard</h2><div id="manager-dashboard-content"></div>';
             if(vId === 'cook-training') div.innerHTML = '<h2 id="training-view-heading">Training Modules & Mandatory Certifications</h2><div class="card"><div id="training-modules-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;"></div></div>';
+            if(vId === 'gm-dashboard') div.innerHTML = '<h2>General Manager Executive Suite</h2><div id="gm-dashboard-content"></div>';
             wrapper.appendChild(div);
         }
     });
@@ -561,7 +562,6 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
     } else if (targetStation === 'fry' || targetStation === 'grill' || targetStation === 'grill/fry') {
         return specs['fry'];
     } 
-    // 2-Cook Close: Range + First Half of Mid Close Tasks
     else if (targetStation === 'range + mid close split') {
         let combined = JSON.parse(JSON.stringify(specs['range']));
         const midTasks = specs['mid'][0].tasks;
@@ -569,7 +569,6 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         combined.push({ phase: "MID CLOSING SPLIT (PART 1 - RANGE)", tasks: halfMid });
         return combined;
     } 
-    // 2-Cook Close: Grill/Fry + Second Half of Mid Close Tasks
     else if (targetStation === 'grill/fry + mid close split' || targetStation === 'fry + mid close split') {
         let combined = JSON.parse(JSON.stringify(specs['fry']));
         const midTasks = specs['mid'][0].tasks;
@@ -577,7 +576,6 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         combined.push({ phase: "MID CLOSING SPLIT (PART 2 - GRILL/FRY)", tasks: otherHalfMid });
         return combined;
     } 
-    // Legacy / Opening Splits
     else if (targetStation === 'range + mid split') {
         let combined = JSON.parse(JSON.stringify(specs['range']));
         const midTasks = specs['mid'][0].tasks;
@@ -633,7 +631,7 @@ function renderCookStationSelectorWidget() {
         container.innerHTML = `
             <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 2px solid #cbd5e1;">
                 <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? '📍 Selecciona y Asigna Tu Estación de Turno' : '📍 Select & Assign Your Shift Station'}</h3>
-                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">${isEs ? 'Selecciona tu modo de turno (Apertura de 3 cocineros, Apertura de 2 cocineros o Cierre de 2 cocineros con Mid compartido):' : 'Select your shift mode below (3-Cook Open, 2-Cook Open, or 2-Cook Close with shared Mid duties):'}</p>
+                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">${isEs ? 'Selecciona tu modo de turno:' : 'Select your shift mode below:'}</p>
                 
                 <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">⭐ 3 Cook Open (Dedicated Stations)</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
@@ -667,21 +665,6 @@ function renderCookStationSelectorWidget() {
                         <button class="btn btn-primary" style="background: #ea580c; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Grill/Fry + Mid Close Split')">${isEs ? 'Asignar Cierre 📌' : 'Assign Close 📌'}</button>
                     </div>
                 </div>
-
-                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🏢 2 Cook Open (Mid Opening Duties Split)</div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
-                    <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
-                        <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍳 Range + Mid Split (Pt 1)</h4>
-                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range + first half of Mid open</p>
-                        <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Range + Mid Split')">${isEs ? 'Asignar Split 📌' : 'Assign Split 📌'}</button>
-                    </div>
-
-                    <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
-                        <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍟 Grill/Fry + Mid Split (Pt 2)</h4>
-                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Grill/Fry + second half of Mid open</p>
-                        <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Grill/Fry + Mid Split')">${isEs ? 'Asignar Split 📌' : 'Assign Split 📌'}</button>
-                    </div>
-                </div>
             </div>
         `;
     } else {
@@ -690,7 +673,6 @@ function renderCookStationSelectorWidget() {
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h3 style="margin: 0; color: #166534;">${isEs ? '✅ Estación Asignada Activa' : '✅ Active Assigned Station'}: ${assignedStation}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo incluye tus tareas asignadas.' : 'The checklist below displays your assigned duties.'}</p>
                     </div>
                     <button class="btn btn-secondary" style="background: white; color: #dc2626; border: 1px solid #fecaca;" onclick="clearCookStation()">${isEs ? 'Cambiar Estación 🔄' : 'Change Station 🔄'}</button>
                 </div>
@@ -729,7 +711,6 @@ function renderChecklistForm() {
         container.innerHTML = `
             <div class="card" style="text-align: center; padding: 2rem; background: #eff6ff; border: 1px solid #bfdbfe;">
                 <h3 style="color: #1e3a8a; margin-top: 0;">👆 ${currentLanguage === 'es' ? 'Selecciona una Estación Arriba' : 'Select a Station Above'}</h3>
-                <p style="color: #475569; margin-bottom: 0;">${currentLanguage === 'es' ? 'Haz clic en "Asignar" en tu opción de apertura o cierre para cargar la lista.' : 'Click "Assign" on your opening or closing mode above to load your checklist tasks.'}</p>
             </div>
         `;
         return;
@@ -767,11 +748,39 @@ function populateGUShiftAuditDropdown() {
     selectEl.innerHTML = '<option value="">-- Choose a submitted shift report --</option>';
 
     shiftLogsList.forEach(s => {
+        const roleStr = s.role ? String(s.role) : 'cook';
         const opt = document.createElement('option');
         opt.value = s.id;
-        opt.textContent = `${s.date} | ${s.empName} (${s.role.toUpperCase()}) - Score: ${s.scorePct}%`;
+        opt.textContent = `${s.date} | ${s.empName} (${roleStr.toUpperCase()}) - Score: ${s.scorePct}%`;
         selectEl.appendChild(opt);
     });
+}
+
+function renderGMExecutiveDashboard() {
+    const container = document.getElementById('gm-dashboard-content');
+    if(!container) return;
+    const isEs = currentLanguage === 'es';
+
+    container.innerHTML = `
+        <div class="card">
+            <h3>📈 ${isEs ? 'Resumen Ejecutivo y Auditoría General' : 'Executive Overview & Operational Audit'}</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">${isEs ? 'Bienvenido a la suite de control del Gerente General. Monitorea el rendimiento del equipo, cumplimiento de turnos y aprobaciones.' : 'Welcome to the General Manager control suite. Monitor store performance, shift compliance, and certifications.'}</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
+                    <span style="font-size: 0.85rem; color: #64748b;">${isEs ? 'Total Empleados Activos' : 'Active Employees'}</span>
+                    <h2 style="margin: 5px 0 0 0; color: #1e3a8a;">${employeesList.length}</h2>
+                </div>
+                <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
+                    <span style="font-size: 0.85rem; color: #64748b;">${isEs ? 'Turnos Registrados' : 'Total Shifts Logged'}</span>
+                    <h2 style="margin: 5px 0 0 0; color: #1e3a8a;">${shiftLogsList.length}</h2>
+                </div>
+                <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
+                    <span style="font-size: 0.85rem; color: #64748b;">${isEs ? 'Certificaciones Completadas' : 'Certifications Recorded'}</span>
+                    <h2 style="margin: 5px 0 0 0; color: #1e3a8a;">${certificationsList.length}</h2>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function loadSubmittedShiftAudit() {
@@ -1109,6 +1118,16 @@ function submitQuizAnswers() {
         managerSignOff: false
     };
 
+    const existingIndex = certificationsList.findIndex(c => c.empId === targetEmpId && c.modId === mod.id);
+    if(existingIndex >= 0) {
+        certificationsList[existingIndex] = certPayload;
+    } else {
+        certificationsList.push(certPayload);
+    }
+    
+    renderTrainingModulesView();
+    closeQuizModal();
+
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1117,8 +1136,10 @@ function submitQuizAnswers() {
     .then(res => res.text())
     .then(text => {
         alert(isEs ? `¡Cuestionario enviado! Tu puntaje: ${scorePct}%. ${passed ? '¡Aprobaste! Pendiente de firma del gerente.' : 'Obtuviste menos del 85%. Por favor intenta nuevamente.'}` : `Quiz Submitted! Your score: ${scorePct}%. ${passed ? 'You passed! Pending manager sign-off.' : 'You scored under 85%. Please try again.'}`);
-        closeQuizModal();
         fetchCertifications();
+    })
+    .catch(err => {
+        console.error("Error saving cert:", err);
     });
 }
 
@@ -1128,6 +1149,7 @@ function managerSignOffCert(empId, modId) {
     const isEs = currentLanguage === 'es';
 
     certRecord.managerSignOff = true;
+    renderTrainingModulesView();
 
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -1409,46 +1431,6 @@ function renderCookDashboard() {
     `;
 }
 
-function renderManagerDashboard() {
-    const container = document.getElementById('manager-dashboard-content');
-    if(!container) return;
-    const isEs = currentLanguage === 'es';
-
-    container.innerHTML = `
-        <div class="card">
-            <h3>${isEs ? 'Supervisión de Turnos del Equipo y Reportes Quincenales (Ciclo Lun–Dom)' : 'Team Shift Oversight & Bi-Weekly Reports (Mon–Sun Cycle)'}</h3>
-            <p style="font-size:0.85rem; color:#64748b; margin-top:0;">${isEs ? 'Haz clic en cualquier nombre de empleado para abrir su reporte quincenal completo.' : 'Click any employee name below to open their full bi-weekly report.'}</p>
-            <table class="data-table">
-                <thead><tr>
-                    <th>${isEs ? 'Nombre del Empleado' : 'Employee Name'}</th>
-                    <th>${isEs ? 'Rol' : 'Role'}</th>
-                    <th>${isEs ? 'Estación' : 'Station'}</th>
-                    <th>${isEs ? 'Turnos' : 'Shifts'}</th>
-                    <th>${isEs ? 'Promedio' : 'Average'}</th>
-                </tr></thead>
-                <tbody>
-                    ${employeesList.length === 0 ? `<tr><td colspan="5">${isEs ? 'No se encontraron empleados.' : 'No employees found.'}</td></tr>` :
-                      employeesList.map(emp => {
-                        const empShifts = shiftLogsList.filter(s => s.empId === emp.id && isWithinBiWeeklyPayrollCycle(s.date));
-                        const avg = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+b.scorePct,0)/empShifts.length) : 0;
-                        const isCertified = isEmployeeCertifiedTeamLeader(emp.id);
-                        const nameDisplay = `${emp.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
-                        return `
-                            <tr>
-                                <td><span class="clickable-emp-name" onclick="openEmployeeReportModal('${emp.id}')">${nameDisplay}</span></td>
-                                <td>${emp.role.toUpperCase()}</td>
-                                <td>${emp.station}</td>
-                                <td>${empShifts.length}</td>
-                                <td><strong class="highlight">${avg}%</strong></td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
-}
-
 function renderRosterTable() {
     const tbody = document.getElementById('roster-table-body');
     if(!tbody) return;
@@ -1458,11 +1440,12 @@ function renderRosterTable() {
     employeesList.forEach(e => {
         const isCertified = isEmployeeCertifiedTeamLeader(e.id);
         const nameDisplay = `${e.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
+        const roleStr = e.role ? String(e.role).toUpperCase() : '';
         tbody.innerHTML += `
             <tr>
                 <td>${e.id}</td>
                 <td><strong>${nameDisplay}</strong></td>
-                <td>${e.role.toUpperCase()}</td>
+                <td>${roleStr}</td>
                 <td>${e.station}</td>
                 <td>•••• (${e.pin})</td>
                 <td>$${Number(e.hourlyRate).toFixed(2)}</td>
