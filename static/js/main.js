@@ -175,19 +175,19 @@ const CHECKLIST_SPECS = {
             {
                 phase: "PRE-TURNO Y MEDIA JORNADA",
                 tasks: [
-                    { id: "m5", title: "Manager-Cook Pre-Shift Meeting", desc: "Run 5-min huddle with kitchen crew. Align on daily specials & targets." },
-                    { id: "m6", title: "Mandatory BOH Line Check", desc: "Audit kitchen line. Taste items, check hot/cold temperatures." },
-                    { id: "m7", title: "Active Floor Management", desc: "Lead peak rushes on floor. Monitor guest satisfaction & table turn times." },
-                    { id: "m8", title: "Mid-Day Labor Cuts", desc: "Evaluate labor %. Cut hours dynamically if sales drop below forecast." }
+                    { id: "m5", title: "Reunión Pre-Turno Gerente-Cocinero", desc: "Realizar junta de 5 mins con el equipo. Alinear sobre especiales y metas." },
+                    { id: "m6", title: "Inspección Obligatoria de Línea BOH", desc: "Auditar línea de cocina. Probar calidad y revisar temperaturas." },
+                    { id: "m7", title: "Gestión Activa del Salón", desc: "Liderar picos en el salón, monitorear satisfacción y optimizar rotación." },
+                    { id: "m8", title: "Recortes de Personal a Media Jornada", desc: "Evaluar porcentaje de mano de obra y reducir horas si las ventas bajan." }
                 ]
             },
             {
-                phase: "PM / CLOSE",
+                phase: "PM / CIERRE",
                 tasks: [
-                    { id: "m9", title: "PM Kitchen Line Check", desc: "Conduct secondary check on line item quality and station pars." },
-                    { id: "m10", title: "Daily Food Waste Logging", desc: "Review and input kitchen waste log. Investigate excessive errors." },
-                    { id: "m11", title: "Final Kitchen Close Audit", desc: "Walkthrough kitchen close. Verify clean stations and FIFO labels." },
-                    { id: "m12", title: "P&L & Shift Summary", desc: "Close out financials, deposit cash, and write summary log." }
+                    { id: "m9", title: "Inspección de Línea PM", desc: "Realizar segunda revisión de calidad y controles de temperatura antes de la cena." },
+                    { id: "m10", title: "Registro Diario de Desperdicios", desc: "Revisar e ingresar registro de desperdicios e investigar errores excesivos." },
+                    { id: "m11", title: "Auditoría Final de Cierre de Cocina", desc: "Completar recorrido de cierre, verificar estaciones limpias y etiquetas FIFO." },
+                    { id: "m12", title: "P&L y Resumen de Turno", desc: "Cerrar finanzas, deposit efectivo y redactar informe de resumen." }
                 ]
             }
         ]
@@ -960,6 +960,9 @@ function submitShiftChecklist() {
         notes: JSON.stringify(taskNotes)
     };
 
+    // Push immediately to local array for instant appearance in Shifts Completed
+    shiftLogsList.push(shiftPayload);
+
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -970,7 +973,11 @@ function submitShiftChecklist() {
         alert("Shift saved successfully!");
         fetchShifts();
         populateGUShiftAuditDropdown();
-    });
+        if(currentRoleSession === 'cook') {
+            renderCookDashboard();
+        }
+    })
+    .catch(err => alert("Error saving shift: " + err));
 }
 
 function renderTrainingModulesView() {
@@ -1295,7 +1302,7 @@ function openEmployeeReportModal(empId) {
     if(!emp) return;
     const isEs = currentLanguage === 'es';
 
-    const empShifts = shiftLogsList.filter(s => s.empId === emp.id && isWithinBiWeeklyPayrollCycle(s.date));
+    const empShifts = shiftLogsList.filter(s => String(s.empId || s.EMPID || '').trim() === String(emp.id).trim() && isWithinBiWeeklyPayrollCycle(s.date));
     const avgScore = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+b.scorePct,0)/empShifts.length) : 0;
 
     let tierLabel = isEs ? "No elegible (<85%)" : "Ineligible (<85%)";
@@ -1390,7 +1397,7 @@ function emailCurrentEmployeeReport() {
     if(!emp) return;
     const isEs = currentLanguage === 'es';
 
-    const empShifts = shiftLogsList.filter(s => s.empId === emp.id && isWithinBiWeeklyPayrollCycle(s.date));
+    const empShifts = shiftLogsList.filter(s => String(s.empId || s.EMPID || '').trim() === String(emp.id).trim() && isWithinBiWeeklyPayrollCycle(s.date));
     const avgScore = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+b.scorePct,0)/empShifts.length) : 0;
 
     let tierLabel = isEs ? "No elegible (<85%)" : "Ineligible (<85%)";
@@ -1541,7 +1548,7 @@ function saveNewEmployee(e) {
 
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'saveEmployee', employee: newEmp })
     })
     .then(res => res.text())
@@ -1575,27 +1582,4 @@ function closeEditEmployeeModal() {
 function saveEditedEmployee(e) {
     e.preventDefault();
     const empId = document.getElementById('edit-emp-id').value;
-    const emp = employeesList.find(e => e.id === empId);
-    if(!emp) return;
-    const isEs = currentLanguage === 'es';
-
-    emp.name = document.getElementById('edit-emp-name').value.trim();
-    emp.role = document.getElementById('edit-employee-form').querySelector('#edit-emp-role').value;
-    emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
-    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
-    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-employee-rate').value);
-
-    alert(isEs ? "¡Detalles del empleado actualizados con éxito!" : "Employee details successfully updated!");
-    closeEditEmployeeModal();
-    renderRosterTable();
-    populateStaffDropdown();
-}
-
-function removeEmp(id) {
-    const isEs = currentLanguage === 'es';
-    if(confirm(isEs ? "¿Eliminar empleado?" : "Remove employee?")) {
-        employeesList = employeesList.filter(e => e.id !== id);
-        renderRosterTable();
-        populateStaffDropdown();
-    }
-}
+    const emp = employeesList.find(e => e.id
