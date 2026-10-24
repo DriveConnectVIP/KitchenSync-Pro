@@ -187,7 +187,7 @@ const CHECKLIST_SPECS = {
                     { id: "m9", title: "Inspección de Línea PM", desc: "Realizar segunda revisión de calidad y controles de temperatura antes de la cena." },
                     { id: "m10", title: "Registro Diario de Desperdicios", desc: "Revisar e ingresar registro de desperdicios e investigar errores excesivos." },
                     { id: "m11", title: "Auditoría Final de Cierre de Cocina", desc: "Completar recorrido de cierre, verificar estaciones limpias y etiquetas FIFO." },
-                    { id: "m12", title: "P&L y Resumen de Turno", desc: "Cerrar finanzas, depositar efectivo y redactar informe de resumen." }
+                    { id: "m12", title: "P&L y Resumen de Turno", desc: "Cerrar finanzas, deposit efectivo y redactar informe de resumen." }
                 ]
             }
         ]
@@ -317,11 +317,13 @@ function finalizeSuccessfulLogin() {
 }
 
 function isEmployeeCertifiedTeamLeader(empId) {
-    const empCerts = certificationsList.filter(c => c.empId === empId);
+    const empCerts = certificationsList.filter(c => String(c.empId || c.EMPID || '').trim() === String(empId).trim());
     if(empCerts.length < TRAINING_MODULES.length) return false;
     return TRAINING_MODULES.every(mod => {
-        const record = empCerts.find(c => c.modId === mod.id);
-        return record && record.passed && record.managerSignOff;
+        const record = empCerts.find(c => String(c.modId || c.MODID || '').trim() === String(mod.id).trim());
+        const isPassed = record && (record.passed === true || String(record.passed).toLowerCase() === 'true' || Number(record.score) >= 85);
+        const isSignedOff = record && (record.managerSignOff === true || String(record.managerSignOff).toLowerCase() === 'true');
+        return record && isPassed && isSignedOff;
     });
 }
 
@@ -764,7 +766,7 @@ function renderGMExecutiveDashboard() {
     container.innerHTML = `
         <div class="card">
             <h3>📈 ${isEs ? 'Resumen Ejecutivo y Auditoría General' : 'Executive Overview & Operational Audit'}</h3>
-            <p style="color: #64748b; font-size: 0.9rem;">${isEs ? 'Bienvenido a la suite de control del Gerente General. Monitorea el rendimiento del equipo, cumplimiento de turnos y aprobaciones.' : 'Welcome to the General Manager control suite. Monitor store performance, shift compliance, and certifications.'}</p>
+            <p style="color: #64748b; font-size: 0.9rem;">${isEs ? 'Bienvenido a la suite de control del Gerente General.' : 'Welcome to the General Manager control suite.'}</p>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
                 <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
                     <span style="font-size: 0.85rem; color: #64748b;">${isEs ? 'Total Empleados Activos' : 'Active Employees'}</span>
@@ -979,16 +981,21 @@ function renderTrainingModulesView() {
         } else {
             cooks.forEach(cook => {
                 TRAINING_MODULES.forEach(mod => {
-                    const cert = certificationsList.find(c => c.empId === cook.id && c.modId === mod.id);
-                    const scoreText = cert ? `${cert.score}%` : (isEs ? 'No tomado' : 'Not Taken');
-                    const passedText = cert ? (cert.passed ? `<span style="color:#16a34a; font-weight:bold;">${isEs ? 'Sí ✅' : 'Yes ✅'}</span>` : `<span style="color:#dc2626; font-weight:bold;">${isEs ? 'No ❌' : 'No ❌'}</span>`) : `<span style="color:#64748b;">${isEs ? 'Pendiente' : 'Pending'}</span>`;
+                    const cert = certificationsList.find(c => 
+                        String(c.empId || c.EMPID || '').trim() === String(cook.id).trim() && 
+                        String(c.modId || c.MODID || '').trim() === String(mod.id).trim()
+                    );
+                    const scoreText = cert && cert.score !== undefined ? `${cert.score}%` : (isEs ? 'No tomado' : 'Not Taken');
+                    const isPassed = cert && (cert.passed === true || String(cert.passed).toLowerCase() === 'true' || Number(cert.score) >= 85);
+                    const passedText = cert ? (isPassed ? `<span style="color:#16a34a; font-weight:bold;">${isEs ? 'Sí ✅' : 'Yes ✅'}</span>` : `<span style="color:#dc2626; font-weight:bold;">${isEs ? 'No ❌' : 'No ❌'}</span>`) : `<span style="color:#64748b;">${isEs ? 'Pendiente' : 'Pending'}</span>`;
 
                     let signOffText = `<span style="color:#64748b;">N/A</span>`;
                     let actionBtn = `<span>-</span>`;
 
                     if(cert) {
-                        if(cert.passed) {
-                            if(cert.managerSignOff) {
+                        const isSignedOff = cert.managerSignOff === true || String(cert.managerSignOff).toLowerCase() === 'true';
+                        if(isPassed) {
+                            if(isSignedOff) {
                                 signOffText = `<span style="color:#16a34a; font-weight:bold;">${isEs ? 'Aprobado y Firmado ✔️' : 'Approved & Signed Off ✔️'}</span>`;
                                 actionBtn = `<span style="color:#16a34a; font-size:0.8rem;">${isEs ? 'Certificado' : 'Certified'}</span>`;
                             } else {
@@ -1026,10 +1033,14 @@ function renderTrainingModulesView() {
         let targetEmpId = currentUser.id;
 
         TRAINING_MODULES.forEach(mod => {
-            const certRecord = certificationsList.find(c => c.empId === targetEmpId && c.modId === mod.id);
-            const score = certRecord ? certRecord.score : null;
-            const passed = certRecord ? certRecord.passed : false;
-            const signedOff = certRecord ? certRecord.managerSignOff : false;
+            const certRecord = certificationsList.find(c => 
+                String(c.empId || c.EMPID || '').trim() === String(targetEmpId).trim() && 
+                String(c.modId || c.MODID || '').trim() === String(mod.id).trim()
+            );
+            
+            const score = certRecord && certRecord.score !== undefined ? certRecord.score : null;
+            const passed = certRecord && (certRecord.passed === true || String(certRecord.passed).toLowerCase() === 'true' || Number(certRecord.score) >= 85);
+            const signedOff = certRecord && (certRecord.managerSignOff === true || String(certRecord.managerSignOff).toLowerCase() === 'true');
 
             let statusHtml = `<span style="color:var(--danger); font-weight:bold;">${isEs ? 'No Iniciado' : 'Not Started'}</span>`;
             let actionBtn = `<button class="btn btn-primary" style="padding:0.3rem 0.8rem; font-size:0.85rem;" onclick="openQuizModal('${mod.id}', '${targetEmpId}')">${isEs ? 'Tomar Cuestionario ✍️' : 'Take Quiz ✍️'}</button>`;
@@ -1118,7 +1129,7 @@ function submitQuizAnswers() {
         managerSignOff: false
     };
 
-    const existingIndex = certificationsList.findIndex(c => c.empId === targetEmpId && c.modId === mod.id);
+    const existingIndex = certificationsList.findIndex(c => String(c.empId).trim() === String(targetEmpId).trim() && String(c.modId).trim() === String(mod.id).trim());
     if(existingIndex >= 0) {
         certificationsList[existingIndex] = certPayload;
     } else {
@@ -1144,7 +1155,7 @@ function submitQuizAnswers() {
 }
 
 function managerSignOffCert(empId, modId) {
-    const certRecord = certificationsList.find(c => c.empId === empId && c.modId === modId);
+    const certRecord = certificationsList.find(c => String(c.empId).trim() === String(empId).trim() && String(c.modId).trim() === String(modId).trim());
     if(!certRecord) return;
     const isEs = currentLanguage === 'es';
 
@@ -1425,6 +1436,46 @@ function renderCookDashboard() {
                             <td>-</td>
                         </tr>
                     `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function renderManagerDashboard() {
+    const container = document.getElementById('manager-dashboard-content');
+    if(!container) return;
+    const isEs = currentLanguage === 'es';
+
+    container.innerHTML = `
+        <div class="card">
+            <h3>${isEs ? 'Supervisión de Turnos del Equipo y Reportes Quincenales (Ciclo Lun–Dom)' : 'Team Shift Oversight & Bi-Weekly Reports (Mon–Sun Cycle)'}</h3>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:0;">${isEs ? 'Haz clic en cualquier nombre de empleado para abrir su reporte quincenal completo.' : 'Click any employee name below to open their full bi-weekly report.'}</p>
+            <table class="data-table">
+                <thead><tr>
+                    <th>${isEs ? 'Nombre del Empleado' : 'Employee Name'}</th>
+                    <th>${isEs ? 'Rol' : 'Role'}</th>
+                    <th>${isEs ? 'Estación' : 'Station'}</th>
+                    <th>${isEs ? 'Turnos' : 'Shifts'}</th>
+                    <th>${isEs ? 'Promedio' : 'Average'}</th>
+                </tr></thead>
+                <tbody>
+                    ${employeesList.length === 0 ? `<tr><td colspan="5">${isEs ? 'No se encontraron empleados.' : 'No employees found.'}</td></tr>` :
+                      employeesList.map(emp => {
+                        const empShifts = shiftLogsList.filter(s => s.empId === emp.id && isWithinBiWeeklyPayrollCycle(s.date));
+                        const avg = empShifts.length > 0 ? Math.round(empShifts.reduce((a,b)=>a+b.scorePct,0)/empShifts.length) : 0;
+                        const isCertified = isEmployeeCertifiedTeamLeader(emp.id);
+                        const nameDisplay = `${emp.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
+                        return `
+                            <tr>
+                                <td><span class="clickable-emp-name" onclick="openEmployeeReportModal('${emp.id}')">${nameDisplay}</span></td>
+                                <td>${emp.role.toUpperCase()}</td>
+                                <td>${emp.station}</td>
+                                <td>${empShifts.length}</td>
+                                <td><strong class="highlight">${avg}%</strong></td>
+                            </tr>
+                        `;
+                    }).join('')}
                 </tbody>
             </table>
         </div>
