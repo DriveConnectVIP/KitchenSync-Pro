@@ -1529,10 +1529,10 @@ function saveEditedEmployee(e) {
     const isEs = currentLanguage === 'es';
 
     emp.name = document.getElementById('edit-emp-name').value.trim();
-    emp.role = document.getElementById('edit-emp-role').value;
+    emp.role = document.getElementById('edit-employee-form').querySelector('#edit-emp-role').value;
     emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
     emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
-    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value);
+    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-employee-rate').value);
 
     alert(isEs ? "¡Detalles del empleado actualizados con éxito!" : "Employee details successfully updated!");
     closeEditEmployeeModal();
