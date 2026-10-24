@@ -1023,17 +1023,19 @@ function renderTrainingModulesView() {
             const signedOff = certRecord ? certRecord.managerSignOff : false;
 
             let statusHtml = `<span style="color:var(--danger); font-weight:bold;">${isEs ? 'No Iniciado' : 'Not Started'}</span>`;
+            let actionBtn = `<button class="btn btn-primary" style="padding:0.3rem 0.8rem; font-size:0.85rem;" onclick="openQuizModal('${mod.id}', '${targetEmpId}')">${isEs ? 'Tomar Cuestionario ✍️' : 'Take Quiz ✍️'}</button>`;
+
             if(score !== null) {
                 if(passed && signedOff) {
                     statusHtml = `<span style="color:var(--success); font-weight:bold;">${isEs ? `Certificado y Aprobado (Puntaje: ${score}%) ✅` : `Certified & Signed Off (Score: ${score}%) ✅`}</span>`;
+                    actionBtn = `<button class="btn btn-secondary" style="background:#dcfce7; color:#166534; padding:0.3rem 0.8rem; font-size:0.85rem; font-weight:bold;" disabled>Complete! (Score: ${score}%) ✅</button>`;
                 } else if(passed && !signedOff) {
                     statusHtml = `<span style="color:var(--warning); font-weight:bold;">${isEs ? `Cuestionario Aprobado (${score}%) - Pendiente de Firma ⏳` : `Quiz Passed (${score}%) - Pending Manager Sign-Off ⏳`}</span>`;
+                    actionBtn = `<button class="btn btn-secondary" style="background:#fef3c7; color:#d97706; padding:0.3rem 0.8rem; font-size:0.85rem; font-weight:bold;" disabled>Complete! (Score: ${score}%) ⏳</button>`;
                 } else {
                     statusHtml = `<span style="color:var(--danger); font-weight:bold;">${isEs ? `Reprobado (${score}%) - Mínimo 85% Requerido ❌` : `Failed (${score}%) - Minimum 85% Required ❌`}</span>`;
                 }
             }
-
-            let actionBtn = `<button class="btn btn-primary" style="padding:0.3rem 0.8rem; font-size:0.85rem;" onclick="openQuizModal('${mod.id}', '${targetEmpId}')">${isEs ? 'Tomar Cuestionario ✍️' : 'Take Quiz ✍️'}</button>`;
 
             container.innerHTML += `
                 <div style="background:white; border:1px solid var(--card-border); border-radius:6px; padding:15px; display:flex; justify-content:space-between; align-items:center;">
