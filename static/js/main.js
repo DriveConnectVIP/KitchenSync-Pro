@@ -917,8 +917,8 @@ function submitShiftChecklist() {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'saveShift', shift: shiftPayload })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.text())
+    .then(text => {
         alert("Shift saved successfully!");
         fetchShifts();
         populateGUShiftAuditDropdown();
@@ -1093,8 +1093,8 @@ function submitQuizAnswers() {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'saveCert', cert: certPayload })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.text())
+    .then(text => {
         alert(isEs ? `¡Cuestionario enviado! Tu puntaje: ${scorePct}%. ${passed ? '¡Aprobaste! Pendiente de firma del gerente.' : 'Obtuviste menos del 85%. Por favor intenta nuevamente.'}` : `Quiz Submitted! Your score: ${scorePct}%. ${passed ? 'You passed! Pending manager sign-off.' : 'You scored under 85%. Please try again.'}`);
         closeQuizModal();
         fetchCertifications();
@@ -1113,8 +1113,8 @@ function managerSignOffCert(empId, modId) {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'saveCert', cert: certRecord })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.text())
+    .then(text => {
         alert(isEs ? "¡Aprobación gerencial completada con éxito!" : "Manager sign-off completed successfully!");
         fetchCertifications();
         updateUserGreetingLabel();
@@ -1431,101 +1431,3 @@ function renderManagerDashboard() {
 function renderRosterTable() {
     const tbody = document.getElementById('roster-table-body');
     if(!tbody) return;
-    tbody.innerHTML = '';
-    const isEs = currentLanguage === 'es';
-
-    employeesList.forEach(e => {
-        const isCertified = isEmployeeCertifiedTeamLeader(e.id);
-        const nameDisplay = `${e.name}${isCertified ? (isEs ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : ''}`;
-        tbody.innerHTML += `
-            <tr>
-                <td>${e.id}</td>
-                <td><strong>${nameDisplay}</strong></td>
-                <td>${e.role.toUpperCase()}</td>
-                <td>${e.station}</td>
-                <td>•••• (${e.pin})</td>
-                <td>$${Number(e.hourlyRate).toFixed(2)}</td>
-                <td>
-                    <button class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.8rem; margin-right:5px;" onclick="openEditEmployeeModal('${e.id}')">✏️ ${isEs ? 'Editar' : 'Edit'}</button>
-                    <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="removeEmp('${e.id}')">${isEs ? 'Eliminar' : 'Delete'}</button>
-                </td>
-            </tr>`;
-    });
-}
-
-function openAddEmployeeModal() { document.getElementById('add-employee-modal').style.display = 'flex'; }
-function closeAddEmployeeModal() { document.getElementById('add-employee-modal').style.display = 'none'; }
-
-function saveNewEmployee(e) {
-    e.preventDefault();
-    const isEs = currentLanguage === 'es';
-    const newEmp = {
-        id: `EMP-${Date.now().toString().slice(-4)}`,
-        name: document.getElementById('new-emp-name').value.trim(),
-        role: document.getElementById('new-emp-role').value,
-        station: document.getElementById('new-emp-station').value.trim(),
-        pin: document.getElementById('new-emp-pin').value.trim(),
-        hourlyRate: parseFloat(document.getElementById('new-emp-rate').value),
-        active: true
-    };
-
-    fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'saveEmployee', employee: newEmp })
-    })
-    .then(res => res.text())
-    .then(text => {
-        alert(isEs ? "¡Nuevo miembro del equipo agregado!" : "New team member added!");
-        closeAddEmployeeModal();
-        document.getElementById('add-employee-form').reset();
-        fetchEmployees();
-    })
-    .catch(err => alert((isEs ? "Error de conexión: " : "Connection error: ") + err));
-}
-
-function openEditEmployeeModal(empId) {
-    const emp = employeesList.find(e => e.id === empId);
-    if(!emp) return;
-
-    document.getElementById('edit-emp-id').value = emp.id;
-    document.getElementById('edit-emp-name').value = emp.name;
-    document.getElementById('edit-emp-role').value = emp.role;
-    document.getElementById('edit-emp-station').value = emp.station;
-    document.getElementById('edit-emp-pin').value = emp.pin;
-    document.getElementById('edit-emp-rate').value = emp.hourlyRate;
-
-    document.getElementById('edit-employee-modal').style.display = 'flex';
-}
-
-function closeEditEmployeeModal() {
-    document.getElementById('edit-employee-modal').style.display = 'none';
-}
-
-function saveEditedEmployee(e) {
-    e.preventDefault();
-    const empId = document.getElementById('edit-emp-id').value;
-    const emp = employeesList.find(e => e.id === empId);
-    if(!emp) return;
-    const isEs = currentLanguage === 'es';
-
-    emp.name = document.getElementById('edit-emp-name').value.trim();
-    emp.role = document.getElementById('edit-emp-role').value;
-    emp.station = document.getElementById('edit-employee-form').querySelector('#edit-emp-station').value.trim();
-    emp.pin = document.getElementById('edit-employee-form').querySelector('#edit-emp-pin').value.trim();
-    emp.hourlyRate = parseFloat(document.getElementById('edit-employee-form').querySelector('#edit-emp-rate').value);
-
-    alert(isEs ? "¡Detalles del empleado actualizados con éxito!" : "Employee details successfully updated!");
-    closeEditEmployeeModal();
-    renderRosterTable();
-    populateStaffDropdown();
-}
-
-function removeEmp(id) {
-    const isEs = currentLanguage === 'es';
-    if(confirm(isEs ? "¿Eliminar empleado?" : "Remove employee?")) {
-        employeesList = employeesList.filter(e => e.id !== id);
-        renderRosterTable();
-        populateStaffDropdown();
-    }
-}
