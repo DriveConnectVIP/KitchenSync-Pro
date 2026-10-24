@@ -254,7 +254,6 @@ function handleLogin(e) {
     e.preventDefault();
     const password = document.getElementById('auth-password').value.trim();
 
-    // 1. Hardcoded GM Master Passcode Override
     if (password === GM_MASTER_PASSCODE) {
         currentUser = { id: "GM-ADMIN", name: "General Manager", role: "gm", station: "All Stations" };
         currentRoleSession = "gm";
@@ -262,7 +261,6 @@ function handleLogin(e) {
         return;
     }
 
-    // 2. Local Employee PIN Match (Cooks & Managers)
     const matchedEmp = employeesList.find(emp => String(emp.pin).trim() === password && emp.active);
     if (matchedEmp) {
         currentUser = matchedEmp;
@@ -271,7 +269,6 @@ function handleLogin(e) {
         return;
     }
 
-    // 3. Backend Fallback
     fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -559,32 +556,23 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         targetStation = selectedOpt.toLowerCase();
     }
 
-    // 1. 3-Cook Open: Dedicated Mid Station
     if (targetStation === 'mid') {
         return specs['mid'];
-    } 
-    // 2. 3-Cook Open: Dedicated Grill/Fry Station
-    else if (targetStation === 'fry' || targetStation === 'grill' || targetStation === 'grill/fry') {
+    } else if (targetStation === 'fry' || targetStation === 'grill' || targetStation === 'grill/fry') {
         return specs['fry'];
-    } 
-    // 3. 2-Cook Open (Weekday Split): Range + First Half of Mid
-    else if (targetStation === 'range + mid split') {
+    } else if (targetStation === 'range + mid split') {
         let combined = JSON.parse(JSON.stringify(specs['range']));
         const midTasks = specs['mid'][0].tasks;
         const halfMid = midTasks.slice(0, Math.ceil(midTasks.length / 2));
         combined.push({ phase: "MID STATION SPLIT (PART 1 - RANGE)", tasks: halfMid });
         return combined;
-    } 
-    // 4. 2-Cook Open (Weekday Split): Grill/Fry + Second Half of Mid
-    else if (targetStation === 'grill/fry + mid split' || targetStation === 'fry + mid split') {
+    } else if (targetStation === 'grill/fry + mid split' || targetStation === 'fry + mid split') {
         let combined = JSON.parse(JSON.stringify(specs['fry']));
         const midTasks = specs['mid'][0].tasks;
         const otherHalfMid = midTasks.slice(Math.ceil(midTasks.length / 2));
         combined.push({ phase: "MID STATION SPLIT (PART 2 - GRILL/FRY)", tasks: otherHalfMid });
         return combined;
-    } 
-    // Default fallback (Range)
-    else {
+    } else {
         return specs['range'];
     }
 }
