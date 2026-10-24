@@ -560,7 +560,25 @@ function getActiveChecklistSpecsForDate(dateStr, roleType, lang) {
         return specs['mid'];
     } else if (targetStation === 'fry' || targetStation === 'grill' || targetStation === 'grill/fry') {
         return specs['fry'];
-    } else if (targetStation === 'range + mid split') {
+    } 
+    // 2-Cook Close: Range + First Half of Mid Close Tasks
+    else if (targetStation === 'range + mid close split') {
+        let combined = JSON.parse(JSON.stringify(specs['range']));
+        const midTasks = specs['mid'][0].tasks;
+        const halfMid = midTasks.slice(0, Math.ceil(midTasks.length / 2));
+        combined.push({ phase: "MID CLOSING SPLIT (PART 1 - RANGE)", tasks: halfMid });
+        return combined;
+    } 
+    // 2-Cook Close: Grill/Fry + Second Half of Mid Close Tasks
+    else if (targetStation === 'grill/fry + mid close split' || targetStation === 'fry + mid close split') {
+        let combined = JSON.parse(JSON.stringify(specs['fry']));
+        const midTasks = specs['mid'][0].tasks;
+        const otherHalfMid = midTasks.slice(Math.ceil(midTasks.length / 2));
+        combined.push({ phase: "MID CLOSING SPLIT (PART 2 - GRILL/FRY)", tasks: otherHalfMid });
+        return combined;
+    } 
+    // Legacy / Opening Splits
+    else if (targetStation === 'range + mid split') {
         let combined = JSON.parse(JSON.stringify(specs['range']));
         const midTasks = specs['mid'][0].tasks;
         const halfMid = midTasks.slice(0, Math.ceil(midTasks.length / 2));
@@ -615,7 +633,7 @@ function renderCookStationSelectorWidget() {
         container.innerHTML = `
             <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 2px solid #cbd5e1;">
                 <h3 style="margin-top: 0; color: #1e3a8a;">${isEs ? '📍 Selecciona y Asigna Tu Estación de Turno' : '📍 Select & Assign Your Shift Station'}</h3>
-                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">${isEs ? 'Selecciona tu modo de apertura (3 Cocineros o 2 Cocineros con Mid compartido):' : 'Select your opening mode below (3-Cook Open or 2-Cook Open with shared Mid duties):'}</p>
+                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">${isEs ? 'Selecciona tu modo de turno (Apertura de 3 cocineros, Apertura de 2 cocineros o Cierre de 2 cocineros con Mid compartido):' : 'Select your shift mode below (3-Cook Open, 2-Cook Open, or 2-Cook Close with shared Mid duties):'}</p>
                 
                 <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">⭐ 3 Cook Open (Dedicated Stations)</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
@@ -635,17 +653,32 @@ function renderCookStationSelectorWidget() {
                     </div>
                 </div>
 
-                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🏢 2 Cook Open (Mid Duties Split)</div>
+                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🌙 2 Cook Close (Mid Closing Duties Split)</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+                    <div style="background: #fff7ed; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+                        <h4 style="color: #c2410c; margin: 0 0 4px 0; font-size: 0.95rem;">🍳 Range Closer (Mid Pt 1)</h4>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range close + first half of Mid close</p>
+                        <button class="btn btn-primary" style="background: #ea580c; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Range + Mid Close Split')">${isEs ? 'Asignar Cierre 📌' : 'Assign Close 📌'}</button>
+                    </div>
+
+                    <div style="background: #fff7ed; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+                        <h4 style="color: #c2410c; margin: 0 0 4px 0; font-size: 0.95rem;">🍟 Grill/Fry Closer (Mid Pt 2)</h4>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Grill/Fry close + second half of Mid close</p>
+                        <button class="btn btn-primary" style="background: #ea580c; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Grill/Fry + Mid Close Split')">${isEs ? 'Asignar Cierre 📌' : 'Assign Close 📌'}</button>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">🏢 2 Cook Open (Mid Opening Duties Split)</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
                     <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
                         <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍳 Range + Mid Split (Pt 1)</h4>
-                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range + first half of Mid tasks</p>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Range + first half of Mid open</p>
                         <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Range + Mid Split')">${isEs ? 'Asignar Split 📌' : 'Assign Split 📌'}</button>
                     </div>
 
                     <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; text-align: center;">
                         <h4 style="color: #166534; margin: 0 0 4px 0; font-size: 0.95rem;">🍟 Grill/Fry + Mid Split (Pt 2)</h4>
-                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Grill/Fry + second half of Mid tasks</p>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 8px 0;">Grill/Fry + second half of Mid open</p>
                         <button class="btn btn-primary" style="background: #16a34a; padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="assignCookStation('Grill/Fry + Mid Split')">${isEs ? 'Asignar Split 📌' : 'Assign Split 📌'}</button>
                     </div>
                 </div>
@@ -657,7 +690,7 @@ function renderCookStationSelectorWidget() {
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h3 style="margin: 0; color: #166534;">${isEs ? '✅ Estación Asignada Activa' : '✅ Active Assigned Station'}: ${assignedStation}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo incluye tus tareas de apertura asignadas.' : 'The checklist below displays your assigned opening duties.'}</p>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isEs ? 'La lista de verificación de abajo incluye tus tareas asignadas.' : 'The checklist below displays your assigned duties.'}</p>
                     </div>
                     <button class="btn btn-secondary" style="background: white; color: #dc2626; border: 1px solid #fecaca;" onclick="clearCookStation()">${isEs ? 'Cambiar Estación 🔄' : 'Change Station 🔄'}</button>
                 </div>
@@ -696,7 +729,7 @@ function renderChecklistForm() {
         container.innerHTML = `
             <div class="card" style="text-align: center; padding: 2rem; background: #eff6ff; border: 1px solid #bfdbfe;">
                 <h3 style="color: #1e3a8a; margin-top: 0;">👆 ${currentLanguage === 'es' ? 'Selecciona una Estación Arriba' : 'Select a Station Above'}</h3>
-                <p style="color: #475569; margin-bottom: 0;">${currentLanguage === 'es' ? 'Haz clic en "Asignar" en tu opción de apertura de 2 o 3 cocineros para cargar la lista.' : 'Click "Assign" on your 2-cook open or 3-cook open choice above to load your opening checklist tasks.'}</p>
+                <p style="color: #475569; margin-bottom: 0;">${currentLanguage === 'es' ? 'Haz clic en "Asignar" en tu opción de apertura o cierre para cargar la lista.' : 'Click "Assign" on your opening or closing mode above to load your checklist tasks.'}</p>
             </div>
         `;
         return;
