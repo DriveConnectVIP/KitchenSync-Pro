@@ -255,7 +255,7 @@ function logoutSession() {
 // ==========================================
 const TRANSLATIONS = {
     en: {
-        myChecklist: "📝 My Shift Checklist",
+        myChecklist: "📝 Station Checklist",
         shiftsCompleted: "⭐ Shifts Completed",
         trainingModules: "🎓 Training & Certs",
         managerDashboard: "📊 Shift Manager Dashboard",
@@ -263,11 +263,10 @@ const TRANSLATIONS = {
         messageBoard: "💬 Message Board",
         recipeBook: "📖 Recipe & Prep Book",
         staffRoster: "👥 Staff Roster",
-        saveChecklist: "💾 Save My Checklist",
         printSheet: "🖨️ Print Sheet"
     },
     es: {
-        myChecklist: "📝 Mi Lista de Turno",
+        myChecklist: "📝 Lista de Estación",
         shiftsCompleted: "⭐ Turnos Completados",
         trainingModules: "🎓 Capacitación",
         managerDashboard: "📊 Panel del Gerente",
@@ -275,7 +274,6 @@ const TRANSLATIONS = {
         messageBoard: "💬 Tablero de Mensajes",
         recipeBook: "📖 Libro de Recetas",
         staffRoster: "👥 Plantilla de Personal",
-        saveChecklist: "💾 Guardar Mi Registro",
         printSheet: "🖨️ Imprimir Hoja"
     }
 };
@@ -347,56 +345,23 @@ function switchTab(viewId, btnEl) {
 }
 
 // ==========================================
-// 5. STATION ASSIGNMENT & CHECKLIST WORKFLOW
+// 5. STATION ASSIGNMENT & STATIC CHECKLIST
 // ==========================================
-function assignCookStation(stationName) {
-    if (!Store.user) return;
-    Store.user.station = stationName;
-    ApiService.request('saveEmployee', { employee: Store.user }).then(() => {
-        renderChecklists();
-        updateGreetingLabel();
-    });
-}
-
 function renderChecklists() {
-    const entryView = document.getElementById('view-shift-entry');
-    if (!entryView) return;
-
-    let widget = document.getElementById('cook-station-selector-widget');
-    if (Store.role === 'cook') {
-        if (!widget) {
-            widget = document.createElement('div');
-            widget.id = 'cook-station-selector-widget';
-            entryView.insertBefore(widget, entryView.firstChild);
-        }
-        const assigned = Store.user?.station?.trim() || "";
-        widget.innerHTML = !assigned ? `
-            <div class="card" style="margin-bottom:1.5rem; background:#f8fafc; border:2px solid #cbd5e1;">
-                <h3 style="color:#1e3a8a; margin-top:0;">📍 Select Your Shift Station</h3>
-                <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-                    <button class="btn btn-primary" onclick="assignCookStation('Range')">🍳 Range Opener</button>
-                    <button class="btn btn-primary" onclick="assignCookStation('Mid')">🥪 Mid Opener</button>
-                    <button class="btn btn-primary" onclick="assignCookStation('Grill/Fry')">🍟 Grill/Fry Opener</button>
-                </div>
-            </div>
-        ` : `
-            <div class="card" style="margin-bottom:1.5rem; background:#f0fdf4; display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="color:#166534; margin:0;">✅ Active Assigned Station: ${assigned}</h3>
-                <button class="btn btn-secondary" style="color:#dc2626;" onclick="assignCookStation('')">Change Station 🔄</button>
-            </div>
-        `;
-    }
-
     const container = document.getElementById('checklist-container');
     if (!container) return;
     container.innerHTML = '';
 
-    if (Store.role === 'cook' && !Store.user?.station) {
-        container.innerHTML = `<div class="card" style="text-align:center; padding:2rem;"><h3>👆 Please select your assigned station above to view your checklist.</h3></div>`;
-        return;
-    }
+    const assigned = Store.user?.station?.trim() || (Store.role === 'cook' ? 'Range' : 'All');
+    
+    // Header banner indicating current assigned station
+    const banner = document.createElement('div');
+    banner.className = 'card';
+    banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station: ${assigned}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">Station tasks assigned by management.</p>`;
+    container.appendChild(banner);
 
-    const stationKey = Store.role === 'cook' ? (Store.user?.station?.toLowerCase().includes('mid') ? 'mid' : Store.user?.station?.toLowerCase().includes('grill') ? 'grill/fry' : 'range') : 'range';
+    const stationKey = assigned.toLowerCase().includes('mid') ? 'mid' : assigned.toLowerCase().includes('grill') ? 'grill/fry' : 'range';
     const specs = CHECKLIST_SPECS[Store.lang]?.[stationKey] || CHECKLIST_SPECS['en'][stationKey] || CHECKLIST_SPECS['en'].range;
 
     specs.forEach(sec => {
@@ -404,7 +369,7 @@ function renderChecklists() {
         sec.tasks.forEach(t => {
             html += `
                 <div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-                    <input type="checkbox" class="task-checkbox" id="cb-${t.id}" onchange="updateShiftScore()" style="width:20px; height:20px; cursor:pointer;">
+                    <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;">
                     <div>
                         <div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div>
                         <div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div>
@@ -414,29 +379,17 @@ function renderChecklists() {
         container.innerHTML += `<div class="card checklist-section">${html}</div>`;
     });
 
-    container.innerHTML += `
-        <div style="margin-top: 1.5rem; display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="submitShiftChecklist()">💾 Save & Submit Shift Checklist</button>
-        </div>
-    `;
-    updateShiftScore();
+    // Only Managers or GMs have the authority to formally submit/sign off checklists for cooks
+    if (Store.role === 'manager' || Store.role === 'gm') {
+        container.innerHTML += `
+            <div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Manager Submit & Log Shift</button>
+            </div>
+        `;
+    }
 }
 
-function updateShiftScore() {
-    const cbs = document.querySelectorAll('.task-checkbox');
-    const total = cbs.length;
-    let checked = 0;
-    cbs.forEach(cb => { if (cb.checked) checked++; });
-    const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
-
-    const countEl = document.getElementById('score-tasks-count');
-    const pctEl = document.getElementById('score-percentage');
-    if (countEl) countEl.textContent = `${checked} / ${total}`;
-    if (pctEl) pctEl.textContent = `${pct}%`;
-}
-
-function submitShiftChecklist() {
-    if (!Store.user) return;
+function submitManagerShiftChecklist() {
     const cbs = document.querySelectorAll('.task-checkbox');
     const total = cbs.length;
     let checked = 0;
@@ -448,7 +401,7 @@ function submitShiftChecklist() {
         empId: Store.user.id,
         empName: Store.user.name,
         role: Store.role,
-        station: Store.user.station || 'General',
+        station: Store.user.station || 'Range',
         date: new Date().toISOString().split('T')[0],
         tasksCompleted: checked,
         totalTasks: total,
@@ -459,8 +412,8 @@ function submitShiftChecklist() {
     Store.shifts.push(shiftRecord);
     ApiService.request('saveShift', { shift: shiftRecord }).then(res => {
         if (res && res.success) {
-            alert(`🎉 Shift checklist submitted successfully! Score: ${pct}%`);
-            switchTab('cook-dashboard', document.querySelector('.tab-btn'));
+            alert(`🎉 Shift checklist officially submitted by Management! Score: ${pct}%`);
+            switchTab('manager-dashboard', document.querySelector('.tab-btn'));
         } else {
             alert("Error saving shift record.");
         }
@@ -754,7 +707,7 @@ function renderCookDashboard() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">No shifts logged yet. Complete your checklist to log a shift!</td></tr>` :
+                    ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">No shifts logged yet.</td></tr>` :
                         myShifts.map(s => `
                             <tr>
                                 <td>${s.date}</td>
@@ -896,7 +849,7 @@ function triggerMasterReset() {
 }
 
 // ==========================================
-// 10. GM CRUD: EMPLOYEES (UPSERT, EDIT, DELETE) & RECIPES
+// 10. GM CRUD: EMPLOYEES & RECIPES
 // ==========================================
 function renderRosterView() {
     const tbody = document.getElementById('roster-table-body');
