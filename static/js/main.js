@@ -1,4 +1,4 @@
-/**
+/***
  * KitchenSync Pro - Core Architecture & State Management
  */
 
