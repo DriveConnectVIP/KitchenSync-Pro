@@ -345,19 +345,20 @@ function switchTab(viewId, btnEl) {
 }
 
 // ==========================================
-// 5. STATION CHECKLISTS (READ-ONLY FOR COOKS, MANAGED BY MGMT)
+// 5. STATION CHECKLISTS (READ-ONLY FOR COOKS, INTERACTIVE FOR MGMT)
 // ==========================================
 function renderChecklists() {
     const container = document.getElementById('checklist-container');
     if (!container) return;
     container.innerHTML = '';
 
-    const assigned = Store.user?.station?.trim() || (Store.role === 'cook' ? 'Range' : 'All');
+    const isCook = Store.role === 'cook';
+    const assigned = Store.user?.station?.trim() || (isCook ? 'Range' : 'All');
     
     const banner = document.createElement('div');
     banner.className = 'card';
     banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
-    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station: ${assigned}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${Store.role === 'cook' ? 'Read-only station reference checklist.' : 'Station checklist for review and shift sign-off.'}</p>`;
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station: ${assigned}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isCook ? 'Read-only station reference checklist.' : 'Station checklist for review and shift sign-off.'}</p>`;
     container.appendChild(banner);
 
     const stationKey = assigned.toLowerCase().includes('mid') ? 'mid' : assigned.toLowerCase().includes('grill') ? 'grill/fry' : 'range';
@@ -366,20 +367,33 @@ function renderChecklists() {
     specs.forEach(sec => {
         let html = `<h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">${sec.phase}</h3>`;
         sec.tasks.forEach(t => {
-            html += `
-                <div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-                    <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;" ${Store.role === 'cook' ? '' : ''}>
-                    <div>
-                        <div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div>
-                        <div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div>
-                    </div>
-                </div>`;
+            if (isCook) {
+                // Read-only format for cooks (no checkboxes)
+                html += `
+                    <div class="task-row" style="display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                        <span style="color: #059669; font-weight: bold; font-size: 1.1rem; line-height: 1;">•</span>
+                        <div>
+                            <div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div>
+                            <div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div>
+                        </div>
+                    </div>`;
+            } else {
+                // Interactive format with checkboxes for Managers / GMs
+                html += `
+                    <div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                        <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;">
+                        <div>
+                            <div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div>
+                            <div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div>
+                        </div>
+                    </div>`;
+            }
         });
         container.innerHTML += `<div class="card checklist-section">${html}</div>`;
     });
 
     // Only Managers or GMs have the submit/log shift authority
-    if (Store.role === 'manager' || Store.role === 'gm') {
+    if (!isCook) {
         container.innerHTML += `
             <div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Manager Submit & Log Shift</button>
