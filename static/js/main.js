@@ -209,9 +209,9 @@ function handleLogin(e) {
         return;
     }
 
-    const emp = Store.employees.find(e => String(e.pin).trim() === pin && (e.active === true || String(e.active).toLowerCase() === 'true'));
+    const emp = Store.employees.find(e => String(e.pin || e.PIN).trim() === pin && (e.active === true || String(e.active).toLowerCase() === 'true'));
     if (emp) {
-        Store.setSession(emp, emp.role || 'cook');
+        Store.setSession(emp, emp.role || emp.Role || 'cook');
         finalizeLogin();
         return;
     }
@@ -541,7 +541,7 @@ function postMessage(e) {
 }
 
 // ==========================================
-// 7. RECIPE & PREP SPEC BOOK
+// 7. RECIPE & PREP SPEC BOOK (WITH EDIT & DELETE)
 // ==========================================
 function renderRecipeBook() {
     const container = document.getElementById('recipe-book-container');
@@ -562,11 +562,17 @@ function renderRecipeBook() {
         html += `<div class="card"><p style="color: #64748b;">No recipes uploaded to the spec book yet.</p></div>`;
     } else {
         Store.recipes.forEach(r => {
+            const rId = r.id || r.ID || r.menuItem;
             html += `
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
                         <h4 style="color: #1e3a8a; margin-top: 0;">🍽️ ${r.menuItem || r.title || 'Recipe'} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>
-                        ${Store.role === 'gm' ? `<button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${r.id || r.menuItem}')">Delete 🗑️</button>` : ''}
+                        ${Store.role === 'gm' ? `
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openRecipeModal('${rId}')">Edit ✏️</button>
+                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button>
+                            </div>
+                        ` : ''}
                     </div>
                     <p style="font-size: 0.9rem; color: #334155;"><strong>Prep Specs:</strong> ${r.prepSpecs || r.specs || ''}</p>
                     <p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>Menu Build Details:</strong> ${r.buildDetails || r.details || ''}</p>
@@ -577,6 +583,50 @@ function renderRecipeBook() {
 
     html += `</div>`;
     container.innerHTML = html;
+}
+
+function openRecipeModal(recId = null) {
+    let existing = null;
+    if (recId) {
+        existing = Store.recipes.find(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
+    }
+
+    const menuItem = prompt("Enter Recipe / Menu Item Name:", existing ? (existing.menuItem || existing.title || '') : '');
+    if (!menuItem) return;
+    const category = prompt("Enter Category (Appetizer, Entree, Prep, Sauce):", existing ? (existing.category || 'Entree') : 'Entree');
+    const prepSpecs = prompt("Enter Prep Specifications:", existing ? (existing.prepSpecs || existing.specs || '') : '');
+    const buildDetails = prompt("Enter Menu Build Details:", existing ? (existing.buildDetails || existing.details || '') : '');
+
+    const recipeObj = {
+        id: existing ? (existing.id || existing.ID || `REC-${Date.now()}`) : `REC-${Date.now()}`,
+        menuItem,
+        category,
+        prepSpecs,
+        buildDetails
+    };
+
+    if (existing) {
+        const index = Store.recipes.findIndex(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
+        if (index > -1) {
+            Store.recipes[index] = recipeObj;
+        } else {
+            Store.recipes.push(recipeObj);
+        }
+    } else {
+        Store.recipes.push(recipeObj);
+    }
+
+    ApiService.request('saveRecipe', { recipe: recipeObj }).then(() => {
+        alert("Recipe saved successfully!");
+        renderRecipeBook();
+    });
+}
+
+function deleteRecipe(recId) {
+    if (!confirm("Are you sure you want to delete this recipe?")) return;
+    Store.recipes = Store.recipes.filter(r => String(r.id || r.ID || r.menuItem).trim() !== String(recId).trim());
+    renderRecipeBook();
+    alert("Recipe deleted successfully.");
 }
 
 // ==========================================
@@ -813,11 +863,12 @@ function renderGMDashboard() {
                 </tbody>
             </table>
         </div>
-        <div class="card">
-            <h4 style="color: #1e3a8a; margin-top: 0;">🛠️ GM Quick Actions</h4>
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h4 style="color: #1e3a8a; margin-top: 0;">🛠️ GM Quick Actions & System Controls</h4>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem;">
                 <button class="btn btn-primary" onclick="openEmployeeModal()">+ Add New Employee</button>
                 <button class="btn btn-primary" onclick="openRecipeModal()">+ Add Recipe / Spec</button>
+                <button class="btn btn-secondary" style="background: #fee2e2; color: #dc2626; border-color: #fca5a5;" onclick="triggerMasterReset()">⚠️ Master Reset (Clear Shifts, Certs & Msgs)</button>
             </div>
         </div>
     `;
@@ -833,38 +884,62 @@ function gmSignOffCert(empId, modId) {
     });
 }
 
+function triggerMasterReset() {
+    if (!confirm("WARNING: This will clear all logged shifts, certifications, and message board posts across the system. Your Recipe & Spec Book will remain completely untouched. Do you wish to proceed?")) return;
+    
+    Store.shifts = [];
+    Store.certifications = [];
+    Store.messages = [];
+    
+    alert("Master Reset complete! Operational shift logs, certifications, and messages have been cleared.");
+    UIController.refreshActiveView();
+}
+
 // ==========================================
-// 10. GM CRUD: EMPLOYEES & RECIPES
+// 10. GM CRUD: EMPLOYEES (UPSERT, EDIT, DELETE) & RECIPES
 // ==========================================
 function renderRosterView() {
     const tbody = document.getElementById('roster-table-body');
     if (!tbody) return;
 
     tbody.innerHTML = Store.employees.length === 0 ? `<tr><td colspan="6" style="text-align: center; color: #64748b;">No employees found.</td></tr>` :
-        Store.employees.map(emp => `
-            <tr>
-                <td>${emp.id || emp.ID}</td>
-                <td><strong>${emp.name || emp.Name}</strong></td>
-                <td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td>
-                <td>${emp.station || emp.Station || 'General'}</td>
-                <td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td>
-                <td>
-                    ${Store.role === 'gm' ? `<button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${emp.id || emp.ID}')">Delete 🗑️</button>` : ''}
-                </td>
-            </tr>
-        `).join('');
+        Store.employees.map(emp => {
+            const eId = emp.id || emp.ID;
+            return `
+                <tr>
+                    <td>${eId}</td>
+                    <td><strong>${emp.name || emp.Name}</strong></td>
+                    <td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td>
+                    <td>${emp.station || emp.Station || 'General'}</td>
+                    <td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td>
+                    <td>
+                        ${Store.role === 'gm' ? `
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openEmployeeModal('${eId}')">Edit ✏️</button>
+                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${eId}')">Delete 🗑️</button>
+                            </div>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
 }
 
-function openEmployeeModal() {
-    const name = prompt("Enter employee name:");
-    if (!name) return;
-    const role = prompt("Enter role (cook, manager, gm):", "cook");
-    const pin = prompt("Enter 4-digit PIN code:", "1234");
-    const station = prompt("Enter default station (Range, Mid, Grill/Fry):", "Range");
-    const hourlyRate = prompt("Enter hourly rate:", "18.00");
+function openEmployeeModal(empId = null) {
+    let existing = null;
+    if (empId) {
+        existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
+    }
 
-    const newEmp = {
-        id: `EMP-${Date.now()}`,
+    const name = prompt("Enter employee name:", existing ? (existing.name || existing.Name || '') : '');
+    if (!name) return;
+    const role = prompt("Enter role (cook, manager, gm):", existing ? (existing.role || existing.Role || 'cook') : 'cook');
+    const pin = prompt("Enter 4-digit PIN code:", existing ? (existing.pin || existing.PIN || '1234') : '1234');
+    const station = prompt("Enter default station (Range, Mid, Grill/Fry):", existing ? (existing.station || existing.Station || 'Range') : 'Range');
+    const hourlyRate = prompt("Enter hourly rate:", existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00');
+
+    const empObj = {
+        id: existing ? (existing.id || existing.ID) : `EMP-${Date.now()}`,
         name,
         role,
         station,
@@ -873,9 +948,19 @@ function openEmployeeModal() {
         active: true
     };
 
-    Store.employees.push(newEmp);
-    ApiService.request('saveEmployee', { employee: newEmp }).then(() => {
-        alert("Employee added successfully!");
+    if (existing) {
+        const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
+        if (index > -1) {
+            Store.employees[index] = empObj;
+        } else {
+            Store.employees.push(empObj);
+        }
+    } else {
+        Store.employees.push(empObj);
+    }
+
+    ApiService.request('saveEmployee', { employee: empObj }).then(() => {
+        alert("Employee saved successfully!");
         renderRosterView();
     });
 }
@@ -885,33 +970,4 @@ function deleteEmployee(empId) {
     Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
     renderRosterView();
     alert("Employee removed from active view.");
-}
-
-function openRecipeModal() {
-    const menuItem = prompt("Enter Recipe / Menu Item Name:");
-    if (!menuItem) return;
-    const category = prompt("Enter Category (Appetizer, Entree, Prep, Sauce):", "Entree");
-    const prepSpecs = prompt("Enter Prep Specifications:");
-    const buildDetails = prompt("Enter Menu Build Details:");
-
-    const newRecipe = {
-        id: `REC-${Date.now()}`,
-        menuItem,
-        category,
-        prepSpecs,
-        buildDetails
-    };
-
-    Store.recipes.push(newRecipe);
-    ApiService.request('saveRecipe', { recipe: newRecipe }).then(() => {
-        alert("Recipe added successfully!");
-        renderRecipeBook();
-    });
-}
-
-function deleteRecipe(recId) {
-    if (!confirm("Are you sure you want to delete this recipe?")) return;
-    Store.recipes = Store.recipes.filter(r => String(r.id || r.menuItem).trim() !== String(recId).trim());
-    renderRecipeBook();
-    alert("Recipe deleted successfully.");
 }
