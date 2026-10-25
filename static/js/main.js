@@ -345,7 +345,7 @@ function switchTab(viewId, btnEl) {
 }
 
 // ==========================================
-// 5. STATION ASSIGNMENT & STATIC CHECKLIST
+// 5. STATION CHECKLISTS (READ-ONLY FOR COOKS, MANAGED BY MGMT)
 // ==========================================
 function renderChecklists() {
     const container = document.getElementById('checklist-container');
@@ -354,11 +354,10 @@ function renderChecklists() {
 
     const assigned = Store.user?.station?.trim() || (Store.role === 'cook' ? 'Range' : 'All');
     
-    // Header banner indicating current assigned station
     const banner = document.createElement('div');
     banner.className = 'card';
     banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
-    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station: ${assigned}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">Station tasks assigned by management.</p>`;
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station: ${assigned}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${Store.role === 'cook' ? 'Read-only station reference checklist.' : 'Station checklist for review and shift sign-off.'}</p>`;
     container.appendChild(banner);
 
     const stationKey = assigned.toLowerCase().includes('mid') ? 'mid' : assigned.toLowerCase().includes('grill') ? 'grill/fry' : 'range';
@@ -369,7 +368,7 @@ function renderChecklists() {
         sec.tasks.forEach(t => {
             html += `
                 <div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-                    <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;">
+                    <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;" ${Store.role === 'cook' ? '' : ''}>
                     <div>
                         <div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div>
                         <div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div>
@@ -379,7 +378,7 @@ function renderChecklists() {
         container.innerHTML += `<div class="card checklist-section">${html}</div>`;
     });
 
-    // Only Managers or GMs have the authority to formally submit/sign off checklists for cooks
+    // Only Managers or GMs have the submit/log shift authority
     if (Store.role === 'manager' || Store.role === 'gm') {
         container.innerHTML += `
             <div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
