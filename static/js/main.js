@@ -683,7 +683,7 @@ function postMessage(e) {
 }
 
 // ==========================================
-// 7. RECIPE & PREP SPEC BOOK (DYNAMIC & ALPHABETIZED)
+// 7. RECIPE & PREP SPEC BOOK (DYNAMIC, ALPHABETIZED & MODIFYABLE)
 // ==========================================
 let activeBookTab = 'recipes'; // 'recipes' or 'prep'
 
@@ -713,8 +713,9 @@ function renderRecipeBook() {
 
             ${Store.role === 'gm' ? `
                 <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 1rem;">
-                    <h4 style="color: #1e3a8a; margin-top: 0;">➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}</h4>
+                    <h4 id="book-form-title" style="color: #1e3a8a; margin-top: 0;">➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}</h4>
                     <form onsubmit="handleInlineBookSubmit(event)" style="display: flex; flex-direction: column; gap: 10px;">
+                        <input type="hidden" id="book-item-id" value="">
                         <input type="hidden" id="book-item-type" value="${activeBookTab}">
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                             <input type="text" id="book-item-name" class="form-control" placeholder="${activeBookTab === 'recipes' ? 'Recipe Name (e.g. Classic Burger)' : 'Prep Item Name (e.g. House Vinaigrette)'}" required>
@@ -728,7 +729,10 @@ function renderRecipeBook() {
                             <textarea id="book-item-ingredients" class="form-control" rows="2" placeholder="Ingredients list (e.g. Brioche bun, 6oz patty, cheddar slice)..."></textarea>
                         ` : ''}
                         <textarea id="book-item-details" class="form-control" rows="2" placeholder="${activeBookTab === 'recipes' ? 'Step-by-step build details / execution instructions...' : 'Detailed prep specifications, yields, and shelf-life instructions...'}" required></textarea>
-                        <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Save to Master Book 💾</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="submit" id="book-submit-btn" class="btn btn-primary">Save to Master Book 💾</button>
+                            <button type="button" id="book-cancel-btn" class="btn btn-secondary" style="display: none;" onclick="resetBookForm()">Cancel ❌</button>
+                        </div>
                     </form>
                 </div>
             ` : ''}
@@ -750,6 +754,7 @@ function renderRecipeBook() {
                         <h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>
                         ${Store.role === 'gm' ? `
                             <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="modifyRecipe('${rId}')">Modify ✏️</button>
                                 <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button>
                             </div>
                         ` : ''}
@@ -773,20 +778,58 @@ function renderRecipeBook() {
 
 function setBookTab(tab) {
     activeBookTab = tab;
+    resetBookForm();
     renderRecipeBook();
+}
+
+function resetBookForm() {
+    document.getElementById('book-item-id').value = '';
+    document.getElementById('book-item-name').value = '';
+    document.getElementById('book-item-category').value = '';
+    document.getElementById('book-item-details').value = '';
+    if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = '';
+    if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = '';
+    if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = '';
+    document.getElementById('book-form-title').textContent = `➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}`;
+    document.getElementById('book-submit-btn').textContent = 'Save to Master Book 💾';
+    document.getElementById('book-cancel-btn').style.display = 'none';
+}
+
+function modifyRecipe(recId) {
+    const item = Store.recipes.find(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
+    if (!item) return;
+
+    activeBookTab = item.type || 'recipes';
+    renderRecipeBook();
+
+    // Populate form fields with existing data
+    document.getElementById('book-item-id').value = item.id || item.ID || recId;
+    document.getElementById('book-item-name').value = item.menuItem || item.title || '';
+    document.getElementById('book-item-category').value = item.category || '';
+    document.getElementById('book-item-details').value = item.prepSpecs || item.buildDetails || item.details || '';
+    if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = item.ingredients || '';
+    if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = item.portionSize || '';
+    if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = item.cookTimeTemp || '';
+
+    document.getElementById('book-form-title').textContent = `✏️ Modify ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}: ${item.menuItem || item.title}`;
+    document.getElementById('book-submit-btn').textContent = 'Update Item 💾';
+    document.getElementById('book-cancel-btn').style.display = 'inline-block';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function handleInlineBookSubmit(e) {
     e.preventDefault();
     if (!Store.user) return;
 
+    const itemId = document.getElementById('book-item-id').value;
     const type = document.getElementById('book-item-type').value;
     const menuItem = document.getElementById('book-item-name').value.trim();
     const category = document.getElementById('book-item-category').value.trim();
     const details = document.getElementById('book-item-details').value.trim();
 
     const recipeObj = {
-        id: `BOOK-${Date.now()}`,
+        id: itemId || `BOOK-${Date.now()}`,
         type: type,
         menuItem,
         category,
@@ -797,8 +840,16 @@ function handleInlineBookSubmit(e) {
         cookTimeTemp: type === 'recipes' ? (document.getElementById('book-item-time-temp')?.value.trim() || '') : ''
     };
 
-    Store.recipes.push(recipeObj);
+    if (itemId) {
+        const index = Store.recipes.findIndex(r => String(r.id || r.ID || r.menuItem).trim() === String(itemId).trim());
+        if (index > -1) Store.recipes[index] = recipeObj;
+        else Store.recipes.push(recipeObj);
+    } else {
+        Store.recipes.push(recipeObj);
+    }
+
     ApiService.request('saveRecipe', { recipe: recipeObj }).then(() => {
+        resetBookForm();
         renderRecipeBook();
     });
 }
@@ -1081,73 +1132,4 @@ function triggerMasterReset() {
 // ==========================================
 // 10. GM CRUD: EMPLOYEES & RECIPES
 // ==========================================
-function renderRosterView() {
-    const tbody = document.getElementById('roster-table-body');
-    if (!tbody) return;
-
-    tbody.innerHTML = Store.employees.length === 0 ? `<tr><td colspan="6" style="text-align: center; color: #64748b;">No employees found.</td></tr>` :
-        Store.employees.map(emp => {
-            const eId = emp.id || emp.ID;
-            return `
-                <tr>
-                    <td>${eId}</td>
-                    <td><strong>${emp.name || emp.Name}</strong></td>
-                    <td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td>
-                    <td>${emp.station || emp.Station || 'General'}</td>
-                    <td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td>
-                    <td>
-                        ${Store.role === 'gm' ? `
-                            <div style="display: flex; gap: 6px;">
-                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openEmployeeModal('${eId}')">Edit ✏️</button>
-                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${eId}')">Delete 🗑️</button>
-                            </div>
-                        ` : ''}
-                    </td>
-                </tr>
-            `;
-        }).join('');
-}
-
-function openEmployeeModal(empId = null) {
-    let existing = null;
-    if (empId) {
-        existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
-    }
-
-    const name = prompt("Enter employee name:", existing ? (existing.name || existing.Name || '') : '');
-    if (!name) return;
-    const role = prompt("Enter role (cook, manager, gm):", existing ? (existing.role || existing.Role || 'cook') : 'cook');
-    const pin = prompt("Enter 4-digit PIN code:", existing ? (existing.pin || existing.PIN || '1234') : '1234');
-    const station = prompt("Enter default station:", existing ? (existing.station || existing.Station || 'range_open') : 'range_open');
-    const hourlyRate = prompt("Enter hourly rate:", existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00');
-
-    const empObj = {
-        id: existing ? (existing.id || existing.ID) : `EMP-${Date.now()}`,
-        name,
-        role,
-        station,
-        hourlyRate,
-        pin,
-        active: true
-    };
-
-    if (existing) {
-        const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
-        if (index > -1) Store.employees[index] = empObj;
-        else Store.employees.push(empObj);
-    } else {
-        Store.employees.push(empObj);
-    }
-
-    ApiService.request('saveEmployee', { employee: empObj }).then(() => {
-        alert("Employee saved successfully!");
-        renderRosterView();
-    });
-}
-
-function deleteEmployee(empId) {
-    if (!confirm("Are you sure you want to remove this employee?")) return;
-    Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
-    renderRosterView();
-    alert("Employee removed from active view.");
-}
+function renderR
