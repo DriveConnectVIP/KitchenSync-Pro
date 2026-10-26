@@ -404,25 +404,41 @@ function renderManagerAssignmentWidget() {
     if (!container) return;
 
     const selectedDateStr = document.getElementById('shift-date')?.value || new Date().toISOString().split('T')[0];
-    const dayOfWeek = new Date(selectedDateStr).getDay();
-    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
 
     let html = `
         <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
             <h3 style="color: #1e3a8a; margin-top: 0;">👥 Station & Shift Line Assignments</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily openers and closers based on ${isWeekend ? 'Weekend (3-Cook Morning / 2-Cook Night)' : 'Weekday (2-Cook Morning Split / 2-Cook Night Split)'} parameters.</p>
+            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions across all available shift formats.</p>
             
             <div style="margin: 1rem 0;">
                 <label style="font-weight: 600; font-size: 0.9rem;">Select Date:</label>
                 <input type="date" id="shift-date" class="form-control" value="${selectedDateStr}" onchange="renderManagerAssignmentWidget()" style="margin-top: 4px; max-width: 200px;">
             </div>
-    `;
 
-    if (isWeekend) {
-        html += `
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                
+                <!-- Option 1: Morning Shift 2-Cook Split Line -->
                 <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift (3 Cooks)</h4>
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Open:</label>
+                        <select class="form-control emp-assignment" data-station="range_mid_split_open">
+                            <option value="">-- Select Cook 1 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Open:</label>
+                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_open">
+                            <option value="">-- Select Cook 2 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Option 2: Morning Shift 3 Cooks -->
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
                     <div style="margin-bottom: 8px;">
                         <label style="font-size: 0.85rem; font-weight: bold;">Range Open:</label>
                         <select class="form-control emp-assignment" data-station="range_open">
@@ -446,8 +462,9 @@ function renderManagerAssignmentWidget() {
                     </div>
                 </div>
 
+                <!-- Option 3: Night Shift 2-Cook Closing -->
                 <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift (2-Cook Split Line)</h4>
+                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
                     <div style="margin-bottom: 8px;">
                         <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Close:</label>
                         <select class="form-control emp-assignment" data-station="range_mid_split_close">
@@ -463,51 +480,10 @@ function renderManagerAssignmentWidget() {
                         </select>
                     </div>
                 </div>
-            </div>
-        `;
-    } else {
-        html += `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Split Line (2-Cook Split Line)</h4>
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Open:</label>
-                        <select class="form-control emp-assignment" data-station="range_mid_split_open">
-                            <option value="">-- Select Opener 1 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Open:</label>
-                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_open">
-                            <option value="">-- Select Opener 2 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
-                    </div>
-                </div>
 
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Split Line (2 Cooks)</h4>
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Close:</label>
-                        <select class="form-control emp-assignment" data-station="range_mid_split_close">
-                            <option value="">-- Select Closer 1 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Close:</label>
-                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_close">
-                            <option value="">-- Select Closer 2 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
-                    </div>
-                </div>
             </div>
-        `;
-    }
-
-    html += `</div>`;
+        </div>
+    `;
     container.innerHTML = html;
 }
 
