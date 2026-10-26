@@ -683,41 +683,85 @@ function postMessage(e) {
 }
 
 // ==========================================
-// 7. RECIPE & PREP SPEC BOOK (WITH EDIT & DELETE)
+// 7. RECIPE & PREP SPEC BOOK (DYNAMIC & ALPHABETIZED)
 // ==========================================
+let activeBookTab = 'recipes'; // 'recipes' or 'prep'
+
 function renderRecipeBook() {
     const container = document.getElementById('recipe-book-container');
     if (!container) return;
 
+    const sortedRecipes = [...Store.recipes].filter(r => r.type !== 'prep').sort((a, b) => 
+        (a.menuItem || '').localeCompare(b.menuItem || '')
+    );
+    const sortedPrep = [...Store.recipes].filter(r => r.type === 'prep').sort((a, b) => 
+        (a.menuItem || '').localeCompare(b.menuItem || '')
+    );
+
     let html = `
-        <div class="card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <div>
-                <h3 style="color: #1e3a8a; margin: 0 0 4px 0;">📖 Recipe & Prep Spec Book</h3>
-                <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Standard builds and prep specifications for kitchen execution.</p>
+        <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="color: #1e3a8a; margin: 0 0 4px 0;">📖 Recipe & Prep Spec Book</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Alphabetized, professional master database for kitchen execution.</p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn ${activeBookTab === 'recipes' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('recipes')">🍽️ Recipes (${sortedRecipes.length})</button>
+                    <button class="btn ${activeBookTab === 'prep' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('prep')">📋 Prep Spec Sheets (${sortedPrep.length})</button>
+                </div>
             </div>
-            ${Store.role === 'gm' ? `<button class="btn btn-primary" onclick="openRecipeModal()">+ Add Recipe / Spec</button>` : ''}
+
+            ${Store.role === 'gm' ? `
+                <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 1rem;">
+                    <h4 style="color: #1e3a8a; margin-top: 0;">➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}</h4>
+                    <form onsubmit="handleInlineBookSubmit(event)" style="display: flex; flex-direction: column; gap: 10px;">
+                        <input type="hidden" id="book-item-type" value="${activeBookTab}">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+                            <input type="text" id="book-item-name" class="form-control" placeholder="${activeBookTab === 'recipes' ? 'Recipe Name (e.g. Classic Burger)' : 'Prep Item Name (e.g. House Vinaigrette)'}" required>
+                            <input type="text" id="book-item-category" class="form-control" placeholder="Category (e.g. Entree, Sauce, Prep)" required>
+                            ${activeBookTab === 'recipes' ? `
+                                <input type="text" id="book-item-portions" class="form-control" placeholder="Portion Size (e.g. 1 Burger / 8 oz)">
+                                <input type="text" id="book-item-time-temp" class="form-control" placeholder="Cooking Time / Temp (e.g. 4 mins @ 350°F)">
+                            ` : ''}
+                        </div>
+                        ${activeBookTab === 'recipes' ? `
+                            <textarea id="book-item-ingredients" class="form-control" rows="2" placeholder="Ingredients list (e.g. Brioche bun, 6oz patty, cheddar slice)..."></textarea>
+                        ` : ''}
+                        <textarea id="book-item-details" class="form-control" rows="2" placeholder="${activeBookTab === 'recipes' ? 'Step-by-step build details / execution instructions...' : 'Detailed prep specifications, yields, and shelf-life instructions...'}" required></textarea>
+                        <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Save to Master Book 💾</button>
+                    </form>
+                </div>
+            ` : ''}
         </div>
+
         <div style="display: flex; flex-direction: column; gap: 1rem;">
     `;
 
-    if (Store.recipes.length === 0) {
-        html += `<div class="card"><p style="color: #64748b;">No recipes uploaded to the spec book yet.</p></div>`;
+    const activeList = activeBookTab === 'recipes' ? sortedRecipes : sortedPrep;
+
+    if (activeList.length === 0) {
+        html += `<div class="card"><p style="color: #64748b; font-style: italic;">No items found in this section.</p></div>`;
     } else {
-        Store.recipes.forEach(r => {
+        activeList.forEach(r => {
             const rId = r.id || r.ID || r.menuItem;
             html += `
-                <div class="card">
+                <div class="card" style="border-left: 4px solid #1e3a8a;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
-                        <h4 style="color: #1e3a8a; margin-top: 0;">🍽️ ${r.menuItem || r.title || 'Recipe'} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>
+                        <h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>
                         ${Store.role === 'gm' ? `
                             <div style="display: flex; gap: 6px;">
-                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openRecipeModal('${rId}')">Edit ✏️</button>
                                 <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button>
                             </div>
                         ` : ''}
                     </div>
-                    <p style="font-size: 0.9rem; color: #334155;"><strong>Prep Specs:</strong> ${r.prepSpecs || r.specs || ''}</p>
-                    <p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>Menu Build Details:</strong> ${r.buildDetails || r.details || ''}</p>
+                    ${r.type === 'recipes' || !r.type ? `
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 8px 0; font-size: 0.9rem; background: #f8fafc; padding: 8px; border-radius: 4px;">
+                            ${r.portionSize ? `<div><strong>Portion Size:</strong> ${r.portionSize}</div>` : ''}
+                            ${r.cookTimeTemp ? `<div><strong>Cook Time/Temp:</strong> ${r.cookTimeTemp}</div>` : ''}
+                        </div>
+                        ${r.ingredients ? `<p style="font-size: 0.9rem; color: #334155; margin: 6px 0;"><strong>Ingredients:</strong> ${r.ingredients}</p>` : ''}
+                    ` : ''}
+                    <p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>${r.type === 'prep' ? 'Prep Specifications:' : 'Build & Execution Details:'}</strong> ${r.prepSpecs || r.buildDetails || r.details || ''}</p>
                 </div>
             `;
         });
@@ -727,45 +771,43 @@ function renderRecipeBook() {
     container.innerHTML = html;
 }
 
-function openRecipeModal(recId = null) {
-    let existing = null;
-    if (recId) {
-        existing = Store.recipes.find(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
-    }
+function setBookTab(tab) {
+    activeBookTab = tab;
+    renderRecipeBook();
+}
 
-    const menuItem = prompt("Enter Recipe / Menu Item Name:", existing ? (existing.menuItem || existing.title || '') : '');
-    if (!menuItem) return;
-    const category = prompt("Enter Category (Appetizer, Entree, Prep, Sauce):", existing ? (existing.category || 'Entree') : 'Entree');
-    const prepSpecs = prompt("Enter Prep Specifications:", existing ? (existing.prepSpecs || existing.specs || '') : '');
-    const buildDetails = prompt("Enter Menu Build Details:", existing ? (existing.buildDetails || existing.details || '') : '');
+function handleInlineBookSubmit(e) {
+    e.preventDefault();
+    if (!Store.user) return;
+
+    const type = document.getElementById('book-item-type').value;
+    const menuItem = document.getElementById('book-item-name').value.trim();
+    const category = document.getElementById('book-item-category').value.trim();
+    const details = document.getElementById('book-item-details').value.trim();
 
     const recipeObj = {
-        id: existing ? (existing.id || existing.ID || `REC-${Date.now()}`) : `REC-${Date.now()}`,
+        id: `BOOK-${Date.now()}`,
+        type: type,
         menuItem,
         category,
-        prepSpecs,
-        buildDetails
+        prepSpecs: type === 'prep' ? details : '',
+        buildDetails: type === 'recipes' ? details : '',
+        ingredients: type === 'recipes' ? (document.getElementById('book-item-ingredients')?.value.trim() || '') : '',
+        portionSize: type === 'recipes' ? (document.getElementById('book-item-portions')?.value.trim() || '') : '',
+        cookTimeTemp: type === 'recipes' ? (document.getElementById('book-item-time-temp')?.value.trim() || '') : ''
     };
 
-    if (existing) {
-        const index = Store.recipes.findIndex(r => String(r.id || r.menuItem).trim() === String(recId).trim());
-        if (index > -1) Store.recipes[index] = recipeObj;
-        else Store.recipes.push(recipeObj);
-    } else {
-        Store.recipes.push(recipeObj);
-    }
-
+    Store.recipes.push(recipeObj);
     ApiService.request('saveRecipe', { recipe: recipeObj }).then(() => {
-        alert("Recipe saved successfully!");
         renderRecipeBook();
     });
 }
 
 function deleteRecipe(recId) {
-    if (!confirm("Are you sure you want to delete this recipe?")) return;
-    Store.recipes = Store.recipes.filter(r => String(r.id || r.menuItem).trim() !== String(recId).trim());
+    if (!confirm("Are you sure you want to delete this item?")) return;
+    Store.recipes = Store.recipes.filter(r => String(r.id || r.ID || r.menuItem).trim() !== String(recId).trim());
     renderRecipeBook();
-    alert("Recipe deleted successfully.");
+    alert("Item deleted successfully.");
 }
 
 // ==========================================
@@ -1007,7 +1049,7 @@ function renderGMDashboard() {
             <h4 style="color: #1e3a8a; margin-top: 0;">🛠️ GM Quick Actions & System Controls</h4>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem;">
                 <button class="btn btn-primary" onclick="openEmployeeModal()">+ Add New Employee</button>
-                <button class="btn btn-primary" onclick="openRecipeModal()">+ Add Recipe / Spec</button>
+                <button class="btn btn-primary" onclick="switchTab('recipe-book', document.querySelector('.tab-btn'))">+ Manage Recipe Book</button>
                 <button class="btn btn-secondary" style="background: #fee2e2; color: #dc2626; border-color: #fca5a5;" onclick="triggerMasterReset()">⚠️ Master Reset (Clear Shifts, Certs & Msgs)</button>
             </div>
         </div>
