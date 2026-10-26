@@ -135,7 +135,7 @@ const CHECKLIST_SPECS = {
         ],
         'range_mid_split_open': [
             {
-                phase: "🌅 Range / Mid Split Open (Weekday Cook 1)",
+                phase: "🌅 Range / Mid Split Open (Cook 1)",
                 tasks: [
                     { id: 'rmso1', title: "Ignite range burners and test hot holding wells", desc: "Verify safe heating temperatures across range and soup wells." },
                     { id: 'rmso2', title: "Setup sandwich press and cold rail components", desc: "Ensure sliced proteins, cheeses, and spreads are fully stocked and dated." },
@@ -145,7 +145,7 @@ const CHECKLIST_SPECS = {
         ],
         'grill_fry_mid_split_open': [
             {
-                phase: "🌅 Grill/Fry / Mid Split Open (Weekday Cook 2)",
+                phase: "🌅 Grill/Fry / Mid Split Open (Cook 2)",
                 tasks: [
                     { id: 'gfmaso1', title: "Filter fryers, check oil, and season flat top", desc: "Preheat grill to 350°F and prepare basket stations." },
                     { id: 'gfmaso2', title: "Pull bread inventory and stage par-bake items", desc: "Support mid-station bread rotation alongside grill startup." },
@@ -219,7 +219,7 @@ function handleLogin(e) {
 
     ApiService.request('authenticate', { password: pin }).then(res => {
         if (res && res.success) {
-            Store.setSession(res.employee || { id: "EMP-001", name: "Employee", role: res.role || "cook", station: "Range" }, res.role || 'cook');
+            Store.setSession(res.employee || { id: "EMP-001", name: "Employee", role: res.role || "cook", station: "range_open" }, res.role || 'cook');
             finalizeLogin();
         } else {
             alert(res?.error || "Invalid PIN or Passcode.");
@@ -469,7 +469,7 @@ function renderManagerAssignmentWidget() {
         html += `
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
                 <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Split Line (2 Cooks)</h4>
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Split Line (2-Cook Split Line)</h4>
                     <div style="margin-bottom: 8px;">
                         <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Open:</label>
                         <select class="form-control emp-assignment" data-station="range_mid_split_open">
