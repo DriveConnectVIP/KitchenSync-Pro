@@ -98,38 +98,41 @@ const UIController = {
 document.addEventListener('DOMContentLoaded', () => UIController.init());
 
 // ==========================================
-// 1. DATA SPECS: OPENING, CLOSING & STATION CHECKLISTS
+// 1. DATA SPECS: OPENING, CLOSING & SPLIT CHECKLISTS
 // ==========================================
 const CHECKLIST_SPECS = {
     en: {
         'range_open': [
             {
-                phase: "🌅 Range Station Open",
+                phase: "🌅 Range Station Open Setup & Safety Checks",
                 tasks: [
                     { id: 'ro1', title: "Turn on range burners & verify flame ignition", desc: "Check all burner ports for clogs or uneven flames." },
                     { id: 'ro2', title: "Calibrate line thermometers", desc: "Verify ice-water bath reads 32°F (0°C)." },
-                    { id: 'ro3', title: "Stock hot holding wells & water levels", desc: "Ensure wells are clean and filled to operational fill line." },
-                    { id: 'ro4', title: "Stock line insert pans with proteins & sauces", desc: "Check expiration labels and FIFO rotation standards." }
+                    { id: 'ro3', title: "Check hot holding wells & water levels", desc: "Ensure wells are clean and filled to operational fill line." },
+                    { id: 'ro4', title: "Stock line insert pans with proteins & sauces", desc: "Check expiration labels and FIFO rotation standards." },
+                    { id: 'ro5', title: "Sanitize station cutting boards & prep surfaces", desc: "Use approved quat sanitizer solution (200-400 ppm)." }
                 ]
             }
         ],
         'mid_open': [
             {
-                phase: "🌅 Mid Station Open",
+                phase: "🌅 Mid Station Open Setup",
                 tasks: [
                     { id: 'mo1', title: "Turn on sandwich press & panini units", desc: "Preheat to 350°F and test press mechanism." },
                     { id: 'mo2', title: "Stock cold sandwich rails & condiments", desc: "Ensure all cheese, sliced meats, and spreads are full and dated." },
-                    { id: 'mo3', title: "Check bread inventory & pull par-bake items", desc: "Estimate volume for the shift and stage accordingly." }
+                    { id: 'mo3', title: "Check bread inventory & pull par-bake items", desc: "Estimate volume for the shift and stage accordingly." },
+                    { id: 'mo4', title: "Sanitize sandwich prep rails and slicer guard", desc: "Ensure all food contact surfaces meet health code standards." }
                 ]
             }
         ],
         'grill_fry_open': [
             {
-                phase: "🌅 Grill/Fry Station Open",
+                phase: "🌅 Grill/Fry Station Open Setup",
                 tasks: [
                     { id: 'gfo1', title: "Filter fryers and check oil levels", desc: "Top off oil if necessary and verify temperature controller at 350°F." },
                     { id: 'gfo2', title: "Season and test flat top griddle", desc: "Scrape grill surface clean and apply high-temp cooking oil." },
-                    { id: 'gfo3', title: "Stock freezer baskets with fries & appetizers", desc: "Ensure back-up inventory is staged within arm's reach." }
+                    { id: 'gfo3', title: "Stock freezer baskets with fries & appetizers", desc: "Ensure back-up inventory is staged within arm's reach." },
+                    { id: 'gfo4', title: "Check batter stations and breading pans", desc: "Stage fresh breading, wet batters, and sanitizing buckets." }
                 ]
             }
         ],
@@ -194,24 +197,24 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Night Closing (Grill/Fry Station Procedures)",
                 tasks: [
-                    { id: 'gcl1', title: "Flip pancake batter to 6th pan", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle[cite: 5]." },
-                    { id: 'gcl2', title: "Bring batter gun to dish", desc: "Bring the batter gun to dish[cite: 5]." },
-                    { id: 'gcl3', title: "Wipe and scrub lower shelf of grill", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials[cite: 5]." },
-                    { id: 'gcl4', title: "Strain fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles[cite: 5]." },
-                    { id: 'gcl5', title: "Wipe down stainless dividers and front of fryers", desc: "Wipe down the stainless dividers and the front of the fryers[cite: 5]." },
-                    { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator[cite: 5]." },
-                    { id: 'gcl7', title: "Sift fry flour into a new pan", desc: "Sift fry flour into a new pan and top off if necessary[cite: 5]." },
-                    { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables[cite: 5]." },
-                    { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables[cite: 5]." },
-                    { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart[cite: 5]." },
-                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart, wrap left over sausage and bacon with foil, label, and place on lower rack of cart[cite: 5]." },
-                    { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board[cite: 5]." },
-                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap for the grill into a metal German pan[cite: 5]." },
-                    { id: 'gcl14', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap[cite: 5]." },
-                    { id: 'gcl15', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight![cite: 5]." },
-                    { id: 'gcl16', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 5]." },
-                    { id: 'gcl17', title: "Restock freezer (French fries, chicken, etc.)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)[cite: 5]." },
-                    { id: 'gcl18', title: "Manager sign-off before leaving", desc: "Check with manager prior to clocking out and leaving your shift![cite: 5]" }
+                    { id: 'gcl1', title: "Flip pancake batter to 6th pan", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle." },
+                    { id: 'gcl2', title: "Bring batter gun to dish", desc: "Bring the batter gun to dish." },
+                    { id: 'gcl3', title: "Wipe and scrub lower shelf of grill", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials." },
+                    { id: 'gcl4', title: "Strain fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles." },
+                    { id: 'gcl5', title: "Wipe down stainless dividers and front of fryers", desc: "Wipe down the stainless dividers and the front of the fryers." },
+                    { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator." },
+                    { id: 'gcl7', title: "Sift fry flour into a new pan", desc: "Sift fry flour into a new pan and top off if necessary." },
+                    { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables." },
+                    { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables." },
+                    { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart." },
+                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart, wrap left over sausage and bacon with foil, label, and place on lower rack of cart." },
+                    { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board." },
+                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap for the grill into a metal German pan." },
+                    { id: 'gcl14', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap." },
+                    { id: 'gcl15', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight!." },
+                    { id: 'gcl16', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
+                    { id: 'gcl17', title: "Restock freezer (French fries, chicken, etc.)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)." },
+                    { id: 'gcl18', title: "Manager sign-off before leaving", desc: "Check with manager prior to clocking out and leaving your shift!" }
                 ]
             }
         ]
@@ -450,7 +453,7 @@ function renderManagerAssignmentWidget() {
     let html = `
         <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
             <h3 style="color: #1e3a8a; margin-top: 0;">👥 Station & Shift Line Assignments</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions across all available shift formats.</p>
+            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions and instantly update cook dashboards.</p>
             
             <div style="margin: 1rem 0;">
                 <label style="font-weight: 600; font-size: 0.9rem;">Select Date:</label>
@@ -462,64 +465,92 @@ function renderManagerAssignmentWidget() {
                 <!-- Option 1: Morning Shift 2-Cook Split Line -->
                 <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
                     <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Open:</label>
-                        <select class="form-control emp-assignment" data-station="range_mid_split_open">
-                            <option value="">-- Select Cook 1 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Open:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-range_mid_split_open" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('range_mid_split_open', 'sel-range_mid_split_open')">Assign 📌</button>
+                        </div>
                     </div>
+
                     <div>
-                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Open:</label>
-                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_open">
-                            <option value="">-- Select Cook 2 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Open:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-grill_fry_mid_split_open" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('grill_fry_mid_split_open', 'sel-grill_fry_mid_split_open')">Assign 📌</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Option 2: Morning Shift 3 Cooks -->
                 <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
                     <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold;">Range Open:</label>
-                        <select class="form-control emp-assignment" data-station="range_open">
-                            <option value="">-- Select Cook --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range Open:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-range_open" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('range_open', 'sel-range_open')">Assign 📌</button>
+                        </div>
                     </div>
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold;">Mid Open:</label>
-                        <select class="form-control emp-assignment" data-station="mid_open">
-                            <option value="">-- Select Cook --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Mid Open:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-mid_open" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('mid_open', 'sel-mid_open')">Assign 📌</button>
+                        </div>
                     </div>
+
                     <div>
-                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry Open:</label>
-                        <select class="form-control emp-assignment" data-station="grill_fry_open">
-                            <option value="">-- Select Cook --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry Open:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-grill_fry_open" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('grill_fry_open', 'sel-grill_fry_open')">Assign 📌</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Option 3: Night Shift 2-Cook Closing -->
                 <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
                     <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Close:</label>
-                        <select class="form-control emp-assignment" data-station="range_mid_split_close">
-                            <option value="">-- Select Closer 1 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Close:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-range_mid_split_close" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Closer --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('range_mid_split_close', 'sel-range_mid_split_close')">Assign 📌</button>
+                        </div>
                     </div>
+
                     <div>
-                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Close:</label>
-                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_close">
-                            <option value="">-- Select Closer 2 --</option>
-                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                        </select>
+                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Close:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sel-grill_fry_mid_split_close" class="form-control" style="flex: 1;">
+                                <option value="">-- Select Closer --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('grill_fry_mid_split_close', 'sel-grill_fry_mid_split_close')">Assign 📌</button>
+                        </div>
                     </div>
                 </div>
 
@@ -527,6 +558,24 @@ function renderManagerAssignmentWidget() {
         </div>
     `;
     container.innerHTML = html;
+}
+
+function assignCookToStation(stationKey, selectId) {
+    const selectEl = document.getElementById(selectId);
+    if (!selectEl) return;
+    const empId = selectEl.value;
+    if (!empId) {
+        alert("Please select an employee to assign.");
+        return;
+    }
+
+    const emp = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
+    if (!emp) return;
+
+    emp.station = stationKey;
+    ApiService.request('saveEmployee', { employee: emp }).then(res => {
+        alert(`✅ Successfully assigned ${emp.name || emp.Name} to ${stationKey.replace(/_/g, ' ').toUpperCase()}! Their dashboard has been updated.`);
+    });
 }
 
 function submitManagerShiftChecklist() {
