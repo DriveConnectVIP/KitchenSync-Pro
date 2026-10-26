@@ -81,8 +81,14 @@ const UIController = {
         const id = view.id.replace('view-', '');
         if (id === 'shift-entry') renderChecklists();
         if (id === 'cook-dashboard') renderCookDashboard();
-        if (id === 'manager-dashboard') renderManagerDashboard();
-        if (id === 'gm-dashboard') renderGMDashboard();
+        if (id === 'manager-dashboard') {
+            renderManagerDashboard();
+            renderManagerAssignmentWidget();
+        }
+        if (id === 'gm-dashboard') {
+            renderGMDashboard();
+            renderManagerAssignmentWidget();
+        }
         if (id === 'cook-training') renderTrainingView();
         if (id === 'recipe-book') renderRecipeBook();
         if (id === 'roster') renderRosterView();
@@ -92,83 +98,78 @@ const UIController = {
 document.addEventListener('DOMContentLoaded', () => UIController.init());
 
 // ==========================================
-// 1. DATA SPECS: CHECKLISTS & TRAINING MODULES
+// 1. DATA SPECS: OPENING, CLOSING & SPLIT CHECKLISTS
 // ==========================================
 const CHECKLIST_SPECS = {
     en: {
-        range: [
+        'range_open': [
             {
-                phase: "🌅 Opening Duties & Safety Checks",
+                phase: "🌅 Range Station Open (Weekend)",
                 tasks: [
-                    { id: 'r1', title: "Turn on range burners & verify flame ignition", desc: "Check all burner ports for clogs or uneven flames." },
-                    { id: 'r2', title: "Calibrate line thermometers", desc: "Verify ice-water bath reads 32°F (0°C)." },
-                    { id: 'r3', title: "Check hot holding wells & water levels", desc: "Ensure wells are clean and filled to operational fill line." }
-                ]
-            },
-            {
-                phase: "🔪 Prep & Stocking",
-                tasks: [
-                    { id: 'r4', title: "Stock line insert pans with proteins & sauces", desc: "Check expiration labels and FIFO rotation standards." },
-                    { id: 'r5', title: "Sanitize station cutting boards & prep surfaces", desc: "Use approved quat sanitizer solution (200-400 ppm)." }
+                    { id: 'ro1', title: "Turn on range burners & verify flame ignition", desc: "Check all burner ports for clogs or uneven flames." },
+                    { id: 'ro2', title: "Calibrate line thermometers", desc: "Verify ice-water bath reads 32°F (0°C)." },
+                    { id: 'ro3', title: "Stock hot holding wells & water levels", desc: "Ensure wells are clean and filled to operational fill line." },
+                    { id: 'ro4', title: "Stock line insert pans with proteins & sauces", desc: "Check expiration labels and FIFO rotation standards." }
                 ]
             }
         ],
-        mid: [
+        'mid_open': [
             {
-                phase: "🥪 Prep & Station Setup",
+                phase: "🌅 Mid Station Open (Weekend)",
                 tasks: [
-                    { id: 'm1', title: "Turn on sandwich press & panini units", desc: "Preheat to 350°F and test press mechanism." },
-                    { id: 'm2', title: "Stock cold sandwich rails & condiments", desc: "Ensure all cheese, sliced meats, and spreads are full and dated." },
-                    { id: 'm3', title: "Check bread inventory & pull par-bake items", desc: "Estimate volume for the shift and stage accordingly." }
+                    { id: 'mo1', title: "Turn on sandwich press & panini units", desc: "Preheat to 350°F and test press mechanism." },
+                    { id: 'mo2', title: "Stock cold sandwich rails & condiments", desc: "Ensure all cheese, sliced meats, and spreads are full and dated." },
+                    { id: 'mo3', title: "Check bread inventory & pull par-bake items", desc: "Estimate volume for the shift and stage accordingly." }
                 ]
             }
         ],
-        'grill/fry': [
+        'grill_fry_open': [
             {
-                phase: "🍟 Fryer & Grill Startup",
+                phase: "🌅 Grill/Fry Station Open (Weekend)",
                 tasks: [
-                    { id: 'gf1', title: "Filter fryers and check oil levels", desc: "Top off oil if necessary and verify temperature controller at 350°F." },
-                    { id: 'gf2', title: "Season and test flat top griddle", desc: "Scrape grill surface clean and apply high-temp cooking oil." },
-                    { id: 'gf3', title: "Stock freezer baskets with fries & appetizers", desc: "Ensure back-up inventory is staged within arm's reach." }
-                ]
-            }
-        ]
-    },
-    es: {
-        range: [
-            {
-                phase: "🌅 Deberes de Apertura y Seguridad",
-                tasks: [
-                    { id: 'r1', title: "Encender quemadores y verificar la llama", desc: "Revisar todos los puertos en busca de obstrucciones." },
-                    { id: 'r2', title: "Calibrar termómetros de línea", desc: "Verificar baño de agua con hielo a 32°F (0°C)." },
-                    { id: 'r3', title: "Revisar niveles de agua en pozos calientes", desc: "Asegurar que estén limpios y llenos hasta la línea." }
-                ]
-            },
-            {
-                phase: "🔪 Preparación y Abastecimiento",
-                tasks: [
-                    { id: 'r4', title: "Abastecer bandejas de la línea con proteínas", desc: "Revisar etiquetas de expiración y estándares FIFO." },
-                    { id: 'r5', title: "Desinfectar tablas de cortar y superficies", desc: "Usar solución desinfectante cuat of 200-400 ppm." }
+                    { id: 'gfo1', title: "Filter fryers and check oil levels", desc: "Top off oil if necessary and verify temperature controller at 350°F." },
+                    { id: 'gfo2', title: "Season and test flat top griddle", desc: "Scrape grill surface clean and apply high-temp cooking oil." },
+                    { id: 'gfo3', title: "Stock freezer baskets with fries & appetizers", desc: "Ensure back-up inventory is staged within arm's reach." }
                 ]
             }
         ],
-        mid: [
+        'range_mid_split_open': [
             {
-                phase: "🥪 Configuración de Estación Mid",
+                phase: "🌅 Range / Mid Split Open (Weekday Cook 1)",
                 tasks: [
-                    { id: 'm1', title: "Encender prensa de sándwiches y paninis", desc: "Precalentar a 350°F y probar mecanismo." },
-                    { id: 'm2', title: "Abastecer rieles fríos y condimentos", desc: "Asegurar que quesos, carnes y aderezos estén fechados." },
-                    { id: 'm3', title: "Revisar inventario de pan", desc: "Estimar volumen para el turno actual." }
+                    { id: 'rmso1', title: "Ignite range burners and test hot holding wells", desc: "Verify safe heating temperatures across range and soup wells." },
+                    { id: 'rmso2', title: "Setup sandwich press and cold rail components", desc: "Ensure sliced proteins, cheeses, and spreads are fully stocked and dated." },
+                    { id: 'rmso3', title: "Split-Task: Setup backup line sauces & dressings", desc: "Equally divide shared mid-station prep tasks with partner." }
                 ]
             }
         ],
-        'grill/fry': [
+        'grill_fry_mid_split_open': [
             {
-                phase: "🍟 Inicio de Freidoras y Plancha",
+                phase: "🌅 Grill/Fry / Mid Split Open (Weekday Cook 2)",
                 tasks: [
-                    { id: 'gf1', title: "Filtrar freidoras y revisar niveles de aceite", desc: "Rellenar aceite y verificar temperatura a 350°F." },
-                    { id: 'gf2', title: "Sazonar y probar la plancha", desc: "Raspar superficie y aplicar aceite de alta temperatura." },
-                    { id: 'gf3', title: "Abastecer canastas con papas y aperitivos", desc: "Asegurar inventario de respaldo al alcance." }
+                    { id: 'gfmaso1', title: "Filter fryers, check oil, and season flat top", desc: "Preheat grill to 350°F and prepare basket stations." },
+                    { id: 'gfmaso2', title: "Pull bread inventory and stage par-bake items", desc: "Support mid-station bread rotation alongside grill startup." },
+                    { id: 'gfmaso3', title: "Split-Task: Restock shared line squeeze bottles", desc: "Equally divide shared condiment stocking responsibilities." }
+                ]
+            }
+        ],
+        'range_mid_split_close': [
+            {
+                phase: "🌙 Range / Mid Split Close (Closer 1)",
+                tasks: [
+                    { id: 'rmsc1', title: "Power down range burners and drain/clean hot wells", desc: "Scrape range top and sanitize surfaces once cooled." },
+                    { id: 'rmsc2', title: "Break down cold sandwich rail and cover/date pans", desc: "Store backup items in walk-in cooler following FIFO standards." },
+                    { id: 'rmsc3', title: "Split-Task: Sweep and mop back-line floors", desc: "Share evening floor care and trash runs with closing partner." }
+                ]
+            }
+        ],
+        'grill_fry_mid_split_close': [
+            {
+                phase: "🌙 Grill/Fry / Mid Split Close (Closer 2)",
+                tasks: [
+                    { id: 'gfmsch1', title: "Scrape and degrease flat top grill surface", desc: "Apply grill cleaner, polish brick, and coat with high-temp oil." },
+                    { id: 'gfmsch2', title: "Perform nightly fryer filtration and wipe down hoods", desc: "Filter fry oil through machine and empty crumb catchers." },
+                    { id: 'gfmsch3', title: "Split-Task: Empty line trash and sanitize prep tables", desc: "Share evening closing trash runs and chemical sanitization." }
                 ]
             }
         ]
@@ -345,7 +346,7 @@ function switchTab(viewId, btnEl) {
 }
 
 // ==========================================
-// 5. STATION CHECKLISTS (READ-ONLY FOR COOKS, INTERACTIVE FOR MGMT)
+// 5. STATION CHECKLISTS & ASSIGNMENT WIDGET
 // ==========================================
 function renderChecklists() {
     const container = document.getElementById('checklist-container');
@@ -353,22 +354,20 @@ function renderChecklists() {
     container.innerHTML = '';
 
     const isCook = Store.role === 'cook';
-    const assigned = Store.user?.station?.trim() || (isCook ? 'Range' : 'All');
+    const assigned = Store.user?.station?.trim() || (isCook ? 'range_open' : 'range_open');
     
     const banner = document.createElement('div');
     banner.className = 'card';
     banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
-    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station: ${assigned}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isCook ? 'Read-only station reference checklist.' : 'Station checklist for review and shift sign-off.'}</p>`;
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station / Shift: ${assigned.replace(/_/g, ' ').toUpperCase()}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isCook ? 'Read-only station reference checklist.' : 'Station checklist for review and shift sign-off.'}</p>`;
     container.appendChild(banner);
 
-    const stationKey = assigned.toLowerCase().includes('mid') ? 'mid' : assigned.toLowerCase().includes('grill') ? 'grill/fry' : 'range';
-    const specs = CHECKLIST_SPECS[Store.lang]?.[stationKey] || CHECKLIST_SPECS['en'][stationKey] || CHECKLIST_SPECS['en'].range;
+    const specs = CHECKLIST_SPECS[Store.lang]?.[assigned] || CHECKLIST_SPECS['en'][assigned] || CHECKLIST_SPECS['en']['range_open'];
 
     specs.forEach(sec => {
         let html = `<h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">${sec.phase}</h3>`;
         sec.tasks.forEach(t => {
             if (isCook) {
-                // Read-only format for cooks (no checkboxes)
                 html += `
                     <div class="task-row" style="display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
                         <span style="color: #059669; font-weight: bold; font-size: 1.1rem; line-height: 1;">•</span>
@@ -378,7 +377,6 @@ function renderChecklists() {
                         </div>
                     </div>`;
             } else {
-                // Interactive format with checkboxes for Managers / GMs
                 html += `
                     <div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
                         <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;">
@@ -392,7 +390,6 @@ function renderChecklists() {
         container.innerHTML += `<div class="card checklist-section">${html}</div>`;
     });
 
-    // Only Managers or GMs have the submit/log shift authority
     if (!isCook) {
         container.innerHTML += `
             <div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -400,6 +397,118 @@ function renderChecklists() {
             </div>
         `;
     }
+}
+
+function renderManagerAssignmentWidget() {
+    const container = document.getElementById('manager-assignment-widget-container');
+    if (!container) return;
+
+    const selectedDateStr = document.getElementById('shift-date')?.value || new Date().toISOString().split('T')[0];
+    const dayOfWeek = new Date(selectedDateStr).getDay();
+    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+    let html = `
+        <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
+            <h3 style="color: #1e3a8a; margin-top: 0;">👥 Station & Shift Line Assignments</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily openers and closers based on ${isWeekend ? 'Weekend (3-Cook Morning / 2-Cook Night)' : 'Weekday (2-Cook Morning Split / 2-Cook Night Split)'} parameters.</p>
+            
+            <div style="margin: 1rem 0;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Select Date:</label>
+                <input type="date" id="shift-date" class="form-control" value="${selectedDateStr}" onchange="renderManagerAssignmentWidget()" style="margin-top: 4px; max-width: 200px;">
+            </div>
+    `;
+
+    if (isWeekend) {
+        html += `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift (3 Cooks)</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Range Open:</label>
+                        <select class="form-control emp-assignment" data-station="range_open">
+                            <option value="">-- Select Cook --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Mid Open:</label>
+                        <select class="form-control emp-assignment" data-station="mid_open">
+                            <option value="">-- Select Cook --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry Open:</label>
+                        <select class="form-control emp-assignment" data-station="grill_fry_open">
+                            <option value="">-- Select Cook --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift (2-Cook Split Line)</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Close:</label>
+                        <select class="form-control emp-assignment" data-station="range_mid_split_close">
+                            <option value="">-- Select Closer 1 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Close:</label>
+                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_close">
+                            <option value="">-- Select Closer 2 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Split Line (2 Cooks)</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Open:</label>
+                        <select class="form-control emp-assignment" data-station="range_mid_split_open">
+                            <option value="">-- Select Opener 1 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Open:</label>
+                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_open">
+                            <option value="">-- Select Opener 2 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Split Line (2 Cooks)</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Close:</label>
+                        <select class="form-control emp-assignment" data-station="range_mid_split_close">
+                            <option value="">-- Select Closer 1 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Close:</label>
+                        <select class="form-control emp-assignment" data-station="grill_fry_mid_split_close">
+                            <option value="">-- Select Closer 2 --</option>
+                            ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
 }
 
 function submitManagerShiftChecklist() {
@@ -414,7 +523,7 @@ function submitManagerShiftChecklist() {
         empId: Store.user.id,
         empName: Store.user.name,
         role: Store.role,
-        station: Store.user.station || 'Range',
+        station: Store.user.station || 'range_open',
         date: new Date().toISOString().split('T')[0],
         tasksCompleted: checked,
         totalTasks: total,
@@ -572,12 +681,9 @@ function openRecipeModal(recId = null) {
     };
 
     if (existing) {
-        const index = Store.recipes.findIndex(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
-        if (index > -1) {
-            Store.recipes[index] = recipeObj;
-        } else {
-            Store.recipes.push(recipeObj);
-        }
+        const index = Store.recipes.findIndex(r => String(r.id || r.menuItem).trim() === String(recId).trim());
+        if (index > -1) Store.recipes[index] = recipeObj;
+        else Store.recipes.push(recipeObj);
     } else {
         Store.recipes.push(recipeObj);
     }
@@ -590,7 +696,7 @@ function openRecipeModal(recId = null) {
 
 function deleteRecipe(recId) {
     if (!confirm("Are you sure you want to delete this recipe?")) return;
-    Store.recipes = Store.recipes.filter(r => String(r.id || r.ID || r.menuItem).trim() !== String(recId).trim());
+    Store.recipes = Store.recipes.filter(r => String(r.id || r.menuItem).trim() !== String(recId).trim());
     renderRecipeBook();
     alert("Recipe deleted successfully.");
 }
@@ -659,9 +765,7 @@ function submitQuizAnswers() {
     let correctCount = 0;
     mod.questions.forEach((qObj, idx) => {
         const selected = document.querySelector(`input[name="q-${idx}"]:checked`);
-        if (selected && Number(selected.value) === qObj.correct) {
-            correctCount++;
-        }
+        if (selected && Number(selected.value) === qObj.correct) correctCount++;
     });
 
     const score = Math.round((correctCount / mod.questions.length) * 100);
@@ -743,9 +847,10 @@ function renderManagerDashboard() {
     container.innerHTML = `
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3 style="color: #1e3a8a; margin-top: 0;">📊 Shift Manager Dashboard & Oversight</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Review team shift logs and operational updates.</p>
+            <p style="font-size: 0.85rem; color: #64748b;">Assign line positions and review team shift logs.</p>
         </div>
-        <div class="card" style="margin-bottom: 1.5rem;">
+        <div id="manager-assignment-widget-container"></div>
+        <div class="card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
             <h4 style="color: #1e3a8a; margin-top: 0;">⭐ Completed Team Shifts</h4>
             <table class="data-table" style="width: 100%; margin-top: 1rem;">
                 <thead>
@@ -774,6 +879,7 @@ function renderManagerDashboard() {
         <div id="message-board-container"></div>
     `;
     renderMessageBoard();
+    renderManagerAssignmentWidget();
 }
 
 function renderGMDashboard() {
@@ -789,7 +895,7 @@ function renderGMDashboard() {
     container.innerHTML = `
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3 style="color: #1e3a8a; margin-top: 0;">📈 General Manager Executive Suite</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Manage employees, approve training certifications, and monitor operations.</p>
+            <p style="font-size: 0.85rem; color: #64748b;">Manage employees, approve training certifications, and assign shifts.</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div class="card" style="text-align: center;">
@@ -805,6 +911,7 @@ function renderGMDashboard() {
                 <h2 style="color: #dc2626; margin: 5px 0 0 0;">${pendingCerts.length}</h2>
             </div>
         </div>
+        <div id="manager-assignment-widget-container" style="margin-bottom: 1.5rem;"></div>
         <div class="card" style="margin-bottom: 1.5rem;">
             <h4 style="color: #1e3a8a; margin-top: 0;">🎓 Pending Training Certifications for Approval</h4>
             <table class="data-table" style="width: 100%; margin-top: 1rem;">
@@ -838,6 +945,7 @@ function renderGMDashboard() {
             </div>
         </div>
     `;
+    renderManagerAssignmentWidget();
 }
 
 function gmSignOffCert(empId, modId) {
@@ -901,7 +1009,7 @@ function openEmployeeModal(empId = null) {
     if (!name) return;
     const role = prompt("Enter role (cook, manager, gm):", existing ? (existing.role || existing.Role || 'cook') : 'cook');
     const pin = prompt("Enter 4-digit PIN code:", existing ? (existing.pin || existing.PIN || '1234') : '1234');
-    const station = prompt("Enter default station (Range, Mid, Grill/Fry):", existing ? (existing.station || existing.Station || 'Range') : 'Range');
+    const station = prompt("Enter default station:", existing ? (existing.station || existing.Station || 'range_open') : 'range_open');
     const hourlyRate = prompt("Enter hourly rate:", existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00');
 
     const empObj = {
@@ -916,11 +1024,8 @@ function openEmployeeModal(empId = null) {
 
     if (existing) {
         const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
-        if (index > -1) {
-            Store.employees[index] = empObj;
-        } else {
-            Store.employees.push(empObj);
-        }
+        if (index > -1) Store.employees[index] = empObj;
+        else Store.employees.push(empObj);
     } else {
         Store.employees.push(empObj);
     }
