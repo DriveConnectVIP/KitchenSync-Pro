@@ -160,36 +160,36 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Night Closing (Range Station Procedures)",
                 tasks: [
-                    { id: 'rcl1', title: "Break down veg and poach pans", desc: "One hour prior to close, break down veg. and poach pans and bring to dish[cite: 3]." },
-                    { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners[cite: 3]." },
-                    { id: 'rcl3', title: "Clean traps for range and small grill", desc: "Clean traps for range and small grill. Shut down one oven[cite: 3]." },
-                    { id: 'rcl4', title: "Clean interior of egg station & oven doors", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table[cite: 3]." },
-                    { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks[cite: 3]." },
-                    { id: 'rcl6', title: "Restock traulsen & rotate product", desc: "Restock traulsen, ensuring that all product is rotated and covered[cite: 3]." },
-                    { id: 'rcl7', title: "Change foil in oven & wipe/scup interior doors", desc: "Change foil in oven and wipe/scup interior doors of ovens[cite: 3]." },
-                    { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed[cite: 3]." },
-                    { id: 'rcl9', title: "Restock bread and rotate product", desc: "Restock bread as necessary, rotating product[cite: 3]." },
-                    { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in[cite: 3]." },
-                    { id: 'rcl11', title: "Check thaw pull for frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product[cite: 3]." },
-                    { id: 'rcl12', title: "Sweep, deck brush, and mop line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor[cite: 3]." },
-                    { id: 'rcl13', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift![cite: 3]" }
+                    { id: 'rcl1', title: "Break down veg and poach pans", desc: "One hour prior to close, break down veg. and poach pans and bring to dish." },
+                    { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners." },
+                    { id: 'rcl3', title: "Clean traps for range and small grill", desc: "Clean traps for range and small grill. Shut down one oven." },
+                    { id: 'rcl4', title: "Clean interior of egg station & oven doors", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table." },
+                    { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks." },
+                    { id: 'rcl6', title: "Restock traulsen & rotate product", desc: "Restock traulsen, ensuring that all product is rotated and covered." },
+                    { id: 'rcl7', title: "Change foil in oven & wipe/scup interior doors", desc: "Change foil in oven and wipe/scup interior doors of ovens." },
+                    { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed." },
+                    { id: 'rcl9', title: "Restock bread and rotate product", desc: "Restock bread as necessary, rotating product." },
+                    { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in." },
+                    { id: 'rcl11', title: "Check thaw pull for frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product." },
+                    { id: 'rcl12', title: "Sweep, deck brush, and mop line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor." },
+                    { id: 'rcl13', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" }
                 ]
             },
             {
                 phase: "🌙 Night Closing (Mid Station Procedures)",
                 tasks: [
-                    { id: 'mcl1', title: "Remove utensils from sandwich unit", desc: "One hour prior to close, remove all utensils from the sandwich unit[cite: 4]." },
-                    { id: 'mcl2', title: "Clean interior (top) of unit under pans", desc: "Clean interior (top) of unit under pans and around housing[cite: 4]." },
-                    { id: 'mcl3', title: "Clean interior of lower portion of unit", desc: "Clean interior of lower portion of the unit, including the upper shelf inside[cite: 4]." },
-                    { id: 'mcl4', title: "Pull out unit and clean back & floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it[cite: 4]." },
-                    { id: 'mcl5', title: "Flip all pans and restock all items", desc: "Flip all pans and restock all items, making sure to properly rotate product[cite: 4]." },
-                    { id: 'mcl6', title: "Verify stock levels", desc: "DO NOT double stock product. There should be one full pan of every item[cite: 4]." },
-                    { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out[cite: 4]." },
-                    { id: 'mcl8', title: "Clean microwave inside and out", desc: "Clean the microwave inside and out, including the microwave shelf[cite: 4]." },
-                    { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed[cite: 4]." },
-                    { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 4]." },
-                    { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift[cite: 4]." },
-                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift![cite: 4]" }
+                    { id: 'mcl1', title: "Remove utensils from sandwich unit", desc: "One hour prior to close, remove all utensils from the sandwich unit." },
+                    { id: 'mcl2', title: "Clean interior (top) of unit under pans", desc: "Clean interior (top) of unit under pans and around housing." },
+                    { id: 'mcl3', title: "Clean interior of lower portion of unit", desc: "Clean interior of lower portion of the unit, including the upper shelf inside." },
+                    { id: 'mcl4', title: "Pull out unit and clean back & floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it." },
+                    { id: 'mcl5', title: "Flip all pans and restock all items", desc: "Flip all pans and restock all items, making sure to properly rotate product." },
+                    { id: 'mcl6', title: "Verify stock levels", desc: "DO NOT double stock product. There should be one full pan of every item." },
+                    { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out." },
+                    { id: 'mcl8', title: "Clean microwave inside and out", desc: "Clean the microwave inside and out, including the microwave shelf." },
+                    { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed." },
+                    { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
+                    { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift." },
+                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" }
                 ]
             }
         ],
@@ -247,7 +247,9 @@ const TRAINING_MODULES = [
 // ==========================================
 function handleLogin(e) {
     e.preventDefault();
-    const pin = document.getElementById('auth-password').value.trim();
+    const passwordInput = document.getElementById('auth-password');
+    if (!passwordInput) return;
+    const pin = passwordInput.value.trim();
 
     if (pin === CONFIG.GM_MASTER_PASSCODE) {
         Store.setSession({ id: "GM-ADMIN", name: "General Manager", role: "gm", station: "All" }, "gm");
@@ -802,7 +804,6 @@ function modifyRecipe(recId) {
     activeBookTab = item.type || 'recipes';
     renderRecipeBook();
 
-    // Populate form fields with existing data
     document.getElementById('book-item-id').value = item.id || item.ID || recId;
     document.getElementById('book-item-name').value = item.menuItem || item.title || '';
     document.getElementById('book-item-category').value = item.category || '';
@@ -1132,4 +1133,73 @@ function triggerMasterReset() {
 // ==========================================
 // 10. GM CRUD: EMPLOYEES & RECIPES
 // ==========================================
-function renderR
+function renderRosterView() {
+    const tbody = document.getElementById('roster-table-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = Store.employees.length === 0 ? `<tr><td colspan="6" style="text-align: center; color: #64748b;">No employees found.</td></tr>` :
+        Store.employees.map(emp => {
+            const eId = emp.id || emp.ID;
+            return `
+                <tr>
+                    <td>${eId}</td>
+                    <td><strong>${emp.name || emp.Name}</strong></td>
+                    <td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td>
+                    <td>${emp.station || emp.Station || 'General'}</td>
+                    <td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td>
+                    <td>
+                        ${Store.role === 'gm' ? `
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openEmployeeModal('${eId}')">Edit ✏️</button>
+                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${eId}')">Delete 🗑️</button>
+                            </div>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+}
+
+function openEmployeeModal(empId = null) {
+    let existing = null;
+    if (empId) {
+        existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
+    }
+
+    const name = prompt("Enter employee name:", existing ? (existing.name || existing.Name || '') : '');
+    if (!name) return;
+    const role = prompt("Enter role (cook, manager, gm):", existing ? (existing.role || existing.Role || 'cook') : 'cook');
+    const pin = prompt("Enter 4-digit PIN code:", existing ? (existing.pin || existing.PIN || '1234') : '1234');
+    const station = prompt("Enter default station:", existing ? (existing.station || existing.Station || 'range_open') : 'range_open');
+    const hourlyRate = prompt("Enter hourly rate:", existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00');
+
+    const empObj = {
+        id: existing ? (existing.id || existing.ID) : `EMP-${Date.now()}`,
+        name,
+        role,
+        station,
+        hourlyRate,
+        pin,
+        active: true
+    };
+
+    if (existing) {
+        const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
+        if (index > -1) Store.employees[index] = empObj;
+        else Store.employees.push(empObj);
+    } else {
+        Store.employees.push(empObj);
+    }
+
+    ApiService.request('saveEmployee', { employee: empObj }).then(() => {
+        alert("Employee saved successfully!");
+        renderRosterView();
+    });
+}
+
+function deleteEmployee(empId) {
+    if (!confirm("Are you sure you want to remove this employee?")) return;
+    Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
+    renderRosterView();
+    alert("Employee removed from active view.");
+}
