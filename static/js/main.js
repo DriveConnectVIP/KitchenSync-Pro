@@ -189,7 +189,7 @@ const CHECKLIST_SPECS = {
                     { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed[cite: 4]." },
                     { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 4]." },
                     { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift[cite: 4]." },
-                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift[cite: 4]." }
+                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift![cite: 4]" }
                 ]
             }
         ],
@@ -207,9 +207,9 @@ const CHECKLIST_SPECS = {
                     { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables." },
                     { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables." },
                     { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart." },
-                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart, wrap left over sausage and bacon with foil, label, and place on lower rack of cart." },
+                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart." },
                     { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board." },
-                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap for the grill into a metal German pan." },
+                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap into a metal German pan." },
                     { id: 'gcl14', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap." },
                     { id: 'gcl15', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight!." },
                     { id: 'gcl16', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
@@ -463,94 +463,88 @@ function renderManagerAssignmentWidget() {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
                 
                 <!-- Option 1: Morning Shift 2-Cook Split Line -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Open:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-range_mid_split_open" class="form-control" style="flex: 1;">
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Open:</label>
+                            <select id="sel-range_mid_split_open" class="form-control" style="width: 100%;">
                                 <option value="">-- Select Cook --</option>
                                 ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
                             </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('range_mid_split_open', 'sel-range_mid_split_open')">Assign 📌</button>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Open:</label>
+                            <select id="sel-grill_fry_mid_split_open" class="form-control" style="width: 100%;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
                         </div>
                     </div>
-
-                    <div>
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Open:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-grill_fry_mid_split_open" class="form-control" style="flex: 1;">
-                                <option value="">-- Select Cook --</option>
-                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                            </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('grill_fry_mid_split_open', 'sel-grill_fry_mid_split_open')">Assign 📌</button>
-                        </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_mid_split_open', 'sel-grill_fry_mid_split_open'])">Assign Split Line 📌</button>
                     </div>
                 </div>
 
                 <!-- Option 2: Morning Shift 3 Cooks -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range Open:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-range_open" class="form-control" style="flex: 1;">
-                                <option value="">-- Select Cook --</option>
-                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                            </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('range_open', 'sel-range_open')">Assign 📌</button>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Mid Open:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-mid_open" class="form-control" style="flex: 1;">
-                                <option value="">-- Select Cook --</option>
-                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                            </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('mid_open', 'sel-mid_open')">Assign 📌</button>
-                        </div>
-                    </div>
-
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry Open:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-grill_fry_open" class="form-control" style="flex: 1;">
+                        <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range Open:</label>
+                            <select id="sel-range_open" class="form-control" style="width: 100%;">
                                 <option value="">-- Select Cook --</option>
                                 ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
                             </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('grill_fry_open', 'sel-grill_fry_open')">Assign 📌</button>
                         </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Mid Open:</label>
+                            <select id="sel-mid_open" class="form-control" style="width: 100%;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry Open:</label>
+                            <select id="sel-grill_fry_open" class="form-control" style="width: 100%;">
+                                <option value="">-- Select Cook --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_open', 'sel-mid_open', 'sel-grill_fry_open'])">Assign 3-Cook Line 📌</button>
                     </div>
                 </div>
 
                 <!-- Option 3: Night Shift 2-Cook Closing -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Close:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-range_mid_split_close" class="form-control" style="flex: 1;">
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Close:</label>
+                            <select id="sel-range_mid_split_close" class="form-control" style="width: 100%;">
                                 <option value="">-- Select Closer --</option>
                                 ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
                             </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('range_mid_split_close', 'sel-range_mid_split_close')">Assign 📌</button>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Close:</label>
+                            <select id="sel-grill_fry_mid_split_close" class="form-control" style="width: 100%;">
+                                <option value="">-- Select Closer --</option>
+                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
+                            </select>
                         </div>
                     </div>
-
-                    <div>
-                        <label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Close:</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sel-grill_fry_mid_split_close" class="form-control" style="flex: 1;">
-                                <option value="">-- Select Closer --</option>
-                                ${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}
-                            </select>
-                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.85rem;" onclick="assignCookToStation('grill_fry_mid_split_close', 'sel-grill_fry_mid_split_close')">Assign 📌</button>
-                        </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-primary" style="width: 100%; background: #c2410c; border-color: #c2410c;" onclick="assignCooksGroup(['sel-range_mid_split_close', 'sel-grill_fry_mid_split_close'])">Assign Closing Line 📌</button>
                     </div>
                 </div>
 
@@ -560,22 +554,28 @@ function renderManagerAssignmentWidget() {
     container.innerHTML = html;
 }
 
-function assignCookToStation(stationKey, selectId) {
-    const selectEl = document.getElementById(selectId);
-    if (!selectEl) return;
-    const empId = selectEl.value;
-    if (!empId) {
-        alert("Please select an employee to assign.");
-        return;
-    }
+function assignCooksGroup(selectIds) {
+    let assignedCount = 0;
+    selectIds.forEach(id => {
+        const selectEl = document.getElementById(id);
+        if (!selectEl || !selectEl.value) return;
 
-    const emp = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
-    if (!emp) return;
-
-    emp.station = stationKey;
-    ApiService.request('saveEmployee', { employee: emp }).then(res => {
-        alert(`✅ Successfully assigned ${emp.name || emp.Name} to ${stationKey.replace(/_/g, ' ').toUpperCase()}! Their dashboard has been updated.`);
+        const stationKey = id.replace('sel-', '');
+        const empId = selectEl.value;
+        const emp = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
+        
+        if (emp) {
+            emp.station = stationKey;
+            ApiService.request('saveEmployee', { employee: emp });
+            assignedCount++;
+        }
     });
+
+    if (assignedCount > 0) {
+        alert(`✅ Successfully assigned ${assignedCount} cook(s)! Their dashboards have been updated with their stations and checklists.`);
+    } else {
+        alert("Please select at least one cook in this block before assigning.");
+    }
 }
 
 function submitManagerShiftChecklist() {
