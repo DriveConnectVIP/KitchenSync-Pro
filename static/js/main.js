@@ -351,7 +351,7 @@ const TRANSLATIONS = {
 function toggleLanguage() {
     Store.lang = Store.lang === 'en' ? 'es' : 'en';
     const btn = document.getElementById('lang-toggle-btn');
-    if (btn) btn.textContent = Store.lang === 'en' ? '🇺🇸 English' : '🇪🇸 Español';
+    if (btn) btn.textContent = Store.lang === 'es' ? '🇺🇸 English' : '🇪🇸 Español';
     buildNavForRole(Store.role);
     UIController.refreshActiveView();
 }
@@ -671,13 +671,13 @@ function submitManagerShiftChecklist() {
 }
 
 // ==========================================
-// 6. 6-CHANNEL CATEGORIZED MESSAGE BOARD
+// 6. 6-CHANNEL CATEGORIZED MESSAGE BOARD (WITH 86 ITEMS)
 // ==========================================
 function renderMessageBoard() {
     const container = document.getElementById('message-board-container');
     if (!container) return;
 
-    const categories = ["Maintenance", "Injuries", "Customers", "Employees", "General"];
+    const categories = ["Maintenance", "Injuries", "Customers", "Employees", "86 Items", "General"];
 
     let html = `
         <div class="card" style="margin-bottom: 1.5rem;">
