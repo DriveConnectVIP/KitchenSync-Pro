@@ -243,23 +243,178 @@ const CHECKLIST_SPECS = {
     }
 };
 
+// ==========================================
+// SERVSAFE COMPLIANT 10 TRAINING MODULES (10-12 Qs EACH)
+// ==========================================
 const TRAINING_MODULES = [
     {
         id: 'MOD-01',
-        title: "Food Safety & HACCP Temperature Control",
-        description: "Master internal cooking temps, the danger zone, and cooling logs.",
+        title: "Module 1: Providing Safe Food & Biological Contamination",
+        description: "Master foodborne illness outbreaks, biological pathogens, bacteria, viruses, parasites, and fungi.",
         questions: [
-            { q: "What is the temperature danger zone threshold?", options: ["41°F to 135°F", "32°F to 100°F", "50°F to 150°F"], correct: 0 },
-            { q: "What is the minimum internal cooking temp for poultry?", options: ["145°F", "155°F", "165°F"], correct: 2 }
+            { q: "What is a foodborne illness outbreak?", options: ["When two or more people get the same illness after eating the same food", "When one person gets sick from restaurant food", "When food is contaminated by cleaning chemicals", "When raw meat touches vegetables"], correct: 0 },
+            { q: "Which of the following is a biological contaminant?", options: ["Glass shards in a salad", "Norovirus in oysters", "Sanitizer residue on a plate", "Jewelry falling into soup"], correct: 1 },
+            { q: "What are the 'Big Six' pathogens most highly contagious?", options: ["Shigella, Salmonella Typhi, Nontyphoidal Salmonella, E. coli, Hepatitis A, Norovirus", "Staph, Listeria, Botulism, Clostridium perfringens, Bacillus cereus, Vibrio", "Common cold, Influenza, Strep throat, Chickenpox, Measles, Mumps", "Mold, Yeast, Mildew, Rust, Algae, Spores"], correct: 0 },
+            { q: "What is the primary symptom that requires excluding a food handler from the operation?", options: ["Mild headache", "Vomiting", "Slight fatigue", "Runny nose"], correct: 1 },
+            { q: "Bacteria grow exceptionally well in food that contains:", options: ["High acidity", "Little to no moisture", "Little or no acid (pH 4.6 to 7.5) and protein/carbs", "High salinity and high sugar"], correct: 2 },
+            { q: "What condition is required for bacterial growth represented by the 'T' in FAT TOM?", options: ["Time", "Temperature", "Toxins", "Texture"], correct: 1 },
+            { q: "Which virus is primarily linked with ready-to-eat foods and shellfish from contaminated water?", options: ["Hepatitis A", "Rabies", "Rotavirus", "Influenza"], correct: 0 },
+            { q: "Parasites are commonly linked with what type of food?", options: ["Dry grains and cereals", "Seafood and wild game", "Pasteurized dairy", "Canned vegetables"], correct: 1 },
+            { q: "Fungi include which of the following organisms?", options: ["Bacteria and viruses", "Molds and yeasts", "Parasites and protozoa", "Insects and rodents"], correct: 1 },
+            { q: "What is the best way to prevent bacterial spores from surviving in cooked food?", options: ["Rinsing food in cold water", "Cooking food to required minimum internal temperatures", "Storing food in direct sunlight", "Adding extra table salt"], correct: 1 }
         ]
     },
     {
         id: 'MOD-02',
-        title: "Kitchen Equipment Safety & Chemical Handling",
-        description: "Safe operation of slicers, mixers, and quat sanitizers.",
+        title: "Module 2: Personal Hygiene & Employee Health",
+        description: "Proper handwashing procedures, personal cleanliness, work attire, and illness reporting.",
         questions: [
-            { q: "What ppm range is required for quaternary sanitizer?", options: ["50-100 ppm", "200-400 ppm", "500-800 ppm"], correct: 1 },
-            { q: "When must the slicer blade guard be cleaned?", options: ["End of week", "Only when requested", "After every use and every 4 hours of continuous use"], correct: 2 }
+            { q: "What is the minimum total time you should scrub your hands with soap during handwashing?", options: ["3 to 5 seconds", "10 to 15 seconds", "30 to 45 seconds", "60 seconds"], correct: 1 },
+            { q: "When must food handlers wash their hands?", options: ["Only at the start of a shift", "After touching raw meat, using the restroom, or handling garbage", "Only when changing stations", "Only if hands look visibly dirty"], correct: 1 },
+            { q: "What is the correct way to dry hands after washing?", options: ["On your apron or uniform pants", "Using a single-use paper towel or warm-air dryer", "By waving them in the air until dry", "Using a shared cloth towel kept by the sink"], correct: 1 },
+            { q: "Where is it acceptable to drink from an open beverage cup while working?", options: ["At any prep table if covered", "Only in designated employee break areas", "Next to the cooking line", "In the dishwashing area"], correct: 1 },
+            { q: "What jewelry is generally permitted on food handlers' hands or arms?", options: ["A diamond engagement ring", "A plain metal band ring", "A wristwatch with a leather strap", "A medical alert bracelet"], correct: 1 },
+            { q: "What should a food handler do if they have an infected cut on their hand?", options: ["Bandage the wound and cover it with a waterproof single-use glove", "Ignore it if it is small", "Wash hands twice as often", "Wear a sweatband over it"], correct: 0 },
+            { q: "When must single-use gloves be changed?", options: ["Every 8 hours regardless of tasks", "As soon as they become torn, soiled, or when switching tasks", "Only at the end of the shift", "Only when handling raw poultry"], correct: 1 },
+            { q: "Which symptom requires a food handler to be restricted from working around food but not necessarily excluded?", options: ["Sore throat with fever", "Active vomiting", "Jaundice", "Diarrhea"], correct: 0 },
+            { q: "What hair restraint must food handlers wear in food prep areas?", options: ["A clean hat or hairnet", "Only hairspray", "A tight ponytail", "No restraint is required if hair is short"], correct: 0 },
+            { q: "Before putting on single-use gloves, what must a food handler always do?", options: ["Apply hand lotion", "Wash their hands", "Sanitize the gloves", "Blow into the gloves to open them"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-03',
+        title: "Module 3: Flow of Food - Introduction & Purchasing",
+        description: "Managing cross-contamination, time-temperature abuse, approved suppliers, and receiving criteria.",
+        questions: [
+            { q: "What is the temperature danger zone range where bacteria grow rapidly?", options: ["32°F to 40°F", "41°F to 135°F", "140°F to 212°F", "0°F to 32°F"], correct: 1 },
+            { q: "How can cross-contamination be prevented during food storage?", options: ["Storing raw meat above ready-to-eat food", "Using separate cutting boards and storing raw poultry below ready-to-eat food", "Storing cleaning chemicals next to flour", "Wiping down counters with dry rags"], correct: 1 },
+            { q: "What is the calibration boiling-point method temperature for standard dial thermometers at sea level?", options: ["32°F", "100°F", "212°F", "350°F"], correct: 2 },
+            { q: "At what internal temperature should cold TCS food be received?", options: ["41°F (5°C) or lower", "50°F (10°C) or lower", "60°F (15°C) or lower", "32°F (0°C) or lower"], correct: 0 },
+            { q: "At what internal temperature should hot TCS food be received?", options: ["100°F (38°C) or higher", "135°F (57°C) or higher", "165°F (74°C) or higher", "212°F (100°C) or higher"], correct: 1 },
+            { q: "Live shellfish must be received with what documentation attached?", options: ["A USDA inspection stamp", "An invoice marked paid in full", "An approved shellstock identification tag", "A weight certificate"], correct: 2 },
+            { q: "What is required for packaged food delivered in damaged or torn containers?", options: ["Accept it if the price is discounted", "Reject the delivery immediately", "Transfer the food into clean bags", "Rinse the outer packaging in bleach water"], correct: 1 },
+            { q: "What is the maximum acceptable receiving temperature for fresh shell eggs?", options: ["41°F or lower", "45°F or lower", "50°F or lower", "60°F or lower"], correct: 1 },
+            { q: "What action should be taken if frozen food shows evidence of thawing and refreezing (ice crystals)?", options: ["Cook it immediately", "Reject the shipment", "Thaw it in warm water", "Refreeze it in the blast chiller"], correct: 1 },
+            { q: "What is an approved supplier?", options: ["Any vendor who delivers locally", "A supplier inspected and complying with local, state, and federal laws", "A supplier offering the lowest wholesale prices", "Any farmer selling produce at a roadside stand"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-04',
+        title: "Module 4: Flow of Food - Preparation & Thawing",
+        description: "Safe food preparation guidelines, thawing methods, and prep controls for TCS foods.",
+        questions: [
+            { q: "What is the maximum time food can remain in the temperature danger zone before being discarded?", options: ["1 hour", "2 hours", "4 hours", "6 hours"], correct: 2 },
+            { q: "Which of the following is an approved method for thawing TCS food?", options: ["Thawing on the kitchen prep counter at room temperature", "Thawing submerged in running potable water at 70°F (21°C) or lower", "Thawing in a sink filled with warm soapy water", "Thawing directly under heat lamps"], correct: 1 },
+            { q: "What internal cooking temperature is required for poultry (whole or ground chicken, turkey)?", options: ["135°F for 15 seconds", "155°F for 15 seconds", "165°F for 15 seconds for instantaneous reading", "175°F for 15 seconds"], correct: 2 },
+            { q: "What internal cooking temperature is required for ground beef and pork?", options: ["135°F", "145°F", "155°F for 15 seconds", "165°F"], correct: 2 },
+            { q: "What is the required minimum internal cooking temperature for seafood, steaks, and chops of pork/beef?", options: ["135°F", "145°F for 15 seconds", "155°F", "165°F"], correct: 1 },
+            { q: "What is the required minimum cooking temperature for commercially raised game animals, ratites, and stuffed meats?", options: ["145°F", "155°F", "165°F for 15 seconds", "175°F"], correct: 2 },
+            { q: "What is the first stage of the two-stage cooling process for TCS foods?", options: ["Cooling from 135°F to 70°F within 2 hours", "Cooling from 135°F to 41°F within 6 hours total", "Cooling from 70°F to 41°F within 4 hours", "Cooling immediately in a freezer"], correct: 0 },
+            { q: "What is the total maximum combined time allowed for cooling TCS food?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 2 },
+            { q: "What must be done to reheated TCS food intended for hot holding?", options: ["Heat to an internal temperature of 165°F for 15 seconds within 2 hours", "Warm gently on a steam table until piping hot", "Rinse in boiling water", "Microwave for 30 seconds"], correct: 0 },
+            { q: "When prepping food, what is the best practice to prevent time-temperature abuse?", options: ["Prep large batches all at once and leave them on the counter", "Prep food in small batches to limit time in the danger zone", "Turn off kitchen air conditioning", "Use warm water for all prep work"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-05',
+        title: "Module 5: Flow of Food - Service & Holding",
+        description: "Holding hot and cold foods, self-service safety, off-site service, and tableware re-service.",
+        questions: [
+            { q: "At what minimum temperature must hot TCS food be held during service?", options: ["120°F", "135°F or higher", "150°F", "165°F"], correct: 1 },
+            { q: "At what maximum temperature must cold TCS food be held during service?", options: ["32°F", "41°F (5°C) or lower", "50°F", "60°F"], correct: 1 },
+            { q: "How frequently must internal temperatures of hot/cold holding food be checked?", options: ["Every 30 minutes", "At least every 4 hours (ideally every 2 hours)", "Once at the start of the shift", "Once at the end of the day"], correct: 1 },
+            { q: "Without temperature control, cold food can be held for up to how many hours if labeled and maintained under 70°F?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 2 },
+            { q: "What is a key rule regarding self-service salad bars and buffets?", options: ["Customers can reuse their dirty plates for second helpings", "Provide clean plates and utensils for each new trip to the buffet", "Store raw meat above ready-to-eat salad items", "Leave sneeze guards open for easy access"], correct: 1 },
+            { q: "Which food item can legally be re-served to another customer if untouched?", options: ["An open bowl of salsa", "An unopened pre-packaged cracker or condiment packet", "A basket of unfinished dinner rolls", "A partial drink glass"], correct: 1 },
+            { q: "When transporting food off-site, what is required of delivery vehicles?", options: ["Insulated food-grade containers that keep food safe", "Open-air truck beds", "Uninsulated cardboard boxes", "Air-conditioned passenger seats"], correct: 0 },
+            { q: "What is the maximum holding time for hot TCS food held without temperature control?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 0 },
+            { q: "Where must sneeze guards be installed on a food display bar?", options: ["Below the food level", "At least 14 inches above the food counter extending outward", "Directly touching the food pans", "Only behind the kitchen service window"], correct: 1 },
+            { q: "What must be included on food labels for items prepared in-house and held for over 24 hours?", options: ["The cook's home address", "Name of the food and the use-by/discard date (max 7 days at 41°F)", "The wholesale cost", "The exact recipe ingredients"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-06',
+        title: "Module 6: Food Safety Management Systems & HACCP",
+        description: "Active managerial control, prerequisite programs, and the 7 principles of HACCP.",
+        questions: [
+            { q: "What is active managerial control?", options: ["Waiting for a health inspector to find violations", "The manager's proactive approach to controlling foodborne illness risk factors", "Delegating all kitchen tasks to line cooks", "Keeping doors locked during rush hours"], correct: 1 },
+            { q: "What does HACCP stand for?", options: ["Hazard Analysis Critical Control Point", "Health And Cleanliness Critical Control Procedures", "Hygiene And Consumer Care Protocol", "Hazard Assessment Control Center Program"], correct: 0 },
+            { q: "What is the first principle in a HACCP plan?", options: ["Establish critical limits", "Conduct a hazard analysis", "Establish monitoring procedures", "Verify that the system works"], correct: 1 },
+            { q: "What is a Critical Control Point (CCP)?", options: ["The final invoice price of food", "A point in the flow of food where a hazard can be prevented, eliminated, or reduced to safe levels", "The employee break room schedule", "The time when health inspectors arrive"], correct: 1 },
+            { q: "Establishing critical limits in HACCP involves what action?", options: ["Setting maximum or minimum parameters like cooking temperatures", "Writing employee reprimands", "Counting inventory items", "Checking restroom supplies"], correct: 0 },
+            { q: "What is corrective action in HACCP?", options: ["Firing a cook who makes a mistake", "The procedure followed when a critical limit is not met", "Throwing out all kitchen trash", "Cleaning grease traps weekly"], correct: 1 },
+            { q: "What is the purpose of verification in a HACCP system?", options: ["Checking that the HACCP plan is working properly through logs and reviews", "Checking customer credit cards", "Ensuring employees wear clean uniforms", "Verifying delivery truck mileage"], correct: 0 },
+            { q: "Which food is most vulnerable and commonly associated with a HACCP plan requirement?", options: ["Dry pasta", "Packaged crackers", "Juice squeezed and packaged in-house", "Bottled water"], correct: 2 },
+            { q: "What is the final principle of HACCP?", options: ["Establish record-keeping and documentation procedures", "Determine pricing strategies", "Order weekly linen supplies", "Conduct employee interviews"], correct: 0 },
+            { q: "Which of the following represents a biological hazard managed by HACCP?", options: ["Cleaning chemical spills", "Salmonella contamination in poultry", "Metal shavings from a can opener", "Broken floor tiles"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-07',
+        title: "Module 7: Cleaning, Sanitizing & Facility Management",
+        description: "Difference between cleaning and sanitizing, three-compartment sinks, dishwasher specs, and facility safety.",
+        questions: [
+            { q: "What is the difference between cleaning and sanitizing?", options: ["Cleaning removes food and dirt; sanitizing reduces pathogens to safe levels", "Cleaning kills germs; sanitizing removes grease", "They mean the exact same thing", "Cleaning is for floors; sanitizing is for dishes"], correct: 0 },
+            { q: "What is the correct order of steps for manual dishwashing in a 3-compartment sink?", options: ["Sanitize, Rinse, Wash, Air Dry", "Wash in clean detergent water, Rinse in clean water, Sanitize, Air dry", "Rinse, Wash, Sanitize, Towel dry", "Wash, Sanitize, Rinse, Towel dry"], correct: 1 },
+            { q: "What is the minimum water temperature required for the sanitizing rinse in a hot-water sanitizing dishwasher?", options: ["140°F", "165°F", "180°F (82°C)", "212°F"], correct: 2 },
+            { q: "What chemical concentration range is standard for chlorine (bleach) sanitizer in a 3-compartment sink?", options: ["10-25 ppm", "50-99 ppm", "200-400 ppm", "500-800 ppm"], correct: 1 },
+            { q: "What is the required concentration range for quaternary ammonium (quat) sanitizers?", options: ["10-25 ppm", "50-99 ppm", "200-400 ppm", "500-1000 ppm"], correct: 2 },
+            { q: "How should sanitized tableware and utensils be stored?", options: ["Stacked directly on the floor", "At least 6 inches off the floor, covered or inverted", "In wet dish rags", "On open outdoor patios"], correct: 1 },
+            { q: "What is an air gap in plumbing?", options: ["An open space between two doors", "An air space that separates a water supply outlet from a potentially contaminated source", "A vent in the roof", "A gap in the walk-in freezer seal"], correct: 1 },
+            { q: "What lighting intensity is required in food prep areas?", options: ["10 foot-candles", "20 foot-candles", "50 foot-candles (540 lux)", "100 foot-candles"], correct: 2 },
+            { q: "What is backflow?", options: ["Water flowing backward from a drainage system into a safe water supply", "Food flowing out of a piping bag", "Dishes sliding off a tray", "Exhaust fans blowing inward"], correct: 0 },
+            { q: "Where must wet wiping cloths be stored when not in use?", options: ["On top of prep tables", "In a bucket of sanitizer solution at correct concentration", "In employee apron pockets", "In the handwashing sink"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-08',
+        title: "Module 8: Pest Management & Integrated Defense",
+        description: "Preventing pests, identifying signs of infestation, and working with licensed pest control operators.",
+        questions: [
+            { q: "What are the three main rules of an Integrated Pest Management (IPM) program?", options: ["Deny pests access, deny pests food/water/shelter, work with a licensed PCO", "Spray chemicals daily, set traps weekly, lock doors at night", "Hire exterminators, clean floors hourly, discard all dry goods", "Ignore small mice, bait exterior doors, use open traps inside"], correct: 0 },
+            { q: "What is a sign of a cockroach infestation?", options: ["Shredded paper nests", "Capsule-shaped egg cases (oothecae) and strong oily odors", "Green fuzzy mold on walls", "Clean grease traps"], correct: 1 },
+            { q: "What is a sign of rodent activity?", options: ["Small pellet droppings, gnaw marks on wood/packaging, and rub marks along walls", "Small green leaves on the floor", "Damp water puddles", "Dry flour dust"], correct: 0 },
+            { q: "How high off the floor must food and supplies be stored on shelving to prevent pest nesting?", options: ["At least 2 inches", "At least 4 inches", "At least 6 inches (15 cm)", "At least 12 inches"], correct: 2 },
+            { q: "What should you do if you notice pesticide residue on clean prep counters?", options: ["Wipe it with a dry rag", "Wash, rinse, and sanitize the surface immediately", "Ignore it since it kills bugs", "Cover it with foil"], correct: 1 },
+            { q: "Why must outer doors and windows be tightly fitted and self-closing?", options: ["To lower heating bills", "To prevent flying and crawling pests from entering", "To reduce noise levels", "To comply with fire codes"], correct: 1 },
+            { q: "What is a fly air curtain?", options: ["A fan mounted above doors that blows a steady stream of air downward to deter flies", "A net placed over windows", "An electronic zapper in the dining room", "An exhaust hood filter"], correct: 0 },
+            { q: "Where should garbage containers be kept to discourage pests?", options: ["Directly next to the kitchen back door inside", "Clean, covered, and stored on a paved, non-absorbent surface outside", "Inside the walk-in cooler", "Stacked in the dining room"], correct: 1 },
+            { q: "Who should apply restricted-use pesticides in a food establishment?", options: ["Any trained line cook", "A licensed pest control operator (PCO)", "The evening shift supervisor", "The general manager"], correct: 1 },
+            { q: "What is the best way to deny pests shelter?", options: ["Keep facilities clean, dispose of garbage promptly, and seal cracks/crevices", "Leave lights on 24/7", "Keep storage rooms humid", "Store boxes directly on concrete floors"], correct: 0 }
+        ]
+    },
+    {
+        id: 'MOD-09',
+        title: "Module 9: Food Allergens & Cross-Contact Prevention",
+        description: "The Big Nine allergens, recognizing allergic reactions, and kitchen cross-contact prevention.",
+        questions: [
+            { q: "What are the 'Big Nine' major food allergens?", options: ["Milk, eggs, fish, shellfish, tree nuts, peanuts, wheat, soybeans, sesame", "Beef, pork, chicken, lamb, venison, duck, turkey, rabbit, veal", "Corn, rice, oats, barley, rye, potato, tomato, garlic, onion", "Salt, sugar, pepper, vinegar, oil, butter, mustard, ketchup, mayo"], correct: 0 },
+            { q: "What is food cross-contact?", options: ["When raw meat touches ready-to-eat food", "When allergens are transferred from allergen-containing food or surfaces to food served to a customer", "When two employees bump into each other", "When food is overcooked"], correct: 1 },
+            { q: "Which of the following is a symptom of a severe allergic reaction (anaphylaxis)?", options: ["Slight drowsiness", "Tightening of the throat, wheezing, and hives", "Mild sunburn", "Runny nose"], correct: 1 },
+            { q: "What must service staff do when a customer informs them of a food allergy?", options: ["Guess whether the dish is safe", "Notify the kitchen staff clearly, check ingredient labels, and ensure dedicated prep equipment is used", "Tell the customer to pick around the allergen", "Ignore it if the allergy is mild"], correct: 1 },
+            { q: "Which ingredient is classified as a tree nut allergen?", options: ["Peanuts", "Walnuts", "Soybeans", "Sesame seeds"], correct: 1 },
+            { q: "How can kitchen staff prevent allergen cross-contact on griddles and fryers?", options: ["Wipe the surface with a wet sponge", "Use dedicated fryers, separate pans, and thoroughly clean/sanitize equipment before cooking allergen-free orders", "Cook all orders together to save time", "Add extra lemon juice"], correct: 1 },
+            { q: "Which food is part of the crustacean shellfish allergen group?", options: ["Tuna", "Shrimp", "Salmon", "Cod"], correct: 1 },
+            { q: "What is an effective response if a customer is experiencing anaphylactic shock in your restaurant?", options: ["Give them a glass of water", "Call 911 immediately and inform emergency responders of the suspected allergen", "Have them lie down on the kitchen floor", "Wait 30 minutes to see if symptoms subside"], correct: 1 },
+            { q: "Is sesame considered one of the major food allergens?", options: ["No, it is just a garnish", "Yes, it is part of the Big Nine federal allergen requirements", "Only when served raw", "Only in bakery items"], correct: 1 },
+            { q: "What should be done with a dish if allergen cross-contact is suspected during plating?", options: ["Scrape off the allergen", "Discard the dish and prepare a fresh order using clean equipment", "Microwave it for 1 minute", "Serve it to a different table"], correct: 1 }
+        ]
+    },
+    {
+        id: 'MOD-10',
+        title: "Module 10: Government Regulations, Sanitation Standards & Crisis Management",
+        description: "Health inspections, regulatory agencies, food safety recalls, and crisis management protocols.",
+        questions: [
+            { q: "Which agency writes the Model Food Code providing science-based food safety guidelines?", options: ["FDA (Food and Drug Administration)", "OSHA", "EPA", "USDA"], correct: 0 },
+            { q: "What is the role of local/state health departments in food safety?", options: ["Inspecting operations, enforcing regulations, and issuing permits", "Setting federal tax rates", "Managing restaurant payroll", "Designing kitchen equipment"], correct: 0 },
+            { q: "When a health inspector conducts an inspection, what is required of the manager?", options: ["Deny entry until an appointment is scheduled", "Accompany the inspector, cooperate fully, and take notes on any findings", "Bribe the inspector to ignore violations", "Leave the building immediately"], correct: 1 },
+            { q: "What triggers a voluntary or mandatory food product recall?", options: ["When food items are past their seasonal peak", "When a food product is contaminated, mislabeled, or poses a health hazard", "When wholesale prices drop", "When a restaurant closes for renovations"], correct: 1 },
+            { q: "What should you do if notified of a food product recall in your operation?", options: ["Serve it quickly before customers notice", "Locate the recalled item, remove it from inventory, label it 'Do Not Use', and store separately", "Donate it to a local homeless shelter", "Throw it in the regular dumpster unlocked"], correct: 1 },
+            { q: "What constitutes an imminent health hazard requiring immediate closure of the facility?", options: ["A burned-out light bulb in the dining room", "A major water interruption, sewage backup, or severe pest infestation", "A broken cash register", "A delayed food delivery"], correct: 1 },
+            { q: "What is the primary focus of OSHA regulations in a restaurant?", options: ["Food temperature logs", "Worker safety, hazard communication, and chemical safety data sheets (SDS)", "Customer seating capacity", "Menu pricing standards"], correct: 1 },
+            { q: "Where must Safety Data Sheets (SDS) for cleaning chemicals be kept?", options: ["Locked in the manager's private home safe", "Accessible to all employees for all chemicals used in the workplace", "Filed away in the corporate office in another state", "Discarded after chemical containers are opened"], correct: 1 },
+            { q: "What is the correct action if a water service main breaks during lunch service?", options: ["Keep cooking with standing tap water", "Stop food preparation immediately, evaluate the hazard, and notify the health authority if necessary", "Use bottled water for boiling pasta only", "Ignore it until closing time"], correct: 1 },
+            { q: "What is the definition of a critical violation on a health inspection report?", options: ["A dusty ceiling fan", "A food safety violation directly linked to foodborne illness (e.g., improper holding temperatures)", "A scuffed floor tile", "A missing employee name tag"], correct: 1 }
         ]
     }
 ];
@@ -940,7 +1095,7 @@ function renderTrainingView() {
                     <h4 style="color: #1e3a8a; margin: 0 0 4px 0;">${mod.id}: ${mod.title}</h4>
                     <p style="font-size: 0.85rem; color: #64748b; margin: 0;">${mod.description}</p>
                     <div style="margin-top: 8px; font-size: 0.85rem; font-weight: 600;">
-                        Status: ${passed ? (signedOff ? '✅ Certified & Signed Off' : '⏳ Passed (Pending GM Sign-Off)') : '❌ Not Completed'}
+                        Status: ${passed ? (signedOff ? '✅ Certified & Signed Off' : '⏳ Passed (Pending GM Sign-Off)') : '❌ Not Completed'} (Passing: 85%+)
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="openQuizModal('${mod.id}')">${passed ? 'Retake Quiz 📝' : 'Take Quiz 🚀'}</button>
@@ -958,7 +1113,7 @@ function openQuizModal(modId) {
     const body = document.getElementById('quiz-modal-body');
     body.innerHTML = `
         <input type="hidden" id="active-mod-id" value="${mod.id}">
-        <p style="color: #64748b; font-size: 0.9rem;">${mod.description}</p>
+        <p style="color: #64748b; font-size: 0.9rem;">${mod.description} (Requires 85% to pass)</p>
         ${mod.questions.map((qObj, idx) => `
             <div style="margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem;">
                 <p style="font-weight: 600; color: #1e3a8a;">${idx + 1}. ${qObj.q}</p>
@@ -1002,7 +1157,7 @@ function submitQuizAnswers() {
     Store.certifications.push(certRecord);
     ApiService.request('saveCert', { cert: certRecord }).then(() => {
         closeQuizModal();
-        alert(`Quiz submitted! Score: ${score}% (${passed ? '✅ Passed' : '❌ Failed'})`);
+        alert(`Quiz submitted! Score: ${score}% (${passed ? '✅ Passed (85%+ achieved)' : '❌ Failed (Need 85%+)'})`);
         renderTrainingView();
         updateGreetingLabel();
     });
