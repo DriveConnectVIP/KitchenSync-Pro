@@ -4,7 +4,8 @@
 
 const CONFIG = {
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxLUl-5Fx1XvJT6jVUURqSeGXT0sFgOB64kESRw4OIC9hxP0hTA4wG46SVV5Ym_UvHJ/exec",
-    GM_MASTER_PASSCODE: "9999"
+    GM_MASTER_PASSCODE: "9999",
+    PROGRAM_START_DATE: "2026-10-01" // Customizable GM Program Launch Start Date
 };
 
 const Store = {
@@ -79,7 +80,10 @@ const UIController = {
         const view = document.querySelector('.app-view.active');
         if (!view) return;
         const id = view.id.replace('view-', '');
-        if (id === 'shift-entry') renderChecklists();
+        if (id === 'shift-entry') {
+            if (Store.role === 'manager') renderManagerChecklist();
+            else renderChecklists();
+        }
         if (id === 'cook-dashboard') renderCookDashboard();
         if (id === 'manager-dashboard') {
             renderManagerDashboard();
@@ -98,8 +102,26 @@ const UIController = {
 document.addEventListener('DOMContentLoaded', () => UIController.init());
 
 // ==========================================
-// 1. DATA SPECS: OPENING, CLOSING & SPLIT CHECKLISTS
+// 1. DATA SPECS: OPENING, CLOSING & MANAGER CHECKLISTS
 // ==========================================
+const MANAGER_STATIC_CHECKLIST = [
+    { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." },
+    { id: 'mc2', title: "Turn on lights, tablets, and Sonos music", desc: "Prepare front-of-house ambiance and terminal readiness." },
+    { id: 'mc3', title: "Check bathrooms for cleanliness, trash, and paper goods", desc: "Maintain spotless guest restroom standards." },
+    { id: 'mc4', title: "Check staffing for punctuality, call outs, and covers", desc: "Verify team arrival and adjust floor plans as needed." },
+    { id: 'mc5', title: "Log call outs or late arrivals when necessary", desc: "Record attendance logs in the management system." },
+    { id: 'mc6', title: "Perform BOH line checks for stock, temps, and prep needs", desc: "Ensure all stations meet safety and recipe par levels." },
+    { id: 'mc7', title: "Check bar stock and cleanliness", desc: "Inspect bar station inventory and glassware sanitation." },
+    { id: 'mc8', title: "Check tables prior to service for cleanliness and condiment stock", desc: "Verify dining room readiness before guest seating." },
+    { id: 'mc9', title: "Conduct server and line talk-in for sales expectations, goals, 86 items", desc: "Brief team on daily specials, service goals, and 86'd items." },
+    { id: 'mc10', title: "Develop a shift plan for service", desc: "Organize breaks, section rotations, and pacing strategies." },
+    { id: 'mc11', title: "Assist servers and hosts with seating, running food, clearing tables", desc: "Support front-of-house flow during peak volume." },
+    { id: 'mc12', title: "Expedite at the service slide to maintain quality", desc: "Ensure presentation and ticket times meet brand standards." },
+    { id: 'mc13', title: "Monitor labor and make necessary adjustments to control cost", desc: "Cut staff or shift resources based on real-time sales." },
+    { id: 'mc14', title: "Close out shift, check safe and drawer counts, SET UP FOR NEXT SHIFT!", desc: "Complete financial reconciliation and preparation handover." },
+    { id: 'mc15', title: "Check out line and BOH staff to ensure kitchen is clean, stocked, and 911 prep is completed", desc: "Final walk-through verification of back-of-house closing standards." }
+];
+
 const CHECKLIST_SPECS = {
     en: {
         'range_open': [
@@ -329,7 +351,7 @@ const TRANSLATIONS = {
 function toggleLanguage() {
     Store.lang = Store.lang === 'en' ? 'es' : 'en';
     const btn = document.getElementById('lang-toggle-btn');
-    if (btn) btn.textContent = Store.lang === 'es' ? '🇺🇸 English' : '🇪🇸 Español';
+    if (btn) btn.textContent = Store.lang === 'en' ? '🇺🇸 English' : '🇪🇸 Español';
     buildNavForRole(Store.role);
     UIController.refreshActiveView();
 }
@@ -356,7 +378,7 @@ function buildNavForRole(role) {
         ];
     } else if (role === 'manager') {
         tabs = [
-            { id: 'shift-entry', label: t('myChecklist') },
+            { id: 'shift-entry', label: '📋 Shift Manager' },
             { id: 'manager-dashboard', label: t('managerDashboard') },
             { id: 'cook-training', label: t('trainingModules') },
             { id: 'recipe-book', label: t('recipeBook') },
@@ -365,7 +387,7 @@ function buildNavForRole(role) {
     } else if (role === 'gm') {
         tabs = [
             { id: 'gm-dashboard', label: t('gmSuite') },
-            { id: 'shift-entry', label: '📝 Review Checklists' },
+            { id: 'shift-entry', label: '📋 Shift Manager' },
             { id: 'manager-dashboard', label: t('managerDashboard') },
             { id: 'cook-training', label: t('trainingModules') },
             { id: 'recipe-book', label: t('recipeBook') },
@@ -393,15 +415,52 @@ function switchTab(viewId, btnEl) {
 }
 
 // ==========================================
-// 5. STATION CHECKLISTS & ASSIGNMENT WIDGET
+// 5. STATION CHECKLISTS, MANAGER CHECKLIST & ASSIGNMENT WIDGET
 // ==========================================
+function renderManagerChecklist() {
+    const container = document.getElementById('checklist-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const banner = document.createElement('div');
+    banner.className = 'card';
+    banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Shift Manager Operational Checklist</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">Daily shift management and verification standards.</p>`;
+    container.appendChild(banner);
+
+    let html = `<div class="card checklist-section"><h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">📋 Shift Manager Procedures</h3>`;
+    MANAGER_STATIC_CHECKLIST.forEach(t => {
+        html += `
+            <div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                <input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;">
+                <div>
+                    <div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div>
+                    <div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div>
+                </div>
+            </div>`;
+    });
+    html += `</div>`;
+    container.innerHTML += html;
+
+    container.innerHTML += `
+        <div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Submit Manager Shift Checklist</button>
+        </div>
+    `;
+}
+
 function renderChecklists() {
+    if (Store.role === 'manager') {
+        renderManagerChecklist();
+        return;
+    }
+
     const container = document.getElementById('checklist-container');
     if (!container) return;
     container.innerHTML = '';
 
     const isCook = Store.role === 'cook';
-    const assigned = Store.user?.station?.trim() || (isCook ? 'range_open' : 'range_open');
+    const assigned = Store.user?.station?.trim() || 'range_open';
     
     const banner = document.createElement('div');
     banner.className = 'card';
@@ -592,7 +651,7 @@ function submitManagerShiftChecklist() {
         empId: Store.user.id,
         empName: Store.user.name,
         role: Store.role,
-        station: Store.user.station || 'range_open',
+        station: Store.user.station || 'manager_checklist',
         date: new Date().toISOString().split('T')[0],
         tasksCompleted: checked,
         totalTasks: total,
@@ -842,7 +901,7 @@ function handleInlineBookSubmit(e) {
     };
 
     if (itemId) {
-        const index = Store.recipes.findIndex(r => String(r.id || r.ID || r.menuItem).trim() === String(itemId).trim());
+        const index = Store.recipes.findIndex(r => String(r.id || r.menuItem).trim() === String(itemId).trim());
         if (index > -1) Store.recipes[index] = recipeObj;
         else Store.recipes.push(recipeObj);
     } else {
@@ -857,7 +916,7 @@ function handleInlineBookSubmit(e) {
 
 function deleteRecipe(recId) {
     if (!confirm("Are you sure you want to delete this item?")) return;
-    Store.recipes = Store.recipes.filter(r => String(r.id || r.ID || r.menuItem).trim() !== String(recId).trim());
+    Store.recipes = Store.recipes.filter(r => String(r.id || r.menuItem).trim() !== String(recId).trim());
     renderRecipeBook();
     alert("Item deleted successfully.");
 }
@@ -960,7 +1019,7 @@ function isCertifiedTeamLeader(empId) {
 }
 
 // ==========================================
-// 9. DASHBOARDS & COMPLETED SHIFTS
+// 9. DASHBOARDS, 14-DAY COMPLIANCE & BONUS ACCOUNTING
 // ==========================================
 function renderCookDashboard() {
     const container = document.getElementById('cook-dashboard-content');
@@ -1053,26 +1112,151 @@ function renderGMDashboard() {
         return passed && !signed;
     });
 
+    // --- 14-DAY COMPLIANCE CALCULATION ---
+    const startDate = new Date(CONFIG.PROGRAM_START_DATE);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 13);
+
+    const cycleShifts = Store.shifts.filter(s => {
+        const d = new Date(s.date);
+        return d >= startDate && d <= endDate;
+    });
+
+    // Group compliance by day
+    const dailyCompliance = {};
+    for (let i = 0; i < 14; i++) {
+        const curr = new Date(startDate);
+        curr.setDate(curr.getDate() + i);
+        const dateStr = curr.toISOString().split('T')[0];
+        dailyCompliance[dateStr] = { total: 0, sum: 0 };
+    }
+
+    cycleShifts.forEach(s => {
+        if (dailyCompliance[s.date]) {
+            dailyCompliance[s.date].total += 1;
+            dailyCompliance[s.date].sum += Number(s.scorePct || 0);
+        }
+    });
+
+    // --- BONUS TIER CALCULATIONS ---
+    const employeeAverages = {};
+    Store.employees.forEach(emp => {
+        const eId = emp.id || emp.ID;
+        const eShifts = cycleShifts.filter(s => String(s.empId).trim() === String(eId).trim());
+        if (eShifts.length > 0) {
+            const totalScore = eShifts.reduce((acc, s) => acc + Number(s.scorePct || 0), 0);
+            employeeAverages[eId] = {
+                name: emp.name || emp.Name,
+                avg: Math.round(totalScore / eShifts.length),
+                shiftsCount: eShifts.length
+            };
+        }
+    });
+
+    let bronzeCount = 0, silverCount = 0, goldCount = 0;
+    const accountingRows = [];
+
+    Object.values(employeeAverages).forEach(data => {
+        let tier = 'None';
+        if (data.avg >= 100) { tier = 'Gold 🥇'; goldCount++; }
+        else if (data.avg >= 95) { tier = 'Silver 🥈'; silverCount++; }
+        else if (data.avg >= 85) { tier = 'Bronze 🥉'; bronzeCount++; }
+
+        if (tier !== 'None') {
+            accountingRows.push(`
+                <tr>
+                    <td><strong>${data.name}</strong></td>
+                    <td>${data.shiftsCount}</td>
+                    <td>${data.avg}%</td>
+                    <td><span style="font-weight: bold; color: #1e3a8a;">${tier}</span></td>
+                </tr>
+            `);
+        }
+    });
+
     container.innerHTML = `
         <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">📈 General Manager Executive Suite</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Manage employees, approve training certifications, and assign shifts.</p>
+            <h3 style="color: #1e3a8a; margin-top: 0;">📈 General Manager Executive Suite & Bonus Program</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">14-Day compliance tracking cycle (Launch Date: ${CONFIG.PROGRAM_START_DATE} to ${endDate.toISOString().split('T')[0]}).</p>
         </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div class="card" style="text-align: center;">
                 <span style="font-size: 0.85rem; color: #64748b;">Active Team Members</span>
                 <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${Store.employees.length}</h2>
             </div>
             <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Total Shifts Logged</span>
-                <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${Store.shifts.length}</h2>
+                <span style="font-size: 0.85rem; color: #64748b;">Total Shifts Logged (Cycle)</span>
+                <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${cycleShifts.length}</h2>
             </div>
             <div class="card" style="text-align: center;">
                 <span style="font-size: 0.85rem; color: #64748b;">Pending Cert Sign-Offs</span>
                 <h2 style="color: #dc2626; margin: 5px 0 0 0;">${pendingCerts.length}</h2>
             </div>
         </div>
+
+        <!-- 14-DAY COMPLIANCE LINE CHART & METRICS -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h4 style="color: #1e3a8a; margin-top: 0;">📊 14-Day Compliance Tracking Trend</h4>
+            <p style="font-size: 0.85rem; color: #64748b;">Daily average compliance score across the active pay cycle.</p>
+            <div style="display: flex; gap: 6px; align-items: flex-end; height: 180px; padding: 20px 10px 10px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow-x: auto; margin-top: 1rem;">
+                ${Object.entries(dailyCompliance).map(([date, stats]) => {
+                    const avg = stats.total > 0 ? Math.round(stats.sum / stats.total) : 0;
+                    const heightPct = Math.max(avg, 5);
+                    return `
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 35px; height: 100%; justify-content: flex-end;">
+                            <span style="font-size: 0.7rem; font-weight: bold; color: #1e3a8a; margin-bottom: 4px;">${avg}%</span>
+                            <div style="width: 100%; background: #2563eb; border-radius: 4px 4px 0 0; height: ${heightPct}%; transition: height 0.3s;"></div>
+                            <span style="font-size: 0.65rem; color: #64748b; margin-top: 6px; transform: rotate(-35deg);">${date.slice(5)}</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+
+        <!-- BONUS PROGRAM ALLOCATION PIE & ACCOUNTING SHEET -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+            
+            <div class="card">
+                <h4 style="color: #1e3a8a; margin-top: 0;">🥧 Bonus Tier Allocation Distribution</h4>
+                <p style="font-size: 0.85rem; color: #64748b;">Active employee distribution across Bronze (85%+), Silver (95%+), and Gold (100%).</p>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 1.5rem;">
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #ca8a04;">
+                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Gold Tier (100%):</span> <span>${goldCount} Employee(s)</span></div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #64748b;">
+                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Silver Tier (95%+):</span> <span>${silverCount} Employee(s)</span></div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #b45309;">
+                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Bronze Tier (85%+):</span> <span>${bronzeCount} Employee(s)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4 style="color: #1e3a8a; margin-top: 0;">📑 Bonus Program Accounting Sheet</h4>
+                <p style="font-size: 0.85rem; color: #64748b;">Qualified employees meeting 14-day compliance program thresholds.</p>
+                <div style="max-height: 240px; overflow-y: auto; margin-top: 1rem;">
+                    <table class="data-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Shifts</th>
+                                <th>Avg Score</th>
+                                <th>Tier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${accountingRows.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No employees have met bonus thresholds yet.</td></tr>` : accountingRows.join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
         <div id="manager-assignment-widget-container" style="margin-bottom: 1.5rem;"></div>
+
         <div class="card" style="margin-bottom: 1.5rem;">
             <h4 style="color: #1e3a8a; margin-top: 0;">🎓 Pending Training Certifications for Approval</h4>
             <table class="data-table" style="width: 100%; margin-top: 1rem;">
@@ -1097,6 +1281,7 @@ function renderGMDashboard() {
                 </tbody>
             </table>
         </div>
+
         <div class="card" style="margin-bottom: 1.5rem;">
             <h4 style="color: #1e3a8a; margin-top: 0;">🛠️ GM Quick Actions & System Controls</h4>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem;">
