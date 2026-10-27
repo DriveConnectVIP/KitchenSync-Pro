@@ -43,305 +43,7 @@ const ApiService = {
                 return await res.json();
             }
         } catch (err) {
-            console.error(`API Error [${action}]:`, err);
-            return null;
-        }
-    },
-
-    async fetchAll() {
-        const [emps, shifts, certs, msgs, recipes] = await Promise.all([
-            this.request('getEmployees'),
-            this.request('getShifts'),
-            this.request('getCerts'),
-            this.request('getMessages'),
-            this.request('getRecipes')
-        ]);
-
-        if (emps) Store.employees = emps;
-        if (shifts) Store.shifts = shifts;
-        if (certs) Store.certifications = certs;
-        if (msgs) Store.messages = msgs;
-        if (recipes) Store.recipes = recipes;
-
-        UIController.refreshActiveView();
-    }
-};
-
-const UIController = {
-    init() {
-        const today = new Date().toISOString().split('T')[0];
-        ['shift-date', 'cook-shift-date', 'gm-calendar-lookup-date'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = today;
-        });
-        ApiService.fetchAll();
-    },
-    refreshActiveView() {
-        const view = document.querySelector('.app-view.active');
-        if (!view) return;
-        const id = view.id.replace('view-', '');
-        if (id === 'shift-entry') {
-            if (Store.role === 'manager') renderManagerChecklist();
-            else renderChecklists();
-        }
-        if (id === 'cook-dashboard') renderCookDashboard();
-        if (id === 'manager-dashboard') {
-            renderManagerDashboard();
-            renderManagerAssignmentWidget();
-        }
-        if (id === 'gm-dashboard') {
-            renderGMDashboard();
-            renderManagerAssignmentWidget();
-        }
-        if (id === 'cook-training') renderTrainingView();
-        if (id === 'recipe-book') renderRecipeBook();
-        if (id === 'roster') renderRosterView();
-    }
-};
-
-document.addEventListener('DOMContentLoaded', () => UIController.init());
-
-// ==========================================
-// 1. DATA SPECS: OPENING, CLOSING & MANAGER CHECKLISTS
-// ==========================================
-const MANAGER_STATIC_CHECKLIST = [
-    { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." },
-    { id: 'mc2', title: "Turn on lights, tablets, and Sonos music", desc: "Prepare front-of-house ambiance and terminal readiness." },
-    { id: 'mc3', title: "Check bathrooms for cleanliness, trash, and paper goods", desc: "Maintain spotless guest restroom standards." },
-    { id: 'mc4', title: "Check staffing for punctuality, call outs, and covers", desc: "Verify team arrival and adjust floor plans as needed." },
-    { id: 'mc5', title: "Log call outs or late arrivals when necessary", desc: "Record attendance logs in the management system." },
-    { id: 'mc6', title: "Perform BOH line checks for stock, temps, and prep needs", desc: "Ensure all stations meet safety and recipe par levels." },
-    { id: 'mc7', title: "Check bar stock and cleanliness", desc: "Inspect bar station inventory and glassware sanitation." },
-    { id: 'mc8', title: "Check tables prior to service for cleanliness and condiment stock", desc: "Verify dining room readiness before guest seating." },
-    { id: 'mc9', title: "Conduct server and line talk-in for sales expectations, goals, 86 items", desc: "Brief team on daily specials, service goals, and 86'd items." },
-    { id: 'mc10', title: "Develop a shift plan for service", desc: "Organize breaks, section rotations, and pacing strategies." },
-    { id: 'mc11', title: "Assist servers and hosts with seating, running food, clearing tables", desc: "Support front-of-house flow during peak volume." },
-    { id: 'mc12', title: "Expedite at the service slide to maintain quality", desc: "Ensure presentation and ticket times meet brand standards." },
-    { id: 'mc13', title: "Monitor labor and make necessary adjustments to control cost", desc: "Cut staff or shift resources based on real-time sales." },
-    { id: 'mc14', title: "Close out shift, check safe and drawer counts, SET UP FOR NEXT SHIFT!", desc: "Complete financial reconciliation and preparation handover." },
-    { id: 'mc15', title: "Check out line and BOH staff to ensure kitchen is clean, stocked, and 911 prep is completed", desc: "Final walk-through verification of back-of-house closing standards." }
-];
-
-const CHECKLIST_SPECS = {
-    en: {
-        'range_open': [
-            {
-                phase: "🌅 Range Station Open Setup & Safety Checks",
-                tasks: [
-                    { id: 'ro1', title: "Turn on range burners & verify flame ignition", desc: "Check all burner ports for clogs or uneven flames." },
-                    { id: 'ro2', title: "Calibrate line thermometers", desc: "Verify ice-water bath reads 32°F (0°C)." },
-                    { id: 'ro3', title: "Check hot holding wells & water levels", desc: "Ensure wells are clean and filled to operational fill line." },
-                    { id: 'ro4', title: "Stock line insert pans with proteins & sauces", desc: "Check expiration labels and FIFO rotation standards." },
-                    { id: 'ro5', title: "Sanitize station cutting boards & prep surfaces", desc: "Use approved quat sanitizer solution (200-400 ppm)." }
-                ]
-            }
-        ],
-        'mid_open': [
-            {
-                phase: "🌅 Mid Station Open Setup",
-                tasks: [
-                    { id: 'mo1', title: "Turn on sandwich press & panini units", desc: "Preheat to 350°F and test press mechanism." },
-                    { id: 'mo2', title: "Stock cold sandwich rails & condiments", desc: "Ensure all cheese, sliced meats, and spreads are full and dated." },
-                    { id: 'mo3', title: "Check bread inventory & pull par-bake items", desc: "Estimate volume for the shift and stage accordingly." },
-                    { id: 'mo4', title: "Sanitize sandwich prep rails and slicer guard", desc: "Ensure all food contact surfaces meet health code standards." }
-                ]
-            }
-        ],
-        'grill_fry_open': [
-            {
-                phase: "🌅 Grill/Fry Station Open Setup",
-                tasks: [
-                    { id: 'gfo1', title: "Filter fryers and check oil levels", desc: "Top off oil if necessary and verify temperature controller at 350°F." },
-                    { id: 'gfo2', title: "Season and test flat top griddle", desc: "Scrape grill surface clean and apply high-temp cooking oil." },
-                    { id: 'gfo3', title: "Stock freezer baskets with fries & appetizers", desc: "Ensure back-up inventory is staged within arm's reach." },
-                    { id: 'gfo4', title: "Check batter stations and breading pans", desc: "Stage fresh breading, wet batters, and sanitizing buckets." }
-                ]
-            }
-        ],
-        'range_mid_split_open': [
-            {
-                phase: "🌅 Morning 2-Cook Split (Range / Mid Open)",
-                tasks: [
-                    { id: 'rmso1', title: "Ignite range burners and test hot holding wells", desc: "Verify safe heating temperatures across range and soup wells." },
-                    { id: 'rmso2', title: "Setup sandwich press and cold rail components", desc: "Ensure sliced proteins, cheeses, and spreads are fully stocked and dated." },
-                    { id: 'rmso3', title: "Split-Task: Setup backup line sauces & dressings", desc: "Equally divide shared mid-station prep tasks with partner." }
-                ]
-            }
-        ],
-        'grill_fry_mid_split_open': [
-            {
-                phase: "🌅 Morning 2-Cook Split (Grill/Fry / Mid Open)",
-                tasks: [
-                    { id: 'gfmaso1', title: "Filter fryers, check oil, and season flat top", desc: "Preheat grill to 350°F and prepare basket stations." },
-                    { id: 'gfmaso2', title: "Pull bread inventory and stage par-bake items", desc: "Support mid-station bread rotation alongside grill startup." },
-                    { id: 'gfmaso3', title: "Split-Task: Restock shared line squeeze bottles", desc: "Equally divide shared condiment stocking responsibilities." }
-                ]
-            }
-        ],
-        'range_mid_split_close': [
-            {
-                phase: "🌙 Night Closing (Range Station Procedures)",
-                tasks: [
-                    { id: 'rcl1', title: "Break down veg and poach pans", desc: "One hour prior to close, break down veg. and poach pans and bring to dish." },
-                    { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners." },
-                    { id: 'rcl3', title: "Clean traps for range and small grill", desc: "Clean traps for range and small grill. Shut down one oven." },
-                    { id: 'rcl4', title: "Clean interior of egg station & oven doors", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table." },
-                    { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks." },
-                    { id: 'rcl6', title: "Restock traulsen & rotate product", desc: "Restock traulsen, ensuring that all product is rotated and covered." },
-                    { id: 'rcl7', title: "Change foil in oven & wipe/scup interior doors", desc: "Change foil in oven and wipe/scup interior doors of ovens." },
-                    { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed." },
-                    { id: 'rcl9', title: "Restock bread and rotate product", desc: "Restock bread as necessary, rotating product." },
-                    { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in." },
-                    { id: 'rcl11', title: "Check thaw pull for frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product." },
-                    { id: 'rcl12', title: "Sweep, deck brush, and mop line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor." },
-                    { id: 'rcl13', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" }
-                ]
-            },
-            {
-                phase: "🌙 Night Closing (Mid Station Procedures)",
-                tasks: [
-                    { id: 'mcl1', title: "Remove utensils from sandwich unit", desc: "One hour prior to close, remove all utensils from the sandwich unit." },
-                    { id: 'mcl2', title: "Clean interior (top) of unit under pans", desc: "Clean interior (top) of unit under pans and around housing." },
-                    { id: 'mcl3', title: "Clean interior of lower portion of unit", desc: "Clean interior of lower portion of the unit, including the upper shelf inside." },
-                    { id: 'mcl4', title: "Pull out unit and clean back & floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it." },
-                    { id: 'mcl5', title: "Flip all pans and restock all items", desc: "Flip all pans and restock all items, making sure to properly rotate product." },
-                    { id: 'mcl6', title: "Verify stock levels", desc: "DO NOT double stock product. There should be one full pan of every item." },
-                    { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out." },
-                    { id: 'mcl8', title: "Clean microwave inside and out", desc: "Clean the microwave inside and out, including the microwave shelf." },
-                    { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed." },
-                    { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
-                    { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift." },
-                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" }
-                ]
-            }
-        ],
-        'grill_fry_mid_split_close': [
-            {
-                phase: "🌙 Night Closing (Grill/Fry Station Procedures)",
-                tasks: [
-                    { id: 'gcl1', title: "Flip pancake batter to 6th pan", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle." },
-                    { id: 'gcl2', title: "Bring batter gun to dish", desc: "Bring the batter gun to dish." },
-                    { id: 'gcl3', title: "Wipe and scrub lower shelf of grill", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials." },
-                    { id: 'gcl4', title: "Strain fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles." },
-                    { id: 'gcl5', title: "Wipe down stainless dividers and front of fryers", desc: "Wipe down the stainless dividers and the front of the fryers." },
-                    { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator." },
-                    { id: 'gcl7', title: "Sift fry flour into a new pan", desc: "Sift fry flour into a new pan and top off if necessary." },
-                    { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables." },
-                    { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables." },
-                    { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart." },
-                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart." },
-                    { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board." },
-                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap into a metal German pan." },
-                    { id: 'gcl14', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap." },
-                    { id: 'gcl15', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight!." },
-                    { id: 'gcl16', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
-                    { id: 'gcl17', title: "Restock freezer (French fries, chicken, etc.)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)." },
-                    { id: 'gcl18', title: "Manager sign-off before leaving", desc: "Check with manager prior to clocking out and leaving your shift!" }
-                ]
-            }
-        ]
-    }
-};
-
-// ==========================================
-// SERVSAFE COMPLIANT 10 TRAINING MODULES
-// ==========================================
-const TRAINING_MODULES = [
-    {
-        id: 'MOD-01',
-        title: "Module 1: Providing Safe Food & Biological Contamination",
-        description: "Master foodborne illness outbreaks, biological pathogens, bacteria, viruses, parasites, and fungi.",
-        questions: [
-            { q: "What is a foodborne illness outbreak?", options: ["When two or more people get the same illness after eating the same food", "When one person gets sick from restaurant food", "When food is contaminated by cleaning chemicals", "When raw meat touches vegetables"], correct: 0 },
-            { q: "Which of the following is a biological contaminant?", options: ["Glass shards in a salad", "Norovirus in oysters", "Sanitizer residue on a plate", "Jewelry falling into soup"], correct: 1 },
-            { q: "What are the 'Big Six' pathogens most highly contagious?", options: ["Shigella, Salmonella Typhi, Nontyphoidal Salmonella, E. coli, Hepatitis A, Norovirus", "Staph, Listeria, Botulism, Clostridium perfringens, Bacillus cereus, Vibrio", "Common cold, Influenza, Strep throat, Chickenpox, Measles, Mumps", "Mold, Yeast, Mildew, Rust, Algae, Spores"], correct: 0 },
-            { q: "What is the primary symptom that requires excluding a food handler from the operation?", options: ["Mild headache", "Vomiting", "Slight fatigue", "Runny nose"], correct: 1 },
-            { q: "Bacteria grow exceptionally well in food that contains:", options: ["High acidity", "Little to no moisture", "Little or no acid (pH 4.6 to 7.5) and protein/carbs", "High salinity and high sugar"], correct: 2 },
-            { q: "What condition is required for bacterial growth represented by the 'T' in FAT TOM?", options: ["Time", "Temperature", "Toxins", "Texture"], correct: 1 },
-            { q: "Which virus is primarily linked with ready-to-eat foods and shellfish from contaminated water?", options: ["Hepatitis A", "Rabies", "Rotavirus", "Influenza"], correct: 0 },
-            { q: "Parasites are commonly linked with what type of food?", options: ["Dry grains and cereals", "Seafood and wild game", "Pasteurized dairy", "Canned vegetables"], correct: 1 },
-            { q: "Fungi include which of the following organisms?", options: ["Bacteria and viruses", "Molds and yeasts", "Parasites and protozoa", "Insects and rodents"], correct: 1 },
-            { q: "What is the best way to prevent bacterial spores from surviving in cooked food?", options: ["Rinsing food in cold water", "Cooking food to required minimum internal temperatures", "Storing food in direct sunlight", "Adding extra table salt"], correct: 1 }
-        ]
-    },
-    {
-        id: 'MOD-02',
-        title: "Module 2: Personal Hygiene & Employee Health",
-        description: "Proper handwashing procedures, personal cleanliness, work attire, and illness reporting.",
-        questions: [
-            { q: "What is the minimum total time you should scrub your hands with soap during handwashing?", options: ["3 to 5 seconds", "10 to 15 seconds", "30 to 45 seconds", "60 seconds"], correct: 1 },
-            { q: "When must food handlers wash their hands?", options: ["Only at the start of a shift", "After touching raw meat, using the restroom, or handling garbage", "Only when changing stations", "Only if hands look visibly dirty"], correct: 1 },
-            { q: "What is the correct way to dry hands after washing?", options: ["On your apron or uniform pants", "Using a single-use paper towel or warm-air dryer", "By waving them in the air until dry", "Using a shared cloth towel kept by the sink"], correct: 1 },
-            { q: "Where is it acceptable to drink from an open beverage cup while working?", options: ["At any prep table if covered", "Only in designated employee break areas", "Next to the cooking line", "In the dishwashing area"], correct: 1 },
-            { q: "What jewelry is generally permitted on food handlers' hands or arms?", options: ["A diamond engagement ring", "A plain metal band ring", "A wristwatch with a leather strap", "A medical alert bracelet"], correct: 1 },
-            { q: "What should a food handler do if they have an infected cut on their hand?", options: ["Bandage the wound and cover it with a waterproof single-use glove", "Ignore it if it is small", "Wash hands twice as often", "Wear a sweatband over it"], correct: 0 },
-            { q: "When must single-use gloves be changed?", options: ["Every 8 hours regardless of tasks", "As soon as they become torn, soiled, or when switching tasks", "Only at the end of the shift", "Only when handling raw poultry"], correct: 1 },
-            { q: "Which symptom requires a food handler to be restricted from working around food but not necessarily excluded?", options: ["Sore throat with fever", "Active vomiting", "Jaundice", "Diarrhea"], correct: 0 },
-            { q: "What hair restraint must food handlers wear in food prep areas?", options: ["A clean hat or hairnet", "Only hairspray", "A tight ponytail", "No restraint is required if hair is short"], correct: 0 },
-            { q: "Before putting on single-use gloves, what must a food handler always do?", options: ["Apply hand lotion", "Wash their hands", "Sanitize the gloves", "Blow into the gloves to open them"], correct: 1 }
-        ]
-    },
-    {
-        id: 'MOD-03',
-        title: "Module 3: Flow of Food - Introduction & Purchasing",
-        description: "Managing cross-contamination, time-temperature abuse, approved suppliers, and receiving criteria.",
-        questions: [
-            { q: "What is the temperature danger zone range where bacteria grow rapidly?", options: ["32°F to 40°F", "41°F to 135°F", "140°F to 212°F", "0°F to 32°F"], correct: 1 },
-            { q: "How can cross-contamination be prevented during food storage?", options: ["Storing raw meat above ready-to-eat food", "Using separate cutting boards and storing raw poultry below ready-to-eat food", "Storing cleaning chemicals next to flour", "Wiping down counters with dry rags"], correct: 1 },
-            { q: "What is the calibration boiling-point method temperature for standard dial thermometers at sea level?", options: ["32°F", "100°F", "212°F", "350°F"], correct: 2 },
-            { q: "At what internal temperature should cold TCS food be received?", options: ["41°F (5°C) or lower", "50°F (10°C) or lower", "60°F (15°C) or lower", "32°F (0°C) or lower"], correct: 0 },
-            { q: "At what internal temperature should hot TCS food be received?", options: ["100°F (38°C) or higher", "135°F (57°C) or higher", "165°F (74°C) or higher", "212°F (100°C) or higher"], correct: 1 },
-            { q: "Live shellfish must be received with what documentation attached?", options: ["A USDA inspection stamp", "An invoice marked paid in full", "An approved shellstock identification tag", "A weight certificate"], correct: 2 },
-            { q: "What is required for packaged food delivered in damaged or torn containers?", options: ["Accept it if the price is discounted", "Reject the delivery immediately", "Transfer the food into clean bags", "Rinse the outer packaging in bleach water"], correct: 1 },
-            { q: "What is the maximum acceptable receiving temperature for fresh shell eggs?", options: ["41°F or lower", "45°F or lower", "50°F or lower", "60°F or lower"], correct: 1 },
-            { q: "What action should be taken if frozen food shows evidence of thawing and refreezing (ice crystals)?", options: ["Cook it immediately", "Reject the shipment", "Thaw it in warm water", "Refreeze it in the blast chiller"], correct: 1 },
-            { q: "What is an approved supplier?", options: ["Any vendor who delivers locally", "A supplier inspected and complying with local, state, and federal laws", "A supplier offering the lowest wholesale prices", "Any farmer selling produce at a roadside stand"], correct: 1 }
-        ]
-    },
-    {
-        id: 'MOD-04',
-        title: "Module 4: Flow of Food - Preparation & Thawing",
-        description: "Safe food preparation guidelines, thawing methods, and prep controls for TCS foods.",
-        questions: [
-            { q: "What is the maximum time food can remain in the temperature danger zone before being discarded?", options: ["1 hour", "2 hours", "4 hours", "6 hours"], correct: 2 },
-            { q: "Which of the following is an approved method for thawing TCS food?", options: ["Thawing on the kitchen prep counter at room temperature", "Thawing submerged in running potable water at 70°F (21°C) or lower", "Thawing in a sink filled with warm soapy water", "Thawing directly under heat lamps"], correct: 1 },
-            { q: "What internal cooking temperature is required for poultry (whole or ground chicken, turkey)?", options: ["135°F for 15 seconds", "155°F for 15 seconds", "165°F for 15 seconds for instantaneous reading", "175°F for 15 seconds"], correct: 2 },
-            { q: "What internal cooking temperature is required for ground beef and pork?", options: ["135°F", "145°F", "155°F for 15 seconds", "165°F"], correct: 2 },
-            { q: "What is the required minimum internal cooking temperature for seafood, steaks, and chops of pork/beef?", options: ["135°F", "145°F for 15 seconds", "155°F", "165°F"], correct: 1 },
-            { q: "What is the required minimum cooking temperature for commercially raised game animals, ratites, and stuffed meats?", options: ["145°F", "155°F", "165°F for 15 seconds", "175°F"], correct: 2 },
-            { q: "What is the first stage of the two-stage cooling process for TCS foods?", options: ["Cooling from 135°F to 70°F within 2 hours", "Cooling from 135°F to 41°F within 6 hours total", "Cooling from 70°F to 41°F within 4 hours", "Cooling immediately in a freezer"], correct: 0 },
-            { q: "What is the total maximum combined time allowed for cooling TCS food?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 2 },
-            { q: "What must be done to reheated TCS food intended for hot holding?", options: ["Heat to an internal temperature of 165°F for 15 seconds within 2 hours", "Warm gently on a steam table until piping hot", "Rinse in boiling water", "Microwave for 30 seconds"], correct: 0 },
-            { q: "When prepping food, what is the best practice to prevent time-temperature abuse?", options: ["Prep large batches all at once and leave them on the counter", "Prep food in small batches to limit time in the danger zone", "Turn off kitchen air conditioning", "Use warm water for all prep work"], correct: 1 }
-        ]
-    },
-    {
-        id: 'MOD-05',
-        title: "Module 5: Flow of Food - Service & Holding",
-        description: "Holding hot and cold foods, self-service safety, off-site service, and tableware re-service.",
-        questions: [
-            { q: "At what minimum temperature must hot TCS food be held during service?", options: ["120°F", "135°F or higher", "150°F", "165°F"], correct: 1 },
-            { q: "At what maximum temperature must cold TCS food be held during service?", options: ["32°F", "41°F (5°C) or lower", "50°F", "60°F"], correct: 1 },
-            { q: "How frequently must internal temperatures of hot/cold holding food be checked?", options: ["Every 30 minutes", "At least every 4 hours (ideally every 2 hours)", "Once at the start of the shift", "Once at the end of the day"], correct: 1 },
-            { q: "Without temperature control, cold food can be held for up to how many hours if labeled and maintained under 70°F?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 2 },
-            { q: "What is a key rule regarding self-service salad bars and buffets?", options: ["Customers can reuse their dirty plates for second helpings", "Provide clean plates and utensils for each new trip to the buffet", "Store raw meat above ready-to-eat salad items", "Leave sneeze guards open for easy access"], correct: 1 },
-            { q: "Which food item can legally be re-served to another customer if untouched?", options: ["An open bowl of salsa", "An unopened pre-packaged cracker or condiment packet", "A basket of unfinished dinner rolls", "A partial drink glass"], correct: 1 },
-            { q: "When transporting food off-site, what is required of delivery vehicles?", options: ["Insulated food-grade containers that keep food safe", "Open-air truck beds", "Uninsulated cardboard boxes", "Air-conditioned passenger seats"], correct: 0 },
-            { q: "What is the maximum holding time for hot TCS food held without temperature control?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 0 },
-            { q: "Where must sneeze guards be installed on a food display bar?", options: ["Below the food level", "At least 14 inches above the food counter extending outward", "Directly touching the food pans", "Only behind the kitchen service window"], correct: 1 },
-            { q: "What must be included on food labels for items prepared in-house and held for over 24 hours?", options: ["The cook's home address", "Name of the food and the use-by/discard date (max 7 days at 41°F)", "The wholesale cost", "The exact recipe ingredients"], correct: 1 }
-        ]
-    },
-    {
-        id: 'MOD-06',
-        title: "Module 6: Food Safety Management Systems & HACCP",
-        description: "Active managerial control, prerequisite programs, and the 7 principles of HACCP.",
-        questions: [
-            { q: "What is active managerial control?", options: ["Waiting for a health inspector to find violations", "The manager's proactive approach to controlling foodborne illness risk factors", "Delegating all kitchen tasks to line cooks", "Keeping doors locked during rush hours"], correct: 1 },
-            { q: "What does HACCP stand for?", options: ["Hazard Analysis Critical Control Point", "Health And Cleanliness Critical Control Procedures", "Hygiene And Consumer Care Protocol", "Hazard Assessment Control Center Program"], correct: 0 },
-            { q: "What is the first principle in a HACCP plan?", options: ["Establish critical limits", "Conduct a hazard analysis", "Establish monitoring procedures", "Verify that the system works"], correct: 1 },
-            { q: "What is a Critical Control Point (CCP)?", options: ["The final invoice price of food", "A point in the flow of food where a hazard can be prevented, eliminated, or reduced to safe levels", "The employee break room schedule", "The time when health inspectors arrive"], correct: 1 },
-            { q: "Establishing critical limits in HACCP involves what action?", options: ["Setting maximum or minimum parameters like cooking temperatures", "Writing employee reprimands", "Counting inventory items", "Checking restroom supplies"], correct: 0 },
+            console.error(`API Error [${action}]:`, err); return null; } },  async fetchAll() { const [emps, shifts, certs, msgs, recipes] = await Promise.all([ this.request('getEmployees'), this.request('getShifts'), this.request('getCerts'), this.request('getMessages'), this.request('getRecipes') ]);  if (emps) Store.employees = emps; if (shifts) Store.shifts = shifts; if (certs) Store.certifications = certs; if (msgs) Store.messages = msgs; if (recipes) Store.recipes = recipes;  UIController.refreshActiveView(); } };  const UIController = { init() { const today = new Date().toISOString().split('T')[0]; ['shift-date', 'cook-shift-date', 'gm-calendar-lookup-date'].forEach(id => { const el = document.getElementById(id); if (el) el.value = today; }); ApiService.fetchAll(); }, refreshActiveView() { const view = document.querySelector('.app-view.active'); if (!view) return; const id = view.id.replace('view-', ''); if (id === 'shift-entry') { if (Store.role === 'manager') renderManagerChecklist(); else renderChecklists(); } if (id === 'cook-dashboard') renderCookDashboard(); if (id === 'manager-dashboard') { renderManagerDashboard(); renderManagerAssignmentWidget(); } if (id === 'gm-dashboard') { renderGMDashboard(); renderManagerAssignmentWidget(); } if (id === 'cook-training') renderTrainingView(); if (id === 'recipe-book') renderRecipeBook(); if (id === 'roster') renderRosterView(); } };  document.addEventListener('DOMContentLoaded', () => UIController.init());  // ========================================== // 1. DATA SPECS: OPENING, CLOSING & MANAGER CHECKLISTS // ========================================== const MANAGER_STATIC_CHECKLIST = [ { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." }, { id: 'mc2', title: "Turn on lights, tablets, and Sonos music", desc: "Prepare front-of-house ambiance and terminal readiness." }, { id: 'mc3', title: "Check bathrooms for cleanliness, trash, and paper goods", desc: "Maintain spotless guest restroom standards." }, { id: 'mc4', title: "Check staffing for punctuality, call outs, and covers", desc: "Verify team arrival and adjust floor plans as needed." }, { id: 'mc5', title: "Log call outs or late arrivals when necessary", desc: "Record attendance logs in the management system." }, { id: 'mc6', title: "Perform BOH line checks for stock, temps, and prep needs", desc: "Ensure all stations meet safety and recipe par levels." }, { id: 'mc7', title: "Check bar stock and cleanliness", desc: "Inspect bar station inventory and glassware sanitation." }, { id: 'mc8', title: "Check tables prior to service for cleanliness and condiment stock", desc: "Verify dining room readiness before guest seating." }, { id: 'mc9', title: "Conduct server and line talk-in for sales expectations, goals, 86 items", desc: "Brief team on daily specials, service goals, and 86'd items." }, { id: 'mc10', title: "Develop a shift plan for service", desc: "Organize breaks, section rotations, and pacing strategies." }, { id: 'mc11', title: "Assist servers and hosts with seating, running food, clearing tables", desc: "Support front-of-house flow during peak volume." }, { id: 'mc12', title: "Expedite at the service slide to maintain quality", desc: "Ensure presentation and ticket times meet brand standards." }, { id: 'mc13', title: "Monitor labor and make necessary adjustments to control cost", desc: "Cut staff or shift resources based on real-time sales." }, { id: 'mc14', title: "Close out shift, check safe and drawer counts, SET UP FOR NEXT SHIFT!", desc: "Complete financial reconciliation and preparation handover." }, { id: 'mc15', title: "Check out line and BOH staff to ensure kitchen is clean, stocked, and 911 prep is completed", desc: "Final walk-through verification of back-of-house closing standards." } ];  const CHECKLIST_SPECS = { en: { 'range_open': [ { phase: "🌅 Range Station Open Setup & Safety Checks", tasks: [ { id: 'ro1', title: "Turn on range burners & verify flame ignition", desc: "Check all burner ports for clogs or uneven flames." }, { id: 'ro2', title: "Calibrate line thermometers", desc: "Verify ice-water bath reads 32°F (0°C)." }, { id: 'ro3', title: "Check hot holding wells & water levels", desc: "Ensure wells are clean and filled to operational fill line." }, { id: 'ro4', title: "Stock line insert pans with proteins & sauces", desc: "Check expiration labels and FIFO rotation standards." }, { id: 'ro5', title: "Sanitize station cutting boards & prep surfaces", desc: "Use approved quat sanitizer solution (200-400 ppm)." } ] } ], 'mid_open': [ { phase: "🌅 Mid Station Open Setup", tasks: [ { id: 'mo1', title: "Turn on sandwich press & panini units", desc: "Preheat to 350°F and test press mechanism." }, { id: 'mo2', title: "Stock cold sandwich rails & condiments", desc: "Ensure all cheese, sliced meats, and spreads are full and dated." }, { id: 'mo3', title: "Check bread inventory & pull par-bake items", desc: "Estimate volume for the shift and stage accordingly." }, { id: 'mo4', title: "Sanitize sandwich prep rails and slicer guard", desc: "Ensure all food contact surfaces meet health code standards." } ] } ], 'grill_fry_open': [ { phase: "🌅 Grill/Fry Station Open Setup", tasks: [ { id: 'gfo1', title: "Filter fryers and check oil levels", desc: "Top off oil if necessary and verify temperature controller at 350°F." }, { id: 'gfo2', title: "Season and test flat top griddle", desc: "Scrape grill surface clean and apply high-temp cooking oil." }, { id: 'gfo3', title: "Stock freezer baskets with fries & appetizers", desc: "Ensure back-up inventory is staged within arm's reach." }, { id: 'gfo4', title: "Check batter stations and breading pans", desc: "Stage fresh breading, wet batters, and sanitizing buckets." } ] } ], 'range_mid_split_open': [ { phase: "🌅 Morning 2-Cook Split (Range / Mid Open)", tasks: [ { id: 'rmso1', title: "Ignite range burners and test hot holding wells", desc: "Verify safe heating temperatures across range and soup wells." }, { id: 'rmso2', title: "Setup sandwich press and cold rail components", desc: "Ensure sliced proteins, cheeses, and spreads are fully stocked and dated." }, { id: 'rmso3', title: "Split-Task: Setup backup line sauces & dressings", desc: "Equally divide shared mid-station prep tasks with partner." } ] } ], 'grill_fry_mid_split_open': [ { phase: "🌅 Morning 2-Cook Split (Grill/Fry / Mid Open)", tasks: [ { id: 'gfmaso1', title: "Filter fryers, check oil, and season flat top", desc: "Preheat grill to 350°F and prepare basket stations." }, { id: 'gfmaso2', title: "Pull bread inventory and stage par-bake items", desc: "Support mid-station bread rotation alongside grill startup." }, { id: 'gfmaso3', title: "Split-Task: Restock shared line squeeze bottles", desc: "Equally divide shared condiment stocking responsibilities." } ] } ], 'range_mid_split_close': [ { phase: "🌙 Night Closing (Range Station Procedures)", tasks: [ { id: 'rcl1', title: "Break down veg and poach pans", desc: "One hour prior to close, break down veg. and poach pans and bring to dish." }, { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners." }, { id: 'rcl3', title: "Clean traps for range and small grill", desc: "Clean traps for range and small grill. Shut down one oven." }, { id: 'rcl4', title: "Clean interior of egg station & oven doors", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table." }, { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks." }, { id: 'rcl6', title: "Restock traulsen & rotate product", desc: "Restock traulsen, ensuring that all product is rotated and covered." }, { id: 'rcl7', title: "Change foil in oven & wipe/scup interior doors", desc: "Change foil in oven and wipe/scup interior doors of ovens." }, { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed." }, { id: 'rcl9', title: "Restock bread and rotate product", desc: "Restock bread as necessary, rotating product." }, { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in." }, { id: 'rcl11', title: "Check thaw pull for frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product." }, { id: 'rcl12', title: "Sweep, deck brush, and mop line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor." }, { id: 'rcl13', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" } ] }, { phase: "🌙 Night Closing (Mid Station Procedures)", tasks: [ { id: 'mcl1', title: "Remove utensils from sandwich unit", desc: "One hour prior to close, remove all utensils from the sandwich unit." }, { id: 'mcl2', title: "Clean interior (top) of unit under pans", desc: "Clean interior (top) of unit under pans and around housing." }, { id: 'mcl3', title: "Clean interior of lower portion of unit", desc: "Clean interior of lower portion of the unit, including the upper shelf inside." }, { id: 'mcl4', title: "Pull out unit and clean back & floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it." }, { id: 'mcl5', title: "Flip all pans and restock all items", desc: "Flip all pans and restock all items, making sure to properly rotate product." }, { id: 'mcl6', title: "Verify stock levels", desc: "DO NOT double stock product. There should be one full pan of every item." }, { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out." }, { id: 'mcl8', title: "Clean microwave inside and out", desc: "Clean the microwave inside and out, including the microwave shelf." }, { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed." }, { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." }, { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift." }, { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" } ] } ], 'grill_fry_mid_split_close': [ { phase: "🌙 Night Closing (Grill/Fry Station Procedures)", tasks: [ { id: 'gcl1', title: "Flip pancake batter to 6th pan", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle." }, { id: 'gcl2', title: "Bring batter gun to dish", desc: "Bring the batter gun to dish." }, { id: 'gcl3', title: "Wipe and scrub lower shelf of grill", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials." }, { id: 'gcl4', title: "Strain fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles." }, { id: 'gcl5', title: "Wipe down stainless dividers and front of fryers", desc: "Wipe down the stainless dividers and the front of the fryers." }, { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator." }, { id: 'gcl7', title: "Sift fry flour into a new pan", desc: "Sift fry flour into a new pan and top off if necessary." }, { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables." }, { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables." }, { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart." }, { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart." }, { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board." }, { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap into a metal German pan." }, { id: 'gcl14', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap." }, { id: 'gcl15', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight!." }, { id: 'gcl16', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." }, { id: 'gcl17', title: "Restock freezer (French fries, chicken, etc.)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)." }, { id: 'gcl18', title: "Manager sign-off before leaving", desc: "Check with manager prior to clocking out and leaving your shift!" } ] } ] } };  // ========================================== // SERVSAFE COMPLIANT 10 TRAINING MODULES // ========================================== const TRAINING_MODULES = [ { id: 'MOD-01', title: "Module 1: Providing Safe Food & Biological Contamination", description: "Master foodborne illness outbreaks, biological pathogens, bacteria, viruses, parasites, and fungi.", questions: [ { q: "What is a foodborne illness outbreak?", options: ["When two or more people get the same illness after eating the same food", "When one person gets sick from restaurant food", "When food is contaminated by cleaning chemicals", "When raw meat touches vegetables"], correct: 0 }, { q: "Which of the following is a biological contaminant?", options: ["Glass shards in a salad", "Norovirus in oysters", "Sanitizer residue on a plate", "Jewelry falling into soup"], correct: 1 }, { q: "What are the 'Big Six' pathogens most highly contagious?", options: ["Shigella, Salmonella Typhi, Nontyphoidal Salmonella, E. coli, Hepatitis A, Norovirus", "Staph, Listeria, Botulism, Clostridium perfringens, Bacillus cereus, Vibrio", "Common cold, Influenza, Strep throat, Chickenpox, Measles, Mumps", "Mold, Yeast, Mildew, Rust, Algae, Spores"], correct: 0 }, { q: "What is the primary symptom that requires excluding a food handler from the operation?", options: ["Mild headache", "Vomiting", "Slight fatigue", "Runny nose"], correct: 1 }, { q: "Bacteria grow exceptionally well in food that contains:", options: ["High acidity", "Little to no moisture", "Little or no acid (pH 4.6 to 7.5) and protein/carbs", "High salinity and high sugar"], correct: 2 }, { q: "What condition is required for bacterial growth represented by the 'T' in FAT TOM?", options: ["Time", "Temperature", "Toxins", "Texture"], correct: 1 }, { q: "Which virus is primarily linked with ready-to-eat foods and shellfish from contaminated water?", options: ["Hepatitis A", "Rabies", "Rotavirus", "Influenza"], correct: 0 }, { q: "Parasites are commonly linked with what type of food?", options: ["Dry grains and cereals", "Seafood and wild game", "Pasteurized dairy", "Canned vegetables"], correct: 1 }, { q: "Fungi include which of the following organisms?", options: ["Bacteria and viruses", "Molds and yeasts", "Parasites and protozoa", "Insects and rodents"], correct: 1 }, { q: "What is the best way to prevent bacterial spores from surviving in cooked food?", options: ["Rinsing food in cold water", "Cooking food to required minimum internal temperatures", "Storing food in direct sunlight", "Adding extra table salt"], correct: 1 } ] }, { id: 'MOD-02', title: "Module 2: Personal Hygiene & Employee Health", description: "Proper handwashing procedures, personal cleanliness, work attire, and illness reporting.", questions: [ { q: "What is the minimum total time you should scrub your hands with soap during handwashing?", options: ["3 to 5 seconds", "10 to 15 seconds", "30 to 45 seconds", "60 seconds"], correct: 1 }, { q: "When must food handlers wash their hands?", options: ["Only at the start of a shift", "After touching raw meat, using the restroom, or handling garbage", "Only when changing stations", "Only if hands look visibly dirty"], correct: 1 }, { q: "What is the correct way to dry hands after washing?", options: ["On your apron or uniform pants", "Using a single-use paper towel or warm-air dryer", "By waving them in the air until dry", "Using a shared cloth towel kept by the sink"], correct: 1 }, { q: "Where is it acceptable to drink from an open beverage cup while working?", options: ["At any prep table if covered", "Only in designated employee break areas", "Next to the cooking line", "In the dishwashing area"], correct: 1 }, { q: "What jewelry is generally permitted on food handlers' hands or arms?", options: ["A diamond engagement ring", "A plain metal band ring", "A wristwatch with a leather strap", "A medical alert bracelet"], correct: 1 }, { q: "What should a food handler do if they have an infected cut on their hand?", options: ["Bandage the wound and cover it with a waterproof single-use glove", "Ignore it if it is small", "Wash hands twice as often", "Wear a sweatband over it"], correct: 0 }, { q: "When must single-use gloves be changed?", options: ["Every 8 hours regardless of tasks", "As soon as they become torn, soiled, or when switching tasks", "Only at the end of the shift", "Only when handling raw poultry"], correct: 1 }, { q: "Which symptom requires a food handler to be restricted from working around food but not necessarily excluded?", options: ["Sore throat with fever", "Active vomiting", "Jaundice", "Diarrhea"], correct: 0 }, { q: "What hair restraint must food handlers wear in food prep areas?", options: ["A clean hat or hairnet", "Only hairspray", "A tight ponytail", "No restraint is required if hair is short"], correct: 0 }, { q: "Before putting on single-use gloves, what must a food handler always do?", options: ["Apply hand lotion", "Wash their hands", "Sanitize the gloves", "Blow into the gloves to open them"], correct: 1 } ] }, { id: 'MOD-03', title: "Module 3: Flow of Food - Introduction & Purchasing", description: "Managing cross-contamination, time-temperature abuse, approved suppliers, and receiving criteria.", questions: [ { q: "What is the temperature danger zone range where bacteria grow rapidly?", options: ["32°F to 40°F", "41°F to 135°F", "140°F to 212°F", "0°F to 32°F"], correct: 1 }, { q: "How can cross-contamination be prevented during food storage?", options: ["Storing raw meat above ready-to-eat food", "Using separate cutting boards and storing raw poultry below ready-to-eat food", "Storing cleaning chemicals next to flour", "Wiping down counters with dry rags"], correct: 1 }, { q: "What is the calibration boiling-point method temperature for standard dial thermometers at sea level?", options: ["32°F", "100°F", "212°F", "350°F"], correct: 2 }, { q: "At what internal temperature should cold TCS food be received?", options: ["41°F (5°C) or lower", "50°F (10°C) or lower", "60°F (15°C) or lower", "32°F (0°C) or lower"], correct: 0 }, { q: "At what internal temperature should hot TCS food be received?", options: ["100°F (38°C) or higher", "135°F (57°C) or higher", "165°F (74°C) or higher", "212°F (100°C) or higher"], correct: 1 }, { q: "Live shellfish must be received with what documentation attached?", options: ["A USDA inspection stamp", "An invoice marked paid in full", "An approved shellstock identification tag", "A weight certificate"], correct: 2 }, { q: "What is required for packaged food delivered in damaged or torn containers?", options: ["Accept it if the price is discounted", "Reject the delivery immediately", "Transfer the food into clean bags", "Rinse the outer packaging in bleach water"], correct: 1 }, { q: "What is the maximum acceptable receiving temperature for fresh shell eggs?", options: ["41°F or lower", "45°F or lower", "50°F or lower", "60°F or lower"], correct: 1 }, { q: "What action should be taken if frozen food shows evidence of thawing and refreezing (ice crystals)?", options: ["Cook it immediately", "Reject the shipment", "Thaw it in warm water", "Refreeze it in the blast chiller"], correct: 1 }, { q: "What is an approved supplier?", options: ["Any vendor who delivers locally", "A supplier inspected and complying with local, state, and federal laws", "A supplier offering the lowest wholesale prices", "Any farmer selling produce at a roadside stand"], correct: 1 } ] }, { id: 'MOD-04', title: "Module 4: Flow of Food - Preparation & Thawing", description: "Safe food preparation guidelines, thawing methods, and prep controls for TCS foods.", questions: [ { q: "What is the maximum time food can remain in the temperature danger zone before being discarded?", options: ["1 hour", "2 hours", "4 hours", "6 hours"], correct: 2 }, { q: "Which of the following is an approved method for thawing TCS food?", options: ["Thawing on the kitchen prep counter at room temperature", "Thawing submerged in running potable water at 70°F (21°C) or lower", "Thawing in a sink filled with warm soapy water", "Thawing directly under heat lamps"], correct: 1 }, { q: "What internal cooking temperature is required for poultry (whole or ground chicken, turkey)?", options: ["135°F for 15 seconds", "155°F for 15 seconds", "165°F for 15 seconds for instantaneous reading", "175°F for 15 seconds"], correct: 2 }, { q: "What internal cooking temperature is required for ground beef and pork?", options: ["135°F", "145°F", "155°F for 15 seconds", "165°F"], correct: 2 }, { q: "What is the required minimum internal cooking temperature for seafood, steaks, and chops of pork/beef?", options: ["135°F", "145°F for 15 seconds", "155°F", "165°F"], correct: 1 }, { q: "What is the required minimum cooking temperature for commercially raised game animals, ratites, and stuffed meats?", options: ["145°F", "155°F", "165°F for 15 seconds", "175°F"], correct: 2 }, { q: "What is the first stage of the two-stage cooling process for TCS foods?", options: ["Cooling from 135°F to 70°F within 2 hours", "Cooling from 135°F to 41°F within 6 hours total", "Cooling from 70°F to 41°F within 4 hours", "Cooling immediately in a freezer"], correct: 0 }, { q: "What is the total maximum combined time allowed for cooling TCS food?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 2 }, { q: "What must be done to reheated TCS food intended for hot holding?", options: ["Heat to an internal temperature of 165°F for 15 seconds within 2 hours", "Warm gently on a steam table until piping hot", "Rinse in boiling water", "Microwave for 30 seconds"], correct: 0 }, { q: "When prepping food, what is the best practice to prevent time-temperature abuse?", options: ["Prep large batches all at once and leave them on the counter", "Prep food in small batches to limit time in the danger zone", "Turn off kitchen air conditioning", "Use warm water for all prep work"], correct: 1 } ] }, { id: 'MOD-05', title: "Module 5: Flow of Food - Service & Holding", description: "Holding hot and cold foods, self-service safety, off-site service, and tableware re-service.", questions: [ { q: "At what minimum temperature must hot TCS food be held during service?", options: ["120°F", "135°F or higher", "150°F", "165°F"], correct: 1 }, { q: "At what maximum temperature must cold TCS food be held during service?", options: ["32°F", "41°F (5°C) or lower", "50°F", "60°F"], correct: 1 }, { q: "How frequently must internal temperatures of hot/cold holding food be checked?", options: ["Every 30 minutes", "At least every 4 hours (ideally every 2 hours)", "Once at the start of the shift", "Once at the end of the day"], correct: 1 }, { q: "Without temperature control, cold food can be held for up to how many hours if labeled and maintained under 70°F?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 2 }, { q: "What is a key rule regarding self-service salad bars and buffets?", options: ["Customers can reuse their dirty plates for second helpings", "Provide clean plates and utensils for each new trip to the buffet", "Store raw meat above ready-to-eat salad items", "Leave sneeze guards open for easy access"], correct: 1 }, { q: "Which food item can legally be re-served to another customer if untouched?", options: ["An open bowl of salsa", "An unopened pre-packaged cracker or condiment packet", "A basket of unfinished dinner rolls", "A partial drink glass"], correct: 1 }, { q: "When transporting food off-site, what is required of delivery vehicles?", options: ["Insulated food-grade containers that keep food safe", "Open-air truck beds", "Uninsulated cardboard boxes", "Air-conditioned passenger seats"], correct: 0 }, { q: "What is the maximum holding time for hot TCS food held without temperature control?", options: ["2 hours", "4 hours", "6 hours", "8 hours"], correct: 0 }, { q: "Where must sneeze guards be installed on a food display bar?", options: ["Below the food level", "At least 14 inches above the food counter extending outward", "Directly touching the food pans", "Only behind the kitchen service window"], correct: 1 }, { q: "What must be included on food labels for items prepared in-house and held for over 24 hours?", options: ["The cook's home address", "Name of the food and the use-by/discard date (max 7 days at 41°F)", "The wholesale cost", "The exact recipe ingredients"], correct: 1 } ] }, { id: 'MOD-06', title: "Module 6: Food Safety Management Systems & HACCP", description: "Active managerial control, prerequisite programs, and the 7 principles of HACCP.", questions: [ { q: "What is active managerial control?", options: ["Waiting for a health inspector to find violations", "The manager's proactive approach to controlling foodborne illness risk factors", "Delegating all kitchen tasks to line cooks", "Keeping doors locked during rush hours"], correct: 1 }, { q: "What does HACCP stand for?", options: ["Hazard Analysis Critical Control Point", "Health And Cleanliness Critical Control Procedures", "Hygiene And Consumer Care Protocol", "Hazard Assessment Control Center Program"], correct: 0 }, { q: "What is the first principle in a HACCP plan?", options: ["Establish critical limits", "Conduct a hazard analysis", "Establish monitoring procedures", "Verify that the system works"], correct: 1 }, { q: "What is a Critical Control Point (CCP)?", options: ["The final invoice price of food", "A point in the flow of food where a hazard can be prevented, eliminated, or reduced to safe levels", "The employee break room schedule", "The time when health inspectors arrive"], correct: 1 }, { q: "Establishing critical limits in HACCP involves what action?", options: ["Setting maximum or minimum parameters like cooking temperatures", "Writing employee reprimands", "Counting inventory items", "Checking restroom supplies"], correct: 0 },
             { q: "What is corrective action in HACCP?", options: ["Firing a cook who makes a mistake", "The procedure followed when a critical limit is not met", "Throwing out all kitchen trash", "Cleaning grease traps weekly"], correct: 1 },
             { q: "What is the purpose of verification in a HACCP system?", options: ["Checking that the HACCP plan is working properly through logs and reviews", "Checking customer credit cards", "Ensuring employees wear clean uniforms", "Verifying delivery truck mileage"], correct: 0 },
             { q: "Which food is most vulnerable and commonly associated with a HACCP plan requirement?", options: ["Dry pasta", "Packaged crackers", "Juice squeezed and packaged in-house", "Bottled water"], correct: 2 },
@@ -552,19 +254,7 @@ function buildNavForRole(role) {
 
     tabs.forEach((tab, idx) => {
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`;
-        btn.textContent = tab.label;
-        btn.onclick = () => switchTab(tab.id, btn);
-        nav.appendChild(btn);
-    });
-
-    if (tabs.length > 0) switchTab(tabs[0].id, nav.firstChild);
-}
-
-function switchTab(viewId, btnEl) {
-    document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(`view-${viewId}`)?.classList.add('active');
+        btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`; btn.textContent = tab.label; btn.onclick = () => switchTab(tab.id, btn); nav.appendChild(btn); });  if (tabs.length > 0) switchTab(tabs[0].id, nav.firstChild); }  function switchTab(viewId, btnEl) { document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(`view-${viewId}`)?.classList.add('active');
     btnEl?.classList.add('active');
     UIController.refreshActiveView();
 }
@@ -967,8 +657,7 @@ function renderRecipeBook() {
             html += `
                 <div class="card" style="border-left: 4px solid #1e3a8a;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
-                        <h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>
-                        ${Store.role === 'gm' ? `
+                        <h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category \vert{}\vert{} 'General'}</span></h4>${Store.role === 'gm' ? `
                             <div style="display: flex; gap: 6px;">
                                 <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="modifyRecipe('${rId}')">Modify ✏️</button>
                                 <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button>
@@ -982,7 +671,7 @@ function renderRecipeBook() {
                         </div>
                         ${r.ingredients ? `<p style="font-size: 0.9rem; color: #334155; margin: 6px 0;"><strong>Ingredients:</strong> ${r.ingredients}</p>` : ''}
                     ` : ''}
-                    <p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>${r.type === 'prep' ? 'Prep Specifications:' : 'Build & Execution Details:'}</strong> ${r.prepSpecs || r.buildDetails || r.details || ''}</p>
+                    <p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>${r.type === 'prep' ? 'Prep Specifications:' : 'Build & Execution Details:'}</strong>${r.prepSpecs || r.buildDetails || r.details || ''}</p>
                 </div>
             `;
         });
@@ -1006,45 +695,7 @@ function resetBookForm() {
     if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = '';
     if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = '';
     if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = '';
-    document.getElementById('book-form-title').textContent = `➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}`;
-    document.getElementById('book-submit-btn').textContent = 'Save to Master Book 💾';
-    document.getElementById('book-cancel-btn').style.display = 'none';
-}
-
-function modifyRecipe(recId) {
-    const item = Store.recipes.find(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
-    if (!item) return;
-
-    activeBookTab = item.type || 'recipes';
-    renderRecipeBook();
-
-    document.getElementById('book-item-id').value = item.id || item.ID || recId;
-    document.getElementById('book-item-name').value = item.menuItem || item.title || '';
-    document.getElementById('book-item-category').value = item.category || '';
-    document.getElementById('book-item-details').value = item.prepSpecs || item.buildDetails || item.details || '';
-    if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = item.ingredients || '';
-    if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = item.portionSize || '';
-    if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = item.cookTimeTemp || '';
-
-    document.getElementById('book-form-title').textContent = `✏️ Modify ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}: ${item.menuItem || item.title}`;
-    document.getElementById('book-submit-btn').textContent = 'Update Item 💾';
-    document.getElementById('book-cancel-btn').style.display = 'inline-block';
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function handleInlineBookSubmit(e) {
-    e.preventDefault();
-    if (!Store.user) return;
-
-    const itemId = document.getElementById('book-item-id').value;
-    const type = document.getElementById('book-item-type').value;
-    const menuItem = document.getElementById('book-item-name').value.trim();
-    const category = document.getElementById('book-item-category').value.trim();
-    const details = document.getElementById('book-item-details').value.trim();
-
-    const recipeObj = {
-        id: itemId || `BOOK-${Date.now()}`,
+    document.getElementById('book-form-title').textContent = `➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}`; document.getElementById('book-submit-btn').textContent = 'Save to Master Book 💾'; document.getElementById('book-cancel-btn').style.display = 'none'; }  function modifyRecipe(recId) { const item = Store.recipes.find(r => String(r.id \vert{}\vert{} r.ID \vert{}\vert{} r.menuItem).trim() === String(recId).trim()); if (!item) return;  activeBookTab = item.type \vert{}\vert{} 'recipes'; renderRecipeBook();  document.getElementById('book-item-id').value = item.id \vert{}\vert{} item.ID \vert{}\vert{} recId; document.getElementById('book-item-name').value = item.menuItem \vert{}\vert{} item.title \vert{}\vert{} ''; document.getElementById('book-item-category').value = item.category \vert{}\vert{} ''; document.getElementById('book-item-details').value = item.prepSpecs \vert{}\vert{} item.buildDetails \vert{}\vert{} item.details \vert{}\vert{} ''; if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = item.ingredients \vert{}\vert{} ''; if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = item.portionSize \vert{}\vert{} ''; if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = item.cookTimeTemp \vert{}\vert{} '';  document.getElementById('book-form-title').textContent = `✏️ Modify ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}: ${item.menuItem \vert{}\vert{} item.title}`; document.getElementById('book-submit-btn').textContent = 'Update Item 💾'; document.getElementById('book-cancel-btn').style.display = 'inline-block';  window.scrollTo({ top: 0, behavior: 'smooth' }); }  function handleInlineBookSubmit(e) { e.preventDefault(); if (!Store.user) return;  const itemId = document.getElementById('book-item-id').value; const type = document.getElementById('book-item-type').value; const menuItem = document.getElementById('book-item-name').value.trim(); const category = document.getElementById('book-item-category').value.trim(); const details = document.getElementById('book-item-details').value.trim();  const recipeObj = { id: itemId \vert{}\vert{} `BOOK-${Date.now()}`,
         type: type,
         menuItem,
         category,
@@ -1092,7 +743,7 @@ function renderTrainingView() {
         html += `
             <div class="card" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <div>
-                    <h4 style="color: #1e3a8a; margin: 0 0 4px 0;">${mod.id}: ${mod.title}</h4>
+                    <h4 style="color: #1e3a8a; margin: 0 0 4px 0;">${mod.id}:${mod.title}</h4>
                     <p style="font-size: 0.85rem; color: #64748b; margin: 0;">${mod.description}</p>
                     <div style="margin-top: 8px; font-size: 0.85rem; font-weight: 600;">
                         Status: ${passed ? (signedOff ? '✅ Certified & Signed Off' : '⏳ Passed (Pending GM Sign-Off)') : '❌ Not Completed'} (Passing: 85%+)
@@ -1113,8 +764,7 @@ function openQuizModal(modId) {
     const body = document.getElementById('quiz-modal-body');
     body.innerHTML = `
         <input type="hidden" id="active-mod-id" value="${mod.id}">
-        <p style="color: #64748b; font-size: 0.9rem;">${mod.description} (Requires 85% to pass)</p>
-        ${mod.questions.map((qObj, idx) => `
+        <p style="color: #64748b; font-size: 0.9rem;">${mod.description} (Requires 85\% to pass)</p>${mod.questions.map((qObj, idx) => `
             <div style="margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem;">
                 <p style="font-weight: 600; color: #1e3a8a;">${idx + 1}. ${qObj.q}</p>
                 ${qObj.options.map((opt, oIdx) => `
@@ -1157,7 +807,7 @@ function submitQuizAnswers() {
     Store.certifications.push(certRecord);
     ApiService.request('saveCert', { cert: certRecord }).then(() => {
         closeQuizModal();
-        alert(`Quiz submitted! Score: ${score}% (${passed ? '✅ Passed (85%+ achieved)' : '❌ Failed (Need 85%+)'})`);
+        alert(`Quiz submitted! Score: ${score}\% (${passed ? '✅ Passed (85%+ achieved)' : '❌ Failed (Need 85%+)'})`);
         renderTrainingView();
         updateGreetingLabel();
     });
@@ -1225,66 +875,4 @@ function renderManagerDashboard() {
             <p style="font-size: 0.85rem; color: #64748b;">Assign line positions and review team shift logs.</p>
         </div>
         <div id="manager-assignment-widget-container"></div>
-        <div class="card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">⭐ Completed Team Shifts</h4>
-            <table class="data-table" style="width: 100%; margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Employee</th>
-                        <th>Role</th>
-                        <th>Score</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${Store.shifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">No shifts logged yet.</td></tr>` :
-                        Store.shifts.map(s => `
-                            <tr>
-                                <td>${s.date}</td>
-                                <td><strong>${s.empName}</strong></td>
-                                <td>${String(s.role || '').toUpperCase()}</td>
-                                <td>${s.scorePct}%</td>
-                                <td>${Number(s.scorePct) >= 85 ? '✅ Goal Met' : '❌ Missed'}</td>
-                            </tr>
-                        `).join('')}
-                </tbody>
-            </table>
-        </div>
-        <div id="message-board-container"></div>
-    `;
-    renderMessageBoard();
-    renderManagerAssignmentWidget();
-}
-
-function renderGMDashboard() {
-    const container = document.getElementById('gm-dashboard-content');
-    if (!container) return;
-
-    const pendingCerts = Store.certifications.filter(c => {
-        const passed = c.passed === true || String(c.passed).toLowerCase() === 'true' || Number(c.score) >= 85;
-        const signed = c.managerSignOff === true || String(c.managerSignOff).toLowerCase() === 'true';
-        return passed && !signed;
-    });
-
-    // --- 14-DAY COMPLIANCE CALCULATION ---
-    const startDate = new Date(CONFIG.PROGRAM_START_DATE);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 13);
-
-    const cycleShifts = Store.shifts.filter(s => {
-        const d = new Date(s.date);
-        return d >= startDate && d <= endDate;
-    });
-
-    // Group compliance by day
-    const dailyCompliance = {};
-    for (let i = 0; i < 14; i++) {
-        const curr = new Date(startDate);
-        curr.setDate(curr.getDate() + i);
-        const dateStr = curr.toISOString().split('T')[0];
-        dailyCompliance[dateStr] = { total: 0, sum: 0 };
-    }
-
-    cycleShifts.forEach(s => {
-        if (
+        <div class="card"
