@@ -152,7 +152,7 @@ function t(key) {
 }
 
 // ==========================================
-// 2. DATA SPECS: OPENING, CLOSING & CHECKLISTS (BILINGUAL)
+// 2. DATA SPECS: CHECKLISTS (BILINGUAL)
 // ==========================================
 const MANAGER_STATIC_CHECKLIST = [
     { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." },
@@ -410,7 +410,6 @@ const CHECKLIST_SPECS = {
         ]
     }
 };
-
 // ==========================================
 // 3. SERVSAFE COMPLIANT TRAINING MODULES
 // ==========================================
@@ -682,7 +681,127 @@ function switchTab(viewId, btnEl) {
 }
 
 // ==========================================
-// 5. MESSAGE BOARD & RECIPE BOOK
+// 5. RENDER CHECKLISTS, ASSIGNMENTS & DASHBOARDS
+// ==========================================
+function renderManagerChecklist() {
+    const container = document.getElementById('checklist-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const banner = document.createElement('div');
+    banner.className = 'card';
+    banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Shift Manager Operational Checklist</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">Daily shift management and verification standards.</p>`;
+    container.appendChild(banner);
+    let html = `<div class="card checklist-section"><h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">📋 Shift Manager Procedures</h3>`;
+    MANAGER_STATIC_CHECKLIST.forEach(item => {
+        html += `<div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;"><input type="checkbox" class="task-checkbox" id="cb-${item.id}" style="width:20px; height:20px; cursor:pointer;"><div><div class="task-title" style="font-weight:600; color:#334155;">${item.title}</div><div class="task-desc" style="font-size:0.85rem; color:#64748b;">${item.desc}</div></div></div>`;
+    });
+    html += `</div>`;
+    container.innerHTML += html;
+    container.innerHTML += `<div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"><button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Submit Manager Shift Checklist</button></div>`;
+}
+
+function renderChecklists() {
+    if (Store.role === 'manager') { renderManagerChecklist(); return; }
+    const container = document.getElementById('checklist-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const isCook = Store.role === 'cook';
+    const assigned = Store.user?.station?.trim() || 'range_open';
+    const banner = document.createElement('div');
+    banner.className = 'card';
+    banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">${t('assignedStationLabel')} ${assigned.replace(/_/g, ' ').toUpperCase()}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${t('assignedStationSub')}</p>`;
+    container.appendChild(banner);
+
+    const specs = CHECKLIST_SPECS[Store.lang]?.[assigned] || CHECKLIST_SPECS['en'][assigned] || CHECKLIST_SPECS['en']['range_open'];
+    specs.forEach(sec => {
+        let html = `<h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">${sec.phase}</h3>`;
+        sec.tasks.forEach(task => {
+            if (isCook) {
+                html += `<div class="task-row" style="display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;"><span style="color: #059669; font-weight: bold; font-size: 1.1rem; line-height: 1;">•</span><div><div class="task-title" style="font-weight:600; color:#334155;">${task.title}</div><div class="task-desc" style="font-size:0.85rem; color:#64748b;">${task.desc}</div></div></div>`;
+            } else {
+                html += `<div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;"><input type="checkbox" class="task-checkbox" id="cb-${task.id}" style="width:20px; height:20px; cursor:pointer;"><div><div class="task-title" style="font-weight:600; color:#334155;">${task.title}</div><div class="task-desc" style="font-size:0.85rem; color:#64748b;">${task.desc}</div></div></div>`;
+            }
+        });
+        container.innerHTML += `<div class="card checklist-section">${html}</div>`;
+    });
+    if (!isCook) {
+        container.innerHTML += `<div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"><button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Manager Submit & Log Shift</button></div>`;
+    }
+}
+
+function renderManagerAssignmentWidget() {
+    const container = document.getElementById('manager-assignment-widget-container');
+    if (!container) return;
+    const selectedDateStr = document.getElementById('shift-date')?.value || new Date().toISOString().split('T')[0];
+    container.innerHTML = `
+        <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
+            <h3 style="color: #1e3a8a; margin-top: 0;">👥 Station & Shift Line Assignments</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions and instantly update cook dashboards.</p>
+            <div style="margin: 1rem 0;"><label style="font-weight: 600; font-size: 0.9rem;">Select Date:</label><input type="date" id="shift-date" class="form-control" value="${selectedDateStr}" onchange="renderManagerAssignmentWidget()" style="margin-top: 4px; max-width: 200px;"></div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div><h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Open:</label><select id="sel-range_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Open:</label><select id="sel-grill_fry_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    </div>
+                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_mid_split_open', 'sel-grill_fry_mid_split_open'])">Assign Split Line 📌</button></div>
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div><h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range Open:</label><select id="sel-range_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Mid Open:</label><select id="sel-mid_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry Open:</label><select id="sel-grill_fry_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    </div>
+                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_open', 'sel-mid_open', 'sel-grill_fry_open'])">Assign 3-Cook Line 📌</button></div>
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div><h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Close:</label><select id="sel-range_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Close:</label><select id="sel-grill_fry_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    </div>
+                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%; background: #c2410c; border-color: #c2410c;" onclick="assignCooksGroup(['sel-range_mid_split_close', 'sel-grill_fry_mid_split_close'])">Assign Closing Line 📌</button></div>
+                </div>
+            </div>
+        </div>`;
+}
+
+function assignCooksGroup(selectIds) {
+    let assignedCount = 0;
+    selectIds.forEach(id => {
+        const selectEl = document.getElementById(id);
+        if (!selectEl || !selectEl.value) return;
+        const stationKey = id.replace('sel-', '');
+        const empId = selectEl.value;
+        const emp = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
+        if (emp) { emp.station = stationKey; ApiService.request('saveEmployee', { employee: emp }); assignedCount++; }
+    });
+    if (assignedCount > 0) alert(`✅ Successfully assigned ${assignedCount} cook(s)! Dashboards updated.`);
+    else alert("Please select at least one cook in this block before assigning.");
+}
+
+function submitManagerShiftChecklist() {
+    const cbs = document.querySelectorAll('.task-checkbox');
+    const total = cbs.length;
+    let checked = 0;
+    cbs.forEach(cb => { if (cb.checked) checked++; });
+    const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+    const shiftRecord = {
+        id: `SHIFT-${Date.now()}`, empId: Store.user.id, empName: Store.user.name,
+        role: Store.role, station: Store.user.station || 'manager_checklist',
+        date: new Date().toISOString().split('T')[0], tasksCompleted: checked,
+        totalTasks: total, scorePct: pct, notes: pct >= 85 ? "Goal Met" : "Needs Improvement"
+    };
+    Store.shifts.push(shiftRecord);
+    ApiService.request('saveShift', { shift: shiftRecord }).then(res => {
+        if (res && res.success) { alert(`🎉 Shift checklist submitted! Score: ${pct}%`); switchTab('manager-dashboard', document.querySelector('.tab-btn')); }
+        else alert("Error saving shift record.");
+    });
+}
+
+// ==========================================
+// 6. MESSAGE BOARD, RECIPE BOOK, TRAINING & DASHBOARDS
 // ==========================================
 function renderMessageBoard() {
     const container = document.getElementById('message-board-container');
@@ -785,9 +904,6 @@ function deleteRecipe(recId) {
     renderRecipeBook();
 }
 
-// ==========================================
-// 6. TRAINING & DASHBOARDS
-// ==========================================
 function renderTrainingView() {
     const listContainer = document.getElementById('training-modules-list');
     if (!listContainer) return;
@@ -949,9 +1065,6 @@ function gmSignOffCert(empId, modId) {
     ApiService.request('saveCert', { cert }).then(() => { renderGMDashboard(); alert("Certification approved!"); });
 }
 
-// ==========================================
-// 7. ROSTER & EMPLOYEE CRUD
-// ==========================================
 function renderRosterView() {
     const tbody = document.getElementById('roster-table-body');
     if (!tbody) return;
