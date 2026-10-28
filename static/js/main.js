@@ -244,6 +244,124 @@ const CHECKLIST_SPECS = {
                 ]
             }
         ]
+    },
+    es: {
+        'range_open': [
+            {
+                phase: "🌅 Configuración de Estación de Hornallas y Verificaciones de Seguridad",
+                tasks: [
+                    { id: 'ro1', title: "Encender quemadores de la estufa y verificar ignición de llama", desc: "Verifique que todos los puertos de los quemadores no estén obstruidos." },
+                    { id: 'ro2', title: "Calibrar termómetros de línea", desc: "Verifique que el baño de agua con hielo marque 32°F (0°C)." },
+                    { id: 'ro3', title: "Verificar pozos de retención caliente y niveles de agua", desc: "Asegúrese de que los pozos estén limpios y llenos hasta la línea operativa." },
+                    { id: 'ro4', title: "Surtir bandejas de inserción con proteínas y salsas", desc: "Verifique etiquetas de caducidad y normas de rotación FIFO." },
+                    { id: 'ro5', title: "Sanitizar tablas de cortar y superficies de preparación", desc: "Use solución sanitizante de cuat aprobada (200-400 ppm)." }
+                ]
+            }
+        ],
+        'mid_open': [
+            {
+                phase: "🌅 Configuración de Estación Media",
+                tasks: [
+                    { id: 'mo1', title: "Encender prensa de sándwiches y unidades panini", desc: "Precalentar a 350°F y probar mecanismo de presión." },
+                    { id: 'mo2', title: "Surtir rieles fríos de sándwiches y condimentos", desc: "Asegúrese de que todo el queso, carnes y aderezos estén llenos y fechados." },
+                    { id: 'mo3', title: "Verificar inventario de pan y sacar artículos de pre-horneo", desc: "Estime el volumen para el turno y organice en consecuencia." },
+                    { id: 'mo4', title: "Sanitizar rieles de preparación y protector de cortadora", desc: "Asegúrese de que las superficies cumplan con normas de salud." }
+                ]
+            }
+        ],
+        'grill_fry_mid_split_open': [
+            {
+                phase: "🌅 Apertura Dividida de 2 Cocineros (Parrilla/Fritura / Media)",
+                tasks: [
+                    { id: 'gfmaso1', title: "Filtrar freidoras, revisar aceite y sazonar plancha", desc: "Precalentar la parrilla a 350°F y preparar estaciones de cestas." },
+                    { id: 'gfmaso2', title: "Sacar inventario de pan y preparar artículos de pre-horneo", desc: "Apoyar la rotación de pan en la estación media." },
+                    { id: 'gfmaso3', title: "Tarea Compartida: Reabastecer botellas de salsa de la línea", desc: "Dividir por igual las responsabilidades de abastecimiento." }
+                ]
+            }
+        ],
+        'range_mid_split_open': [
+            {
+                phase: "🌅 Apertura Dividida de 2 Cocineros (Hornallas / Media)",
+                tasks: [
+                    { id: 'rmso1', title: "Encender quemadores y probar pozos calientes", desc: "Verificar temperaturas seguras en hornallas y pozos de sopa." },
+                    { id: 'rmso2', title: "Configurar prensa de sándwiches y riel frío", desc: "Asegúrese de que proteínas y quesos estén surtidos y fechados." },
+                    { id: 'rmso3', title: "Tarea Compartida: Configurar salsas y aderezos de respaldo", desc: "Dividir por igual las tareas de preparación de la estación media." }
+                ]
+            }
+        ],
+        'grill_fry_open': [
+            {
+                phase: "🌅 Configuración de Estación Parrilla / Fritura",
+                tasks: [
+                    { id: 'gfo1', title: "Filtrar freidoras y verificar niveles de aceite", desc: "Completar aceite si es necesario y verificar controlador a 350°F." },
+                    { id: 'gfo2', title: "Sazonar y probar plancha superior", desc: "Raspar la superficie de la parrilla y aplicar aceite de cocina." },
+                    { id: 'gfo3', title: "Surtir canastas de congelador con papas fritas y aperitivos", desc: "Asegúrese de que el inventario esté al alcance de la mano." },
+                    { id: 'gfo4', title: "Verificar estaciones de rebozado y empanado", desc: "Preparar empanado fresco, batidos húmedos y cubos de sanitizado." }
+                ]
+            }
+        ],
+        'range_mid_split_close': [
+            {
+                phase: "🌙 Cierre Nocturno (Procedimientos Estación Hornallas)",
+                tasks: [
+                    { id: 'rcl1', title: "Desarmar verduras y ollas de escalfado", desc: "Una hora antes del cierre, desmontar verduras y llevar a platos." },
+                    { id: 'rcl2', title: "Cepillar parte superior de hornallas y limpiar quemadores", desc: "Cepillar la parte superior y limpiar debajo de los quemadores." },
+                    { id: 'rcl3', title: "Limpiar trampas de hornallas y parrilla pequeña", desc: "Limpiar trampas y apagar un horno." },
+                    { id: 'rcl4', title: "Limpiar interior de estación de huevos y puertas de horno", desc: "Limpiar acero inoxidable incluyendo puertas de horno y traulsens." },
+                    { id: 'rcl5', title: "Limpiar interior de traulsen y rejillas", desc: "Limpiar el interior del traulsen, incluyendo rejillas de alambre." },
+                    { id: 'rcl6', title: "Reabastecer traulsen y rotar producto", desc: "Reabastecer el traulsen asegurando que todo esté rotado y cubierto." },
+                    { id: 'rcl7', title: "Cambiar papel aluminio en hornos y limpiar puertas", desc: "Cambiar aluminio en hornos y limpiar puertas interiores." },
+                    { id: 'rcl8', title: "Cambiar revestimientos de aluminio en estantes superiores", desc: "Cambiar revestimientos de aluminio según sea necesario." },
+                    { id: 'rcl9', title: "Reabastecer pan y rotar producto", desc: "Reabastecer pan según sea necesario, rotando producto." },
+                    { id: 'rcl10', title: "Drenar y poner hielo en pescado en cámara frigorífica", desc: "Drenar y poner hielo en el pescado en la cámara." },
+                    { id: 'rcl11', title: "Revisar extracción de congelados", desc: "Revisar extracción de carnes, pescado y otros congelados." },
+                    { id: 'rcl12', title: "Barrer, cepillar y trapear el piso de la línea", desc: "Ayudar a barrer, cepillar y trapear el piso de la línea." },
+                    { id: 'rcl13', title: "Aprobación del gerente antes de salir", desc: "Consulte con un gerente antes de fichar la salida!" }
+                ]
+            },
+            {
+                phase: "🌙 Cierre Nocturno (Procedimientos Estación Media)",
+                tasks: [
+                    { id: 'mcl1', title: "Retirar utensilios de unidad de sándwiches", desc: "Una hora antes del cierre, retirar todos los utensilios de la unidad." },
+                    { id: 'mcl2', title: "Limpiar interior superior de la unidad bajo bandejas", desc: "Limpiar el interior superior debajo de las bandejas y alrededor." },
+                    { id: 'mcl3', title: "Limpiar parte inferior de la unidad", desc: "Limpiar el interior de la porción inferior, incluyendo estante superior." },
+                    { id: 'mcl4', title: "Sacar la unidad y limpiar parte trasera y piso", desc: "Sacar la unidad y limpiar la parte trasera y el piso." },
+                    { id: 'mcl5', title: "Voltear bandejas y reabastecer artículos", desc: "Voltear bandejas y reabastecer rotando correctamente." },
+                    { id: 'mcl6', title: "Verificar niveles de stock", desc: "NO duplique stock. Debe haber una bandeja llena por artículo." },
+                    { id: 'mcl7', title: "Limpiar tapa de la unidad por dentro y por fuera", desc: "Limpiar la tapa de la unidad por dentro y por fuera." },
+                    { id: 'mcl8', title: "Limpiar microondas por dentro y por fuera", desc: "Limpiar el microondas y su estante correspondiente." },
+                    { id: 'mcl9', title: "Reabastecer platos y recipientes para llevar", desc: "Reabastecer platos y recipientes según sea necesario." },
+                    { id: 'mcl10', title: "Ayudar con extracción de congelados y pisos", desc: "Ayudar con extracción y pisos." },
+                    { id: 'mcl11', title: "Asegurar que los artículos estén cubiertos", desc: "Asegúrese de que los artículos estén cubiertos al finalizar." },
+                    { id: 'mcl12', title: "Aprobación del gerente antes de salir", desc: "Consulte con el gerente antes de fichar la salida!" }
+                ]
+            }
+        ],
+        'grill_fry_mid_split_close': [
+            {
+                phase: "🌙 Cierre Nocturno (Procedimientos Estación Parrilla/Fritura)",
+                tasks: [
+                    { id: 'gcl1', title: "Volcar mezcla de panqueques a recipiente", desc: "Una hora antes del cierre, pasar la mezcla a un recipiente con cucharón." },
+                    { id: 'gcl2', title: "Llevar pistola de mezcla a lavado", desc: "Llevar la pistola de mezcla al área de lavado." },
+                    { id: 'gcl3', title: "Limpiar estante inferior de parrilla y perillas", desc: "Limpiar y fregar el estante inferior y los diales de temperatura." },
+                    { id: 'gcl4', title: "Colar freidoras de migajas y residuos de alimentos", desc: "Colar las freidoras de exceso de migajas y partículas." },
+                    { id: 'gcl5', title: "Limpiar divisores de acero y frente de freidoras", desc: "Limpiar divisores y el frente de las freidoras." },
+                    { id: 'gcl6', title: "Cerrar una freidora", desc: "Cerrar una freidora." },
+                    { id: 'gcl7', title: "Tamizar harina de freír en un recipiente nuevo", desc: "Tamizar la harina en un recipiente limpio y completar si es necesario." },
+                    { id: 'gcl8', title: "Limpiar el fregadero junto a las mesas de vapor", desc: "Limpiar el fregadero junto a las mesas de vapor." },
+                    { id: 'gcl9', title: "Desarmar y limpiar mesas de vapor a fondo", desc: "Desarmar y limpiar a fondo las mesas de vapor." },
+                    { id: 'gcl10', title: "Colocar producto de mesas de vapor en cambros", desc: "Colocar producto en diez (10) cambros plásticos y llevar al carrito." },
+                    { id: 'gcl11', title: "Cubrir salchichas y tocino con aluminio y etiquetar", desc: "Envolver sobrantes con papel aluminio, etiquetar y colocar en el carrito." },
+                    { id: 'gcl12', title: "Anotar freidoras que necesiten cambio de aceite", desc: "Anotar en la pizarra si las freidoras necesitan cambio de aceite." },
+                    { id: 'gcl13', title: "Limpiar trampa de grasa de la parrilla", desc: "Al cerrar, limpiar parrilla, rieles y trampa de grasa en bandeja alemana." },
+                    { id: 'gcl14', title: "Cepillar asador de carbón y limpiar trampa", desc: "Cepillar el asador de carbón y limpiar su trampa." },
+                    { id: 'gcl15', title: "Llevar grasa a trampa exterior", desc: "Llevar la grasa a la trampa exterior. NO deje grasa dentro por la noche!." },
+                    { id: 'gcl16', title: "Ayudar con extracción de congelados y pisos", desc: "Ayudar con extracción y pisos." },
+                    { id: 'gcl17', title: "Reabastecer congelador", desc: "Reabastecer el congelador (papas fritas, pollo, macarrones, etc.)." },
+                    { id: 'gcl18', title: "Aprobación del gerente antes de salir", desc: "Consulte con el gerente antes de fichar la salida!" }
+                ]
+            }
+        ]
     }
 };
 
@@ -502,7 +620,9 @@ const TRANSLATIONS = {
         tblStatus: "Status",
         noShifts: "No shifts logged yet.",
         goalMet: "✅ Goal Met",
-        missed: "❌ Missed"
+        missed: "❌ Missed",
+        assignedStationLabel: "📍 Assigned Station / Shift:",
+        assignedStationSub: "Read-only station reference checklist."
     },
     es: {
         myChecklist: "📝 Lista de Estación",
@@ -523,7 +643,9 @@ const TRANSLATIONS = {
         tblStatus: "Estado",
         noShifts: "Aún no hay turnos registrados.",
         goalMet: "✅ Meta Cumplida",
-        missed: "❌ Incumplido"
+        missed: "❌ Incumplido",
+        assignedStationLabel: "📍 Estación / Turno Asignado:",
+        assignedStationSub: "Lista de verificación de referencia de estación de solo lectura."
     }
 };
 
@@ -650,7 +772,7 @@ function renderChecklists() {
     const banner = document.createElement('div');
     banner.className = 'card';
     banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
-    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Assigned Station / Shift: ${assigned.replace(/_/g, ' ').toUpperCase()}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${isCook ? 'Read-only station reference checklist.' : 'Station checklist for review and shift sign-off.'}</p>`;
+    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">${t('assignedStationLabel')} ${assigned.replace(/_/g, ' ').toUpperCase()}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${t('assignedStationSub')}</p>`;
     container.appendChild(banner);
 
     const specs = CHECKLIST_SPECS[Store.lang]?.[assigned] || CHECKLIST_SPECS['en'][assigned] || CHECKLIST_SPECS['en']['range_open'];
@@ -1221,385 +1343,4 @@ function renderCookDashboard() {
     const thStatus = t('tblStatus');
     const emptyNotice = t('noShifts');
     const statusGoalMet = t('goalMet');
-    const statusMissed = t('missed');
-
-    let rowsHtml = '';
-    if (myShifts.length === 0) {
-        rowsHtml = `<tr><td colspan="5" style="text-align: center; color: #64748b;">${emptyNotice}</td></tr>`;
-    } else {
-        rowsHtml = myShifts.map(s => {
-            const statusLabel = Number(s.scorePct) >= 85 ? statusGoalMet : statusMissed;
-            return `
-                <tr>
-                    <td>${s.date}</td>
-                    <td>${s.station || 'General'}</td>
-                    <td>${s.tasksCompleted} / ${s.totalTasks}</td>
-                    <td>${s.scorePct}%</td>
-                    <td>${statusLabel}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    container.innerHTML = `
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">${titleText}</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">${subText}</p>
-        </div>
-        <div class="card">
-            <table class="data-table" style="width: 100%;">
-                <thead>
-                    <tr>
-                        <th>${thDate}</th>
-                        <th>${thStation}</th>
-                        <th>${thCompleted}</th>
-                        <th>${thScore}</th>
-                        <th>${thStatus}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rowsHtml}
-                </tbody>
-            </table>
-        </div>
-    `;
-}
-
-function renderManagerDashboard() {
-    const container = document.getElementById('manager-dashboard-content');
-    if (!container) return;
-
-    container.innerHTML = `
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">📊 Shift Manager Dashboard & Oversight</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Assign line positions and review team shift logs.</p>
-        </div>
-        <div id="manager-assignment-widget-container"></div>
-        <div class="card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">⭐ Completed Team Shifts</h4>
-            <table class="data-table" style="width: 100%; margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Employee</th>
-                        <th>Role</th>
-                        <th>Score</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${Store.shifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">No shifts logged yet.</td></tr>` :
-                        Store.shifts.map(s => `
-                            <tr>
-                                <td>${s.date}</td>
-                                <td><strong>${s.empName}</strong></td>
-                                <td>${String(s.role || '').toUpperCase()}</td>
-                                <td>${s.scorePct}%</td>
-                                <td>${Number(s.scorePct) >= 85 ? '✅ Goal Met' : '❌ Missed'}</td>
-                            </tr>
-                        `).join('')}
-                </tbody>
-            </table>
-        </div>
-        <div id="message-board-container"></div>
-    `;
-    renderMessageBoard();
-    renderManagerAssignmentWidget();
-}
-
-function renderGMDashboard() {
-    const container = document.getElementById('gm-dashboard-content');
-    if (!container) return;
-
-    const pendingCerts = Store.certifications.filter(c => {
-        const passed = c.passed === true || String(c.passed).toLowerCase() === 'true' || Number(c.score) >= 85;
-        const signed = c.managerSignOff === true || String(c.managerSignOff).toLowerCase() === 'true';
-        return passed && !signed;
-    });
-
-    // --- 14-DAY COMPLIANCE CALCULATION ---
-    const startDate = new Date(CONFIG.PROGRAM_START_DATE);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 13);
-
-    const cycleShifts = Store.shifts.filter(s => {
-        const d = new Date(s.date);
-        return d >= startDate && d <= endDate;
-    });
-
-    const dailyCompliance = {};
-    for (let i = 0; i < 14; i++) {
-        const curr = new Date(startDate);
-        curr.setDate(curr.getDate() + i);
-        const dateStr = curr.toISOString().split('T')[0];
-        dailyCompliance[dateStr] = { total: 0, sum: 0 };
-    }
-
-    cycleShifts.forEach(s => {
-        if (dailyCompliance[s.date]) {
-            dailyCompliance[s.date].total += 1;
-            dailyCompliance[s.date].sum += Number(s.scorePct || 0);
-        }
-    });
-
-    // --- BONUS TIER CALCULATIONS ---
-    const employeeAverages = {};
-    Store.employees.forEach(emp => {
-        const eId = emp.id || emp.ID;
-        const eShifts = cycleShifts.filter(s => String(s.empId).trim() === String(eId).trim());
-        if (eShifts.length > 0) {
-            const totalScore = eShifts.reduce((acc, s) => acc + Number(s.scorePct || 0), 0);
-            employeeAverages[eId] = {
-                name: emp.name || emp.Name,
-                avg: Math.round(totalScore / eShifts.length),
-                shiftsCount: eShifts.length
-            };
-        }
-    });
-
-    let bronzeCount = 0, silverCount = 0, goldCount = 0;
-    const accountingRows = [];
-
-    Object.values(employeeAverages).forEach(data => {
-        let tier = 'None';
-        if (data.avg >= 100) { tier = 'Gold 🥇'; goldCount++; }
-        else if (data.avg >= 95) { tier = 'Silver 🥈'; silverCount++; }
-        else if (data.avg >= 85) { tier = 'Bronze 🥉'; bronzeCount++; }
-
-        if (tier !== 'None') {
-            accountingRows.push(`
-                <tr>
-                    <td><strong>${data.name}</strong></td>
-                    <td>${data.shiftsCount}</td>
-                    <td>${data.avg}%</td>
-                    <td><span style="font-weight: bold; color: #1e3a8a;">${tier}</span></td>
-                </tr>
-            `);
-        }
-    });
-
-    container.innerHTML = `
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">📈 General Manager Executive Suite & Bonus Program</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">14-Day compliance tracking cycle (Launch Date: ${CONFIG.PROGRAM_START_DATE} to ${endDate.toISOString().split('T')[0]}).</p>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Active Team Members</span>
-                <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${Store.employees.length}</h2>
-            </div>
-            <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Total Shifts Logged (Cycle)</span>
-                <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${cycleShifts.length}</h2>
-            </div>
-            <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Pending Cert Sign-Offs</span>
-                <h2 style="color: #dc2626; margin: 5px 0 0 0;">${pendingCerts.length}</h2>
-            </div>
-        </div>
-
-        <!-- 14-DAY COMPLIANCE LINE CHART & METRICS -->
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">📊 14-Day Compliance Tracking Trend</h4>
-            <p style="font-size: 0.85rem; color: #64748b;">Daily average compliance score across the active pay cycle.</p>
-            <div style="display: flex; gap: 6px; align-items: flex-end; height: 180px; padding: 20px 10px 10px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow-x: auto; margin-top: 1rem;">
-                ${Object.entries(dailyCompliance).map(([date, stats]) => {
-                    const avg = stats.total > 0 ? Math.round(stats.sum / stats.total) : 0;
-                    const heightPct = Math.max(avg, 5);
-                    return `
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 35px; height: 100%; justify-content: flex-end;">
-                            <span style="font-size: 0.7rem; font-weight: bold; color: #1e3a8a; margin-bottom: 4px;">${avg}%</span>
-                            <div style="width: 100%; background: #2563eb; border-radius: 4px 4px 0 0; height: ${heightPct}%; transition: height 0.3s;"></div>
-                            <span style="font-size: 0.65rem; color: #64748b; margin-top: 6px; transform: rotate(-35deg);">${date.slice(5)}</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        </div>
-
-        <!-- BONUS PROGRAM ALLOCATION PIE & ACCOUNTING SHEET -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-            
-            <div class="card">
-                <h4 style="color: #1e3a8a; margin-top: 0;">🥧 Bonus Tier Allocation Distribution</h4>
-                <p style="font-size: 0.85rem; color: #64748b;">Active employee distribution across Bronze (85%+), Silver (95%+), and Gold (100%).</p>
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 1.5rem;">
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #ca8a04;">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Gold Tier (100%):</span> <span>${goldCount} Employee(s)</span></div>
-                    </div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #64748b;">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Silver Tier (95%+):</span> <span>${silverCount} Employee(s)</span></div>
-                    </div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #b45309;">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Bronze Tier (85%+):</span> <span>${bronzeCount} Employee(s)</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h4 style="color: #1e3a8a; margin-top: 0;">📑 Bonus Program Accounting Sheet</h4>
-                <p style="font-size: 0.85rem; color: #64748b;">Qualified employees meeting 14-day compliance program thresholds.</p>
-                <div style="max-height: 240px; overflow-y: auto; margin-top: 1rem;">
-                    <table class="data-table" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Shifts</th>
-                                <th>Avg Score</th>
-                                <th>Tier</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${accountingRows.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No employees have met bonus thresholds yet.</td></tr>` : accountingRows.join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
-        <div id="manager-assignment-widget-container" style="margin-bottom: 1.5rem;"></div>
-
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">🎓 Pending Training Certifications for Approval</h4>
-            <table class="data-table" style="width: 100%; margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Employee ID</th>
-                        <th>Module ID</th>
-                        <th>Score</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${pendingCerts.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No pending certifications to approve.</td></tr>` :
-                        pendingCerts.map(c => `
-                            <tr>
-                                <td>${c.empId || c.EMPID}</td>
-                                <td>${c.modId || c.MODID}</td>
-                                <td>${c.score}%</td>
-                                <td><button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="gmSignOffCert('${c.empId || c.EMPID}', '${c.modId || c.MODID}')">Approve Sign-Off ✅</button></td>
-                            </tr>
-                        `).join('')}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">🛠️ GM Quick Actions & System Controls</h4>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem;">
-                <button class="btn btn-primary" onclick="openEmployeeModal()">+ Add New Employee</button>
-                <button class="btn btn-primary" onclick="switchTab('recipe-book', document.querySelector('.tab-btn'))">+ Manage Recipe Book</button>
-                <button class="btn btn-secondary" style="background: #fee2e2; color: #dc2626; border-color: #fca5a5;" onclick="triggerMasterReset()">⚠️ Master Reset (Clear Shifts, Certs & Msgs)</button>
-            </div>
-        </div>
-    `;
-    renderManagerAssignmentWidget();
-}
-
-function gmSignOffCert(empId, modId) {
-    const cert = Store.certifications.find(c => String(c.empId || c.EMPID).trim() === String(empId).trim() && String(c.modId || c.MODID).trim() === String(modId).trim());
-    if (!cert) return;
-    cert.managerSignOff = true;
-    ApiService.request('saveCert', { cert }).then(() => {
-        renderGMDashboard();
-        alert("Certification approved and signed off!");
-    });
-}
-
-function triggerMasterReset() {
-    if (!confirm("WARNING: This will clear all logged shifts, certifications, and message board posts across the system. Your Recipe & Spec Book will remain completely untouched. Do you wish to proceed?")) return;
-    
-    Store.shifts = [];
-    Store.certifications = [];
-    Store.messages = [];
-    
-    alert("Master Reset complete! Operational shift logs, certifications, and messages have been cleared.");
-    UIController.refreshActiveView();
-}
-
-// ==========================================
-// 10. GM CRUD: EMPLOYEES & RECIPES (DEDUPLICATED ROSTER)
-// ==========================================
-function renderRosterView() {
-    const tbody = document.getElementById('roster-table-body');
-    if (!tbody) return;
-
-    // Deduplicate employees by ID to ensure unique listing
-    const uniqueEmployees = Array.from(
-        new Map(Store.employees.map(emp => [String(emp.id || emp.ID).trim(), emp])).values()
-    );
-
-    tbody.innerHTML = uniqueEmployees.length === 0 ? `<tr><td colspan="6" style="text-align: center; color: #64748b;">No employees found.</td></tr>` :
-        uniqueEmployees.map(emp => {
-            const eId = emp.id || emp.ID;
-            return `
-                <tr>
-                    <td>${eId}</td>
-                    <td><strong>${emp.name || emp.Name}</strong></td>
-                    <td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td>
-                    <td>${emp.station || emp.Station || 'General'}</td>
-                    <td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td>
-                    <td>
-                        ${Store.role === 'gm' ? `
-                            <div style="display: flex; gap: 6px;">
-                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openEmployeeModal('${eId}')">Edit ✏️</button>
-                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${eId}')">Delete 🗑️</button>
-                            </div>
-                        ` : ''}
-                    </td>
-                </tr>
-            `;
-        }).join('');
-}
-
-function openEmployeeModal(empId) {
-    let existing = null;
-    if (empId) {
-        existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
-    }
-
-    const defaultName = existing ? (existing.name || existing.Name || '') : '';
-    const defaultRole = existing ? (existing.role || existing.Role || 'cook') : 'cook';
-    const defaultPin = existing ? (existing.pin || existing.PIN || '1234') : '1234';
-    const defaultStation = existing ? (existing.station || existing.Station || 'range_open') : 'range_open';
-    const defaultRate = existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00';
-
-    const name = prompt("Enter employee name:", defaultName);
-    if (!name) return;
-    const role = prompt("Enter role (cook, manager, gm):", defaultRole);
-    const pin = prompt("Enter 4-digit PIN code:", defaultPin);
-    const station = prompt("Enter default station:", defaultStation);
-    const hourlyRate = prompt("Enter hourly rate:", defaultRate);
-
-    const empObj = {
-        id: existing ? (existing.id || existing.ID) : `EMP-${Date.now()}`,
-        name: name,
-        role: role,
-        station: station,
-        hourlyRate: hourlyRate,
-        pin: pin,
-        active: true
-    };
-
-    if (existing) {
-        const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
-        if (index > -1) Store.employees[index] = empObj;
-        else Store.employees.push(empObj);
-    } else {
-        Store.employees.push(empObj);
-    }
-
-    ApiService.request('saveEmployee', { employee: empObj }).then(() => {
-        alert("Employee saved successfully!");
-        renderRosterView();
-    });
-}
-
-function deleteEmployee(empId) {
-    if (!confirm("Are you sure you want to remove this employee?")) return;
-    Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
-    renderRosterView();
-    alert("Employee removed from active view.");
-}
+    const statusMissed =
