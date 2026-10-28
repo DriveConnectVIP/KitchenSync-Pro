@@ -588,8 +588,37 @@ function logoutSession() {
 }
 
 // ==========================================
-// 3. TRANSLATION ENGINE
+// 3. TRANSLATION ENGINE & DICTIONARY
 // ==========================================
+const TRANSLATIONS = {
+    en: {
+        myChecklist: "📝 Station Checklist", shiftsCompleted: "⭐ Shifts Completed",
+        trainingModules: "🎓 Training & Certs", managerDashboard: "📊 Shift Manager Dashboard",
+        gmSuite: "📈 General Manager Suite", messageBoard: "💬 Message Board",
+        recipeBook: "📖 Recipe & Prep Book", staffRoster: "👥 Staff Roster", printSheet: "🖨️ Print Sheet",
+        cookDashTitle: "⭐ My Completed Shifts & Performance Log",
+        cookDashSub: "Review your past shift checklist history and compliance scores.",
+        tblDate: "Date", tblStation: "Station", tblCompletedTasks: "Completed Tasks",
+        tblScore: "Score", tblStatus: "Status", noShifts: "No shifts logged yet.",
+        goalMet: "✅ Goal Met", missed: "❌ Missed",
+        assignedStationLabel: "📍 Assigned Station / Shift:",
+        assignedStationSub: "Read-only station reference checklist."
+    },
+    es: {
+        myChecklist: "📝 Lista de Estación", shiftsCompleted: "⭐ Turnos Completados",
+        trainingModules: "🎓 Capacitación", managerDashboard: "📊 Panel del Gerente",
+        gmSuite: "📈 Suite del Gerente General", messageBoard: "💬 Tablero de Mensajes",
+        recipeBook: "📖 Libro de Recetas", staffRoster: "👥 Plantilla de Personal", printSheet: "🖨️ Imprimir Hoja",
+        cookDashTitle: "⭐ Mis Turnos Completados y Registro de Rendimiento",
+        cookDashSub: "Revise su historial pasado de listas de verificación de turnos y calificaciones de cumplimiento.",
+        tblDate: "Fecha", tblStation: "Estación", tblCompletedTasks: "Tareas Completadas",
+        tblScore: "Calificación", tblStatus: "Estado", noShifts: "Aún no hay turnos registrados.",
+        goalMet: "✅ Meta Cumplida", missed: "❌ Incumplido",
+        assignedStationLabel: "📍 Estación / Turno Asignado:",
+        assignedStationSub: "Lista de verificación de referencia de estación de solo lectura."
+    }
+};
+
 function toggleLanguage() {
     Store.lang = Store.lang === 'en' ? 'es' : 'en';
     const btn = document.getElementById('lang-toggle-btn');
