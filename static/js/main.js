@@ -152,7 +152,7 @@ function t(key) {
 }
 
 // ==========================================
-// 2. DATA SPECS: OPENING, CLOSING & MANAGER CHECKLISTS
+// 2. DATA SPECS: OPENING, CLOSING & CHECKLISTS (BILINGUAL)
 // ==========================================
 const MANAGER_STATIC_CHECKLIST = [
     { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." },
@@ -315,13 +315,14 @@ const CHECKLIST_SPECS = {
                 ]
             }
         ],
-        'grill_fry_mid_split_open': [
+        'grill_fry_open': [
             {
-                phase: "🌅 Apertura Dividida de 2 Cocineros (Parrilla/Fritura / Media)",
+                phase: "🌅 Configuración de Estación Parrilla / Fritura",
                 tasks: [
-                    { id: 'gfmaso1', title: "Filtrar freidoras, revisar aceite y sazonar plancha", desc: "Precalentar la parrilla a 350°F y preparar estaciones de cestas." },
-                    { id: 'gfmaso2', title: "Sacar inventario de pan y preparar artículos de pre-horneo", desc: "Apoyar la rotación de pan en la estación media." },
-                    { id: 'gfmaso3', title: "Tarea Compartida: Reabastecer botellas de salsa de la línea", desc: "Dividir por igual las responsabilidades de abastecimiento." }
+                    { id: 'gfo1', title: "Filtrar freidoras y verificar niveles de aceite", desc: "Completar aceite si es necesario y verificar controlador a 350°F." },
+                    { id: 'gfo2', title: "Sazonar y probar plancha superior", desc: "Raspar la superficie de la parrilla y aplicar aceite de cocina." },
+                    { id: 'gfo3', title: "Surtir canastas de congelador con papas fritas y aperitivos", desc: "Asegúrese de que el inventario esté al alcance de la mano." },
+                    { id: 'gfo4', title: "Verificar estaciones de rebozado y empanado", desc: "Preparar empanado fresco, batidos húmedos y cubos de sanitizado." }
                 ]
             }
         ],
@@ -335,14 +336,13 @@ const CHECKLIST_SPECS = {
                 ]
             }
         ],
-        'grill_fry_open': [
+        'grill_fry_mid_split_open': [
             {
-                phase: "🌅 Configuración de Estación Parrilla / Fritura",
+                phase: "🌅 Apertura Dividida de 2 Cocineros (Parrilla/Fritura / Media)",
                 tasks: [
-                    { id: 'gfo1', title: "Filtrar freidoras y verificar niveles de aceite", desc: "Completar aceite si es necesario y verificar controlador a 350°F." },
-                    { id: 'gfo2', title: "Sazonar y probar plancha superior", desc: "Raspar la superficie de la parrilla y aplicar aceite de cocina." },
-                    { id: 'gfo3', title: "Surtir canastas de congelador con papas fritas y aperitivos", desc: "Asegúrese de que el inventario esté al alcance de la mano." },
-                    { id: 'gfo4', title: "Verificar estaciones de rebozado y empanado", desc: "Preparar empanado fresco, batidos húmedos y cubos de sanitizado." }
+                    { id: 'gfmaso1', title: "Filtrar freidoras, revisar aceite y sazonar plancha", desc: "Precalentar la parrilla a 350°F y preparar estaciones de cestas." },
+                    { id: 'gfmaso2', title: "Sacar inventario de pan y preparar artículos de pre-horneo", desc: "Apoyar la rotación de pan en la estación media." },
+                    { id: 'gfmaso3', title: "Tarea Compartida: Reabastecer botellas de salsa de la línea", desc: "Dividir por igual las responsabilidades de abastecimiento." }
                 ]
             }
         ],
@@ -412,7 +412,7 @@ const CHECKLIST_SPECS = {
 };
 
 // ==========================================
-// SERVSAFE COMPLIANT 10 TRAINING MODULES
+// 3. SERVSAFE COMPLIANT TRAINING MODULES
 // ==========================================
 const TRAINING_MODULES = [
     {
@@ -578,7 +578,7 @@ const TRAINING_MODULES = [
 ];
 
 // ==========================================
-// 3. AUTHENTICATION & NAVIGATION ROUTER
+// 4. AUTHENTICATION & NAVIGATION ROUTER
 // ==========================================
 function handleLogin(e) {
     e.preventDefault();
@@ -665,88 +665,325 @@ function buildNavForRole(role) {
     }
     tabs.forEach((tab, idx) => {
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`; btn.textContent = tab.label; btn.onclick = () => switchTab(tab.id, btn); nav.appendChild(btn); }); if (tabs.length > 0) switchTab(tabs[0].id, nav.firstChild); }  function switchTab(viewId, btnEl) { document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(`view-${viewId}`)?.classList.add('active');
+        btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`;
+        btn.textContent = tab.label;
+        btn.onclick = () => switchTab(tab.id, btn);
+        nav.appendChild(btn);
+    });
+    if (tabs.length > 0) switchTab(tabs[0].id, nav.firstChild);
+}
+
+function switchTab(viewId, btnEl) {
+    document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`view-${viewId}`)?.classList.add('active');
     btnEl?.classList.add('active');
     UIController.refreshActiveView();
 }
 
 // ==========================================
-// 4. CHECKLISTS & MANAGEMENT WIDGETS
+// 5. MESSAGE BOARD & RECIPE BOOK
 // ==========================================
-function renderManagerChecklist() {
-    const container = document.getElementById('checklist-container');
+function renderMessageBoard() {
+    const container = document.getElementById('message-board-container');
     if (!container) return;
-    container.innerHTML = '';
-    const banner = document.createElement('div');
-    banner.className = 'card';
-    banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
-    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">📍 Shift Manager Operational Checklist</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">Daily shift management and verification standards.</p>`;
-    container.appendChild(banner);
-    let html = `<div class="card checklist-section"><h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">📋 Shift Manager Procedures</h3>`;
-    MANAGER_STATIC_CHECKLIST.forEach(t => {
-        html += `<div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;"><input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;"><div><div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div><div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div></div></div>`;
+    const categories = ["Maintenance", "Injuries", "Customers", "Employees", "86 Items", "General"];
+    let html = `<div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #1e3a8a; margin-top: 0;">💬 Management Message Board</h3><p style="font-size: 0.85rem; color: #64748b;">Post operational updates across dedicated categories.</p><form onsubmit="postMessage(event)" style="display: flex; flex-direction: column; gap: 10px; margin-top: 1rem;"><select id="msg-category" class="form-control" required><option value="">-- Select Channel --</option>${categories.map(c => `<option value="${c}">${c}</option>`).join('')}</select><textarea id="msg-text" class="form-control" rows="3" placeholder="Type operational update..." required></textarea><button type="submit" class="btn btn-primary" style="align-self: flex-start;">Post Message 📢</button></form></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">`;
+    categories.forEach(cat => {
+        const catMessages = Store.messages.filter(m => String(m.category).trim().toLowerCase() === cat.toLowerCase());
+        html += `<div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;"><h4 style="color: #1e3a8a; margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px;">📌 ${cat}</h4><div style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">${catMessages.length === 0 ? `<p style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">No posts.</p>` : catMessages.map(m => `<div style="background: white; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem;"><div style="display: flex; justify-content: space-between; font-weight: bold; color: #334155; margin-bottom: 4px;"><span>${m.authorName || m.author || 'Staff'}</span><span style="font-size: 0.75rem; color: #94a3b8;">${m.timestamp || ''}</span></div><p style="margin: 0; color: #475569;">${m.messageText || m.text || ''}</p></div>`).join('')}</div></div>`;
     });
     html += `</div>`;
-    container.innerHTML += html;
-    container.innerHTML += `<div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"><button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Submit Manager Shift Checklist</button></div>`;
+    container.innerHTML = html;
 }
 
-function renderChecklists() {
-    if (Store.role === 'manager') { renderManagerChecklist(); return; }
-    const container = document.getElementById('checklist-container');
-    if (!container) return;
-    container.innerHTML = '';
-    const isCook = Store.role === 'cook';
-    const assigned = Store.user?.station?.trim() || 'range_open';
-    const banner = document.createElement('div');
-    banner.className = 'card';
-    banner.style.cssText = 'margin-bottom: 1.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;';
-    banner.innerHTML = `<h3 style="color: #166534; margin: 0;">${t('assignedStationLabel')}${assigned.replace(/_/g, ' ').toUpperCase()}</h3><p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #15803d;">${t('assignedStationSub')}</p>`;
-    container.appendChild(banner);
+function postMessage(e) {
+    e.preventDefault();
+    if (!Store.user) return;
+    const category = document.getElementById('msg-category').value;
+    const messageText = document.getElementById('msg-text').value.trim();
+    const payload = { id: `MSG-${Date.now()}`, category, authorName: Store.user.name, timestamp: new Date().toLocaleString(), messageText };
+    Store.messages.push(payload);
+    ApiService.request('saveMessage', { message: payload }).then(() => { document.getElementById('msg-text').value = ''; renderMessageBoard(); });
+}
 
-    const specs = CHECKLIST_SPECS[Store.lang]?.[assigned] || CHECKLIST_SPECS['en'][assigned] || CHECKLIST_SPECS['en']['range_open'];
-    specs.forEach(sec => {
-        let html = `<h3 class="checklist-section-title" style="color:#1e3a8a; margin-bottom:0.75rem;">${sec.phase}</h3>`;
-        sec.tasks.forEach(t => {
-            if (isCook) {
-                html += `<div class="task-row" style="display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;"><span style="color: #059669; font-weight: bold; font-size: 1.1rem; line-height: 1;">•</span><div><div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div><div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div></div></div>`;
-            } else {
-                html += `<div class="task-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f1f5f9;"><input type="checkbox" class="task-checkbox" id="cb-${t.id}" style="width:20px; height:20px; cursor:pointer;"><div><div class="task-title" style="font-weight:600; color:#334155;">${t.title}</div><div class="task-desc" style="font-size:0.85rem; color:#64748b;">${t.desc}</div></div></div>`;
-            }
+let activeBookTab = 'recipes';
+function renderRecipeBook() {
+    const container = document.getElementById('recipe-book-container');
+    if (!container) return;
+    const sortedRecipes = [...Store.recipes].filter(r => r.type !== 'prep').sort((a, b) => (a.menuItem || '').localeCompare(b.menuItem || ''));
+    const sortedPrep = [...Store.recipes].filter(r => r.type === 'prep').sort((a, b) => (a.menuItem || '').localeCompare(b.menuItem || ''));
+
+    let html = `<div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem;"><div><h3 style="color: #1e3a8a; margin: 0 0 4px 0;">📖 Recipe & Prep Spec Book</h3><p style="font-size: 0.85rem; color: #64748b; margin: 0;">Alphabetized master database.</p></div><div style="display: flex; gap: 8px;"><button class="btn ${activeBookTab === 'recipes' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('recipes')">🍽️ Recipes (${sortedRecipes.length})</button><button class="btn ${activeBookTab === 'prep' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('prep')">📋 Prep Spec Sheets (${sortedPrep.length})</button></div></div>${Store.role === 'gm' ? `<div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 1rem;"><h4 id="book-form-title" style="color: #1e3a8a; margin-top: 0;">➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}</h4><form onsubmit="handleInlineBookSubmit(event)" style="display: flex; flex-direction: column; gap: 10px;"><input type="hidden" id="book-item-id" value=""><input type="hidden" id="book-item-type" value="${activeBookTab}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;"><input type="text" id="book-item-name" class="form-control" placeholder="Name" required><input type="text" id="book-item-category" class="form-control" placeholder="Category" required>${activeBookTab === 'recipes' ? `<input type="text" id="book-item-portions" class="form-control" placeholder="Portion Size"><input type="text" id="book-item-time-temp" class="form-control" placeholder="Time / Temp">` : ''}</div>${activeBookTab === 'recipes' ? `<textarea id="book-item-ingredients" class="form-control" rows="2" placeholder="Ingredients"></textarea>` : ''}<textarea id="book-item-details" class="form-control" rows="2" placeholder="Details" required></textarea><div style="display: flex; gap: 8px;"><button type="submit" id="book-submit-btn" class="btn btn-primary">Save 💾</button><button type="button" id="book-cancel-btn" class="btn btn-secondary" style="display: none;" onclick="resetBookForm()">Cancel ❌</button></div></form></div>` : ''}</div><div style="display: flex; flex-direction: column; gap: 1rem;">`;
+
+    const activeList = activeBookTab === 'recipes' ? sortedRecipes : sortedPrep;
+    if (activeList.length === 0) { html += `<div class="card"><p style="color: #64748b; font-style: italic;">No items found.</p></div>`; }
+    else {
+        activeList.forEach(r => {
+            const rId = r.id || r.ID || r.menuItem;
+            html += `<div class="card" style="border-left: 4px solid #1e3a8a;"><div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;"><h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>${Store.role === 'gm' ? `<div style="display: flex; gap: 6px;"><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="modifyRecipe('${rId}')">Modify ✏️</button><button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button></div>` : ''}</div>${r.type === 'recipes' || !r.type ? `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 8px 0; font-size: 0.9rem; background: #f8fafc; padding: 8px; border-radius: 4px;">${r.portionSize ? `<div><strong>Portion:</strong> ${r.portionSize}</div>` : ''}${r.cookTimeTemp ? `<div><strong>Time/Temp:</strong> ${r.cookTimeTemp}</div>` : ''}</div>${r.ingredients ? `<p style="font-size: 0.9rem; color: #334155; margin: 6px 0;"><strong>Ingredients:</strong> ${r.ingredients}</p>` : ''}` : ''}<p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>Details:</strong> ${r.prepSpecs || r.buildDetails || r.details || ''}</p></div>`;
         });
-        container.innerHTML += `<div class="card checklist-section">${html}</div>`;
-    });
-    if (!isCook) {
-        container.innerHTML += `<div style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"><button class="btn btn-primary" onclick="submitManagerShiftChecklist()">💾 Manager Submit & Log Shift</button></div>`;
     }
+    html += `</div>`;
+    container.innerHTML = html;
 }
 
-function renderManagerAssignmentWidget() {
-    const container = document.getElementById('manager-assignment-widget-container');
+function setBookTab(tab) { activeBookTab = tab; resetBookForm(); renderRecipeBook(); }
+function resetBookForm() {
+    document.getElementById('book-item-id').value = '';
+    document.getElementById('book-item-name').value = '';
+    document.getElementById('book-item-category').value = '';
+    document.getElementById('book-item-details').value = '';
+    if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = '';
+    if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = '';
+    if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = '';
+    document.getElementById('book-form-title').textContent = `➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}`;
+    document.getElementById('book-submit-btn').textContent = 'Save to Master Book 💾';
+    document.getElementById('book-cancel-btn').style.display = 'none';
+}
+function modifyRecipe(recId) {
+    const item = Store.recipes.find(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
+    if (!item) return;
+    activeBookTab = item.type || 'recipes';
+    renderRecipeBook();
+    document.getElementById('book-item-id').value = item.id || item.ID || recId;
+    document.getElementById('book-item-name').value = item.menuItem || item.title || '';
+    document.getElementById('book-item-category').value = item.category || '';
+    document.getElementById('book-item-details').value = item.prepSpecs || item.buildDetails || item.details || '';
+    if (document.getElementById('book-item-ingredients')) document.getElementById('book-item-ingredients').value = item.ingredients || '';
+    if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = item.portionSize || '';
+    if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = item.cookTimeTemp || '';
+    document.getElementById('book-form-title').textContent = `✏️ Modify: ${item.menuItem || item.title}`;
+    document.getElementById('book-submit-btn').textContent = 'Update Item 💾';
+    document.getElementById('book-cancel-btn').style.display = 'inline-block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function handleInlineBookSubmit(e) {
+    e.preventDefault();
+    if (!Store.user) return;
+    const itemId = document.getElementById('book-item-id').value;
+    const type = document.getElementById('book-item-type').value;
+    const recipeObj = {
+        id: itemId || `BOOK-${Date.now()}`, type,
+        menuItem: document.getElementById('book-item-name').value.trim(),
+        category: document.getElementById('book-item-category').value.trim(),
+        prepSpecs: type === 'prep' ? document.getElementById('book-item-details').value.trim() : '',
+        buildDetails: type === 'recipes' ? document.getElementById('book-item-details').value.trim() : '',
+        ingredients: type === 'recipes' ? (document.getElementById('book-item-ingredients')?.value.trim() || '') : '',
+        portionSize: type === 'recipes' ? (document.getElementById('book-item-portions')?.value.trim() || '') : '',
+        cookTimeTemp: type === 'recipes' ? (document.getElementById('book-item-time-temp')?.value.trim() || '') : ''
+    };
+    if (itemId) {
+        const index = Store.recipes.findIndex(r => String(r.id || r.menuItem).trim() === String(itemId).trim());
+        if (index > -1) Store.recipes[index] = recipeObj; else Store.recipes.push(recipeObj);
+    } else { Store.recipes.push(recipeObj); }
+    ApiService.request('saveRecipe', { recipe: recipeObj }).then(() => { resetBookForm(); renderRecipeBook(); });
+}
+function deleteRecipe(recId) {
+    if (!confirm("Delete item?")) return;
+    Store.recipes = Store.recipes.filter(r => String(r.id || r.menuItem).trim() !== String(recId).trim());
+    renderRecipeBook();
+}
+
+// ==========================================
+// 6. TRAINING & DASHBOARDS
+// ==========================================
+function renderTrainingView() {
+    const listContainer = document.getElementById('training-modules-list');
+    if (!listContainer) return;
+    let html = '';
+    TRAINING_MODULES.forEach(mod => {
+        const userCert = Store.certifications.find(c => String(c.empId || c.EMPID).trim() === String(Store.user.id).trim() && String(c.modId || c.MODID).trim() === String(mod.id).trim());
+        const passed = userCert && (userCert.passed === true || String(userCert.passed).toLowerCase() === 'true' || Number(userCert.score) >= 85);
+        const signedOff = userCert && (userCert.managerSignOff === true || String(userCert.managerSignOff).toLowerCase() === 'true');
+        html += `<div class="card" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;"><div><h4 style="color: #1e3a8a; margin: 0 0 4px 0;">${mod.id}: ${mod.title}</h4><p style="font-size: 0.85rem; color: #64748b; margin: 0;">${mod.description}</p><div style="margin-top: 8px; font-size: 0.85rem; font-weight: 600;">Status: ${passed ? (signedOff ? '✅ Certified & Signed Off' : '⏳ Passed (Pending GM Sign-Off)') : '❌ Not Completed'} (Passing: 85%+)</div></div><button class="btn btn-primary" onclick="openQuizModal('${mod.id}')">${passed ? 'Retake Quiz 📝' : 'Take Quiz 🚀'}</button></div>`;
+    });
+    listContainer.innerHTML = html;
+}
+
+function openQuizModal(modId) {
+    const mod = TRAINING_MODULES.find(m => m.id === modId);
+    if (!mod) return;
+    document.getElementById('quiz-modal-title').textContent = mod.title;
+    const body = document.getElementById('quiz-modal-body');
+    body.innerHTML = `<input type="hidden" id="active-mod-id" value="${mod.id}"><p style="color: #64748b; font-size: 0.9rem;">${mod.description} (Requires 85% to pass)</p>${mod.questions.map((qObj, idx) => `<div style="margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem;"><p style="font-weight: 600; color: #1e3a8a;">${idx + 1}. ${qObj.q}</p>${qObj.options.map((opt, oIdx) => `<label style="display: block; margin-bottom: 4px; font-size: 0.9rem; cursor: pointer;"><input type="radio" name="q-${idx}" value="${oIdx}"> ${opt}</label>`).join('')}</div>`).join('')}`;
+    document.getElementById('quiz-modal').style.display = 'flex';
+}
+
+function closeQuizModal() { document.getElementById('quiz-modal').style.display = 'none'; }
+
+function submitQuizAnswers() {
+    const modId = document.getElementById('active-mod-id').value;
+    const mod = TRAINING_MODULES.find(m => m.id === modId);
+    if (!mod) return;
+    let correctCount = 0;
+    mod.questions.forEach((qObj, idx) => {
+        const selected = document.querySelector(`input[name="q-${idx}"]:checked`);
+        if (selected && Number(selected.value) === qObj.correct) correctCount++;
+    });
+    const score = Math.round((correctCount / mod.questions.length) * 100);
+    const passed = score >= 85;
+    const certRecord = { empId: Store.user.id, modId: mod.id, score, passed, managerSignOff: false };
+    Store.certifications.push(certRecord);
+    ApiService.request('saveCert', { cert: certRecord }).then(() => {
+        closeQuizModal();
+        alert(`Quiz submitted! Score: ${score}% (${passed ? '✅ Passed' : '❌ Failed'})`);
+        renderTrainingView();
+        updateGreetingLabel();
+    });
+}
+
+function isCertifiedTeamLeader(empId) {
+    const empCerts = Store.certifications.filter(c => String(c.empId || c.EMPID || '').trim() === String(empId).trim());
+    if (empCerts.length < TRAINING_MODULES.length) return false;
+    return empCerts.every(rec => {
+        const passed = rec.passed === true || String(rec.passed).toLowerCase() === 'true' || Number(rec.score) >= 85;
+        const signed = rec.managerSignOff === true || String(rec.managerSignOff).toLowerCase() === 'true';
+        return passed && signed;
+    });
+}
+
+function renderCookDashboard() {
+    const container = document.getElementById('cook-dashboard-content');
     if (!container) return;
-    const selectedDateStr = document.getElementById('shift-date')?.value || new Date().toISOString().split('T')[0];
+    const myShifts = Store.shifts.filter(s => String(s.empId).trim() === String(Store.user.id).trim());
+    let rowsHtml = myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">${t('noShifts')}</td></tr>` :
+        myShifts.map(s => `<tr><td>${s.date}</td><td>${s.station || 'General'}</td><td>${s.tasksCompleted} / ${s.totalTasks}</td><td>${s.scorePct}%</td><td>${Number(s.scorePct) >= 85 ? t('goalMet') : t('missed')}</td></tr>`).join('');
+
     container.innerHTML = `
-        <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">👥 Station & Shift Line Assignments</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions and instantly update cook dashboards.</p>
-            <div style="margin: 1rem 0;"><label style="font-weight: 600; font-size: 0.9rem;">Select Date:</label><input type="date" id="shift-date" class="form-control" value="${selectedDateStr}" onchange="renderManagerAssignmentWidget()" style="margin-top: 4px; max-width: 200px;"></div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div><h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Open:</label><select id="sel-range_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Open:</label><select id="sel-grill_fry_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                    </div>
-                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_mid_split_open', 'sel-grill_fry_mid_split_open'])">Assign Split Line 📌</button></div>
+        <div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #1e3a8a; margin-top: 0;">${t('cookDashTitle')}</h3><p style="font-size: 0.85rem; color: #64748b;">${t('cookDashSub')}</p></div>
+        <div class="card"><table class="data-table" style="width: 100%;"><thead><tr><th>${t('tblDate')}</th><th>${t('tblStation')}</th><th>${t('tblCompletedTasks')}</th><th>${t('tblScore')}</th><th>${t('tblStatus')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+}
+
+function renderManagerDashboard() {
+    const container = document.getElementById('manager-dashboard-content');
+    if (!container) return;
+    container.innerHTML = `
+        <div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #1e3a8a; margin-top: 0;">📊 Shift Manager Dashboard & Oversight</h3><p style="font-size: 0.85rem; color: #64748b;">Assign line positions and review team shift logs.</p></div>
+        <div id="manager-assignment-widget-container"></div>
+        <div class="card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;"><h4 style="color: #1e3a8a; margin-top: 0;">⭐ Completed Team Shifts</h4>
+            <table class="data-table" style="width: 100%; margin-top: 1rem;"><thead><tr><th>Date</th><th>Employee</th><th>Role</th><th>Score</th><th>Status</th></tr></thead>
+                <tbody>${Store.shifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">No shifts logged yet.</td></tr>` : Store.shifts.map(s => `<tr><td>${s.date}</td><td><strong>${s.empName}</strong></td><td>${String(s.role || '').toUpperCase()}</td><td>${s.scorePct}%</td><td>${Number(s.scorePct) >= 85 ? '✅ Goal Met' : '❌ Missed'}</td></tr>`).join('')}</tbody></table>
+        </div><div id="message-board-container"></div>`;
+    renderMessageBoard();
+    renderManagerAssignmentWidget();
+}
+
+function renderGMDashboard() {
+    const container = document.getElementById('gm-dashboard-content');
+    if (!container) return;
+    const pendingCerts = Store.certifications.filter(c => {
+        const passed = c.passed === true || String(c.passed).toLowerCase() === 'true' || Number(c.score) >= 85;
+        const signed = c.managerSignOff === true || String(c.managerSignOff).toLowerCase() === 'true';
+        return passed && !signed;
+    });
+    const startDate = new Date(CONFIG.PROGRAM_START_DATE);
+    const endDate = new Date(startDate); endDate.setDate(endDate.getDate() + 13);
+    const cycleShifts = Store.shifts.filter(s => { const d = new Date(s.date); return d >= startDate && d <= endDate; });
+    const dailyCompliance = {};
+    for (let i = 0; i < 14; i++) {
+        const curr = new Date(startDate); curr.setDate(curr.getDate() + i);
+        dailyCompliance[curr.toISOString().split('T')[0]] = { total: 0, sum: 0 };
+    }
+    cycleShifts.forEach(s => { if (dailyCompliance[s.date]) { dailyCompliance[s.date].total += 1; dailyCompliance[s.date].sum += Number(s.scorePct || 0); } });
+    
+    const employeeAverages = {};
+    Store.employees.forEach(emp => {
+        const eId = emp.id || emp.ID;
+        const eShifts = cycleShifts.filter(s => String(s.empId).trim() === String(eId).trim());
+        if (eShifts.length > 0) {
+            const totalScore = eShifts.reduce((acc, s) => acc + Number(s.scorePct || 0), 0);
+            employeeAverages[eId] = { name: emp.name || emp.Name, avg: Math.round(totalScore / eShifts.length), shiftsCount: eShifts.length };
+        }
+    });
+
+    let bronzeCount = 0, silverCount = 0, goldCount = 0;
+    const accountingRows = [];
+    Object.values(employeeAverages).forEach(data => {
+        let tier = 'None';
+        if (data.avg >= 100) { tier = 'Gold 🥇'; goldCount++; }
+        else if (data.avg >= 95) { tier = 'Silver 🥈'; silverCount++; }
+        else if (data.avg >= 85) { tier = 'Bronze 🥉'; bronzeCount++; }
+        if (tier !== 'None') { accountingRows.push(`<tr><td><strong>${data.name}</strong></td><td>${data.shiftsCount}</td><td>${data.avg}%</td><td><span style="font-weight: bold; color: #1e3a8a;">${tier}</span></td></tr>`); }
+    });
+
+    container.innerHTML = `
+        <div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #1e3a8a; margin-top: 0;">📈 General Manager Executive Suite & Bonus Program</h3><p style="font-size: 0.85rem; color: #64748b;">14-Day compliance tracking cycle.</p></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="card" style="text-align: center;"><span style="font-size: 0.85rem; color: #64748b;">Active Team Members</span><h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${Store.employees.length}</h2></div>
+            <div class="card" style="text-align: center;"><span style="font-size: 0.85rem; color: #64748b;">Total Shifts Logged (Cycle)</span><h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${cycleShifts.length}</h2></div>
+            <div class="card" style="text-align: center;"><span style="font-size: 0.85rem; color: #64748b;">Pending Cert Sign-Offs</span><h2 style="color: #dc2626; margin: 5px 0 0 0;">${pendingCerts.length}</h2></div>
+        </div>
+        <div class="card" style="margin-bottom: 1.5rem;"><h4 style="color: #1e3a8a; margin-top: 0;">📊 14-Day Compliance Tracking Trend</h4>
+            <div style="display: flex; gap: 6px; align-items: flex-end; height: 180px; padding: 20px 10px 10px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow-x: auto; margin-top: 1rem;">
+                ${Object.entries(dailyCompliance).map(([date, stats]) => {
+                    const avg = stats.total > 0 ? Math.round(stats.sum / stats.total) : 0;
+                    return `<div style="flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 35px; height: 100%; justify-content: flex-end;"><span style="font-size: 0.7rem; font-weight: bold; color: #1e3a8a; margin-bottom: 4px;">${avg}%</span><div style="width: 100%; background: #2563eb; border-radius: 4px 4px 0 0; height: ${Math.max(avg, 5)}%;"></div><span style="font-size: 0.65rem; color: #64748b; margin-top: 6px; transform: rotate(-35deg);">${date.slice(5)}</span></div>`;
+                }).join('')}
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="card"><h4 style="color: #1e3a8a; margin-top: 0;">🥧 Bonus Tier Allocation Distribution</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 1.5rem;">
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #ca8a04;"><div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Gold Tier (100%):</span> <span>${goldCount} Employee(s)</span></div></div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #64748b;"><div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Silver Tier (95%+):</span> <span>${silverCount} Employee(s)</span></div></div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #b45309;"><div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Bronze Tier (85%+):</span> <span>${bronzeCount} Employee(s)</span></div></div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div><h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range Open:</label><select id="sel-range_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Mid Open:</label><select id="sel-mid_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry Open:</label><select id="sel-grill_fry_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                    </div>
-                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_open', 'sel-mid_open', 'sel-grill_fry_open'])">Assign 3-Cook Line 📌</button></div>
-                </div>
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div><h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Close:</label><select id="sel-range_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Close:</label><select id="sel-grill_fry_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.
+            </div>
+            <div class="card"><h4 style="color: #1e3a8a; margin-top: 0;">📑 Bonus Program Accounting Sheet</h4>
+                <div style="max-height: 240px; overflow-y: auto; margin-top: 1rem;"><table class="data-table" style="width: 100%;"><thead><tr><th>Employee</th><th>Shifts</th><th>Avg Score</th><th>Tier</th></tr></thead><tbody>${accountingRows.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No employees have met thresholds.</td></tr>` : accountingRows.join('')}</tbody></table></div>
+            </div>
+        </div>
+        <div id="manager-assignment-widget-container" style="margin-bottom: 1.5rem;"></div>
+        <div class="card" style="margin-bottom: 1.5rem;"><h4 style="color: #1e3a8a; margin-top: 0;">🎓 Pending Training Certifications for Approval</h4>
+            <table class="data-table" style="width: 100%; margin-top: 1rem;"><thead><tr><th>Employee ID</th><th>Module ID</th><th>Score</th><th>Action</th></tr></thead>
+                <tbody>${pendingCerts.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No pending certifications.</td></tr>` : pendingCerts.map(c => `<tr><td>${c.empId || c.EMPID}</td><td>${c.modId || c.MODID}</td><td>${c.score}%</td><td><button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="gmSignOffCert('${c.empId || c.EMPID}', '${c.modId || c.MODID}')">Approve ✅</button></td></tr>`).join('')}</tbody></table>
+        </div>`;
+    renderManagerAssignmentWidget();
+}
+
+function gmSignOffCert(empId, modId) {
+    const cert = Store.certifications.find(c => String(c.empId || c.EMPID).trim() === String(empId).trim() && String(c.modId || c.MODID).trim() === String(modId).trim());
+    if (!cert) return;
+    cert.managerSignOff = true;
+    ApiService.request('saveCert', { cert }).then(() => { renderGMDashboard(); alert("Certification approved!"); });
+}
+
+// ==========================================
+// 7. ROSTER & EMPLOYEE CRUD
+// ==========================================
+function renderRosterView() {
+    const tbody = document.getElementById('roster-table-body');
+    if (!tbody) return;
+    const uniqueEmployees = Array.from(new Map(Store.employees.map(emp => [String(emp.id || emp.ID).trim(), emp])).values());
+    tbody.innerHTML = uniqueEmployees.length === 0 ? `<tr><td colspan="6" style="text-align: center; color: #64748b;">No employees found.</td></tr>` :
+        uniqueEmployees.map(emp => {
+            const eId = emp.id || emp.ID;
+            return `<tr><td>${eId}</td><td><strong>${emp.name || emp.Name}</strong></td><td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td><td>${emp.station || emp.Station || 'General'}</td><td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td><td>${Store.role === 'gm' ? `<div style="display: flex; gap: 6px;"><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openEmployeeModal('${eId}')">Edit ✏️</button><button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${eId}')">Delete 🗑️</button></div>` : ''}</td></tr>`;
+        }).join('');
+}
+
+function openEmployeeModal(empId) {
+    let existing = null;
+    if (empId) { existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim()); }
+    const name = prompt("Enter employee name:", existing ? (existing.name || existing.Name || '') : '');
+    if (!name) return;
+    const role = prompt("Enter role (cook, manager, gm):", existing ? (existing.role || existing.Role || 'cook') : 'cook');
+    const pin = prompt("Enter 4-digit PIN code:", existing ? (existing.pin || existing.PIN || '1234') : '1234');
+    const station = prompt("Enter default station:", existing ? (existing.station || existing.Station || 'range_open') : 'range_open');
+    const hourlyRate = prompt("Enter hourly rate:", existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00');
+
+    const empObj = { id: existing ? (existing.id || existing.ID) : `EMP-${Date.now()}`, name, role, station, hourlyRate, pin, active: true };
+    if (existing) {
+        const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
+        if (index > -1) Store.employees[index] = empObj; else Store.employees.push(empObj);
+    } else { Store.employees.push(empObj); }
+
+    ApiService.request('saveEmployee', { employee: empObj }).then(() => { alert("Employee saved successfully!"); renderRosterView(); });
+}
+
+function deleteEmployee(empId) {
+    if (!confirm("Remove this employee?")) return;
+    Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
+    renderRosterView();
+}
