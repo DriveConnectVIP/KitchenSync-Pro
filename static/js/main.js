@@ -152,7 +152,7 @@ function t(key) {
 }
 
 // ==========================================
-// 2. DATA SPECS: COMPLETE OPENING & CLOSING CHECKLISTS (BILINGUAL)
+// 2. DATA SPECS: ALL 7 CHECKLISTS (BILINGUAL)
 // ==========================================
 const MANAGER_STATIC_CHECKLIST = [
     { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." },
@@ -232,36 +232,36 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Night Closing (Range Station Procedures)",
                 tasks: [
-                    { id: 'rcl1', title: "One hour prior to close, break down veg. and poach pans and bring to dish", desc: "Break down veg. and poach pans and bring to dish[cite: 3]." },
+                    { id: 'rcl1', title: "Break down veg and poach pans", desc: "One hour prior to close, break down veg. and poach pans and bring to dish[cite: 3]." },
                     { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners[cite: 3]." },
-                    { id: 'rcl3', title: "Clean traps for range and small grill. Shut down one oven", desc: "Clean traps for range and small grill. Shut down one oven[cite: 3]." },
-                    { id: 'rcl4', title: "Clean all stainless in egg station, including oven doors, traulsens, and table", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table[cite: 3]." },
+                    { id: 'rcl3', title: "Clean traps for range and small grill", desc: "Clean traps for range and small grill. Shut down one oven[cite: 3]." },
+                    { id: 'rcl4', title: "Clean interior of egg station & oven doors", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table[cite: 3]." },
                     { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks[cite: 3]." },
-                    { id: 'rcl6', title: "Restock traulsen, ensuring that all product is rotated and covered", desc: "Restock traulsen, ensuring that all product is rotated and covered[cite: 3]." },
-                    { id: 'rcl7', title: "Change foil in oven and wipe/scup interior doors of ovens", desc: "Change foil in oven and wipe/scup interior doors of ovens[cite: 3]." },
+                    { id: 'rcl6', title: "Restock traulsen & rotate product", desc: "Restock traulsen, ensuring that all product is rotated and covered[cite: 3]." },
+                    { id: 'rcl7', title: "Change foil in oven & wipe/scup interior doors", desc: "Change foil in oven and wipe/scup interior doors of ovens[cite: 3]." },
                     { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed[cite: 3]." },
-                    { id: 'rcl9', title: "Restock bread as necessary, rotating product", desc: "Restock bread as necessary, rotating product[cite: 3]." },
+                    { id: 'rcl9', title: "Restock bread and rotate product", desc: "Restock bread as necessary, rotating product[cite: 3]." },
                     { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in[cite: 3]." },
-                    { id: 'rcl11', title: "Check thaw pull including all meats, fish, and other frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product[cite: 3]." },
-                    { id: 'rcl12', title: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor[cite: 3]." },
-                    { id: 'rcl13', title: "Check with a manager prior to clocking out and leaving your shift!", desc: "Manager sign-off before leaving[cite: 3]." }
+                    { id: 'rcl11', title: "Check thaw pull for frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product[cite: 3]." },
+                    { id: 'rcl12', title: "Sweep, deck brush, and mop line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor[cite: 3]." },
+                    { id: 'rcl13', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift[cite: 3]!" }
                 ]
             },
             {
                 phase: "🌙 Night Closing (Mid Station Procedures)",
                 tasks: [
-                    { id: 'mcl1', title: "One hour prior to close, remove all utensils from the sandwich unit", desc: "Remove all utensils from the sandwich unit[cite: 1]." },
-                    { id: 'mcl2', title: "Clean interior (top) of unit under pans and around housing", desc: "Clean interior (top) of unit under pans and around housing[cite: 1]." },
-                    { id: 'mcl3', title: "Clean interior of lower portion of the unit, including the upper shelf inside", desc: "Clean interior of lower portion of the unit, including the upper shelf inside[cite: 1]." },
-                    { id: 'mcl4', title: "Pull out the unit and clean the back of the unit and the floor behind it", desc: "Pull out the unit and clean the back of the unit and the floor behind it[cite: 1]." },
-                    { id: 'mcl5', title: "Flip all pans and restock all items, making sure to properly rotate product", desc: "Flip all pans and restock all items, making sure to properly rotate product[cite: 1]." },
-                    { id: 'mcl6', title: "DO NOT double stock product. There should be one full pan of every item", desc: "Verify stock levels[cite: 1]." },
+                    { id: 'mcl1', title: "Remove utensils from sandwich unit", desc: "One hour prior to close, remove all utensils from the sandwich unit[cite: 1]." },
+                    { id: 'mcl2', title: "Clean interior (top) of unit under pans", desc: "Clean interior (top) of unit under pans and around housing[cite: 1]." },
+                    { id: 'mcl3', title: "Clean interior of lower portion of unit", desc: "Clean interior of lower portion of the unit, including the upper shelf inside[cite: 1]." },
+                    { id: 'mcl4', title: "Pull out unit and clean back & floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it[cite: 1]." },
+                    { id: 'mcl5', title: "Flip all pans and restock all items", desc: "Flip all pans and restock all items, making sure to properly rotate product[cite: 1]." },
+                    { id: 'mcl6', title: "Verify stock levels", desc: "DO NOT double stock product. There should be one full pan of every item[cite: 1]." },
                     { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out[cite: 1]." },
-                    { id: 'mcl8', title: "Clean the microwave inside and out, including the microwave shelf", desc: "Clean the microwave inside and out, including the microwave shelf[cite: 1]." },
-                    { id: 'mcl9', title: "Restock all plates and to go containers as needed", desc: "Restock all plates and to go containers as needed[cite: 1]." },
+                    { id: 'mcl8', title: "Clean microwave inside and out", desc: "Clean the microwave inside and out, including the microwave shelf[cite: 1]." },
+                    { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed[cite: 1]." },
                     { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 1]." },
-                    { id: 'mcl11', title: "Ensure that all sandwich items are covered at the end of your shift", desc: "Ensure that all sandwich items are covered at the end of your shift[cite: 1]." },
-                    { id: 'mcl12', title: "Check with a manager prior to clocking out and leaving your shift", desc: "Check with a manager prior to clocking out and leaving your shift[cite: 1]." }
+                    { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift[cite: 1]." },
+                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift[cite: 1]." }
                 ]
             }
         ],
@@ -269,25 +269,25 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Night Closing (Grill/Fry Station Procedures)",
                 tasks: [
-                    { id: 'gcl1', title: "One hour prior to close, flip pancake batter to a 6th pan with a ladle", desc: "Flip pancake batter to a 6th pan with a ladle[cite: 2]." },
-                    { id: 'gcl2', title: "Bring the batter gun to dish", desc: "Bring the batter gun to dish[cite: 2]." },
-                    { id: 'gcl3', title: "Wipe and scrub lower shelf of the grill and clean temperature dials", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials[cite: 2]." },
-                    { id: 'gcl4', title: "Strain the fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles[cite: 2]." },
-                    { id: 'gcl5', title: "Wipe down the stainless dividers and the front of the fryers", desc: "Wipe down the stainless dividers and the front of the fryers[cite: 2]." },
+                    { id: 'gcl1', title: "Flip pancake batter to 6th pan", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle[cite: 2]." },
+                    { id: 'gcl2', title: "Bring batter gun to dish", desc: "Bring the batter gun to dish[cite: 2]." },
+                    { id: 'gcl3', title: "Wipe and scrub lower shelf of grill", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials[cite: 2]." },
+                    { id: 'gcl4', title: "Strain fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles[cite: 2]." },
+                    { id: 'gcl5', title: "Wipe down stainless dividers and front of fryers", desc: "Wipe down the stainless dividers and the front of the fryers[cite: 2]." },
                     { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator[cite: 2]." },
-                    { id: 'gcl7', title: "Sift fry flour into a new pan and top off if necessary", desc: "Sift fry flour into a new pan and top off if necessary[cite: 2]." },
+                    { id: 'gcl7', title: "Sift fry flour into a new pan", desc: "Sift fry flour into a new pan and top off if necessary[cite: 2]." },
                     { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables[cite: 2]." },
-                    { id: 'gcl9', title: "Break down and thoroughly clean the steam tables", desc: "Break down and thoroughly clean the steam tables[cite: 2]." },
-                    { id: 'gcl10', title: "Place product from steam tables in ten (10) plastic cambros and place on cart", desc: "Place product from steam tables in ten (10) plastic cambros and place on cart[cite: 2]." },
-                    { id: 'gcl11', title: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart[cite: 2]." },
-                    { id: 'gcl12', title: "Make note if the fryolators need to be changed on the dry erase board", desc: "Make note if the fryolators need to be changed on the dry erase board[cite: 2]." },
-                    { id: 'gcl13', title: "At close, clean the grill, grill rails, and wall behind the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill[cite: 2]." },
-                    { id: 'gcl14', title: "Clean the grease trap for the grill into a metal German pan", desc: "Clean the grease trap for the grill into a metal German pan[cite: 2]." },
-                    { id: 'gcl15', title: "Brush down the char broiler and clean the trap", desc: "Brush down the char broiler and clean the trap[cite: 2]." },
-                    { id: 'gcl16', title: "Run grease to outside grease trap. DO NOT leave grease inside overnight!", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight![cite: 2]." },
+                    { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables[cite: 2]." },
+                    { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) plastic cambros and place on cart[cite: 2]." },
+                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart[cite: 2]." },
+                    { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board[cite: 2]." },
+                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill[cite: 2]." },
+                    { id: 'gcl14', title: "Clean grease trap into metal German pan", desc: "Clean the grease trap for the grill into a metal German pan[cite: 2]." },
+                    { id: 'gcl15', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap[cite: 2]." },
+                    { id: 'gcl16', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight![cite: 2]" },
                     { id: 'gcl17', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 2]." },
-                    { id: 'gcl18', title: "Restock freezer (French Fries, chicken, mac and cheese, etc)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)[cite: 2]." },
-                    { id: 'gcl19', title: "Check with manager prior to clocking out and leaving your shift!", desc: "Check with manager prior to clocking out and leaving your shift![cite: 2]." }
+                    { id: 'gcl18', title: "Restock freezer (French fries, chicken, etc.)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)[cite: 2]." },
+                    { id: 'gcl19', title: "Manager sign-off before leaving", desc: "Check with manager prior to clocking out and leaving your shift![cite: 2]" }
                 ]
             }
         ]
@@ -739,30 +739,27 @@ function renderManagerAssignmentWidget() {
     container.innerHTML = `
         <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
             <h3 style="color: #1e3a8a; margin-top: 0;">👥 Station & Shift Line Assignments</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions and instantly update cook dashboards.</p>
+            <p style="font-size: 0.85rem; color: #64748b;">Schedule daily opening and closing line positions.</p>
             <div style="margin: 1rem 0;"><label style="font-weight: 600; font-size: 0.9rem;">Select Date:</label><input type="date" id="shift-date" class="form-control" value="${selectedDateStr}" onchange="renderManagerAssignmentWidget()" style="margin-top: 4px; max-width: 200px;"></div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div><h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split Line</h4>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Open:</label><select id="sel-range_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Open:</label><select id="sel-grill_fry_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                    </div>
-                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_mid_split_open', 'sel-grill_fry_mid_split_open'])">Assign Split Line 📌</button></div>
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 2-Cook Split</h4>
+                    <div style="margin-bottom: 8px;"><label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Open:</label><select id="sel-range_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <div style="margin-bottom: 8px;"><label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Open:</label><select id="sel-grill_fry_mid_split_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="assignCooksGroup(['sel-range_mid_split_open', 'sel-grill_fry_mid_split_open'])">Assign Split Line 📌</button>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div><h4 style="color: #0369a1; margin-top: 0;">☀️ Morning Shift 3 Cooks</h4>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range Open:</label><select id="sel-range_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Mid Open:</label><select id="sel-mid_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry Open:</label><select id="sel-grill_fry_open" class="form-control" style="width: 100%;"><option value="">-- Select Cook --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                    </div>
-                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%;" onclick="assignCooksGroup(['sel-range_open', 'sel-mid_open', 'sel-grill_fry_open'])">Assign 3-Cook Line 📌</button></div>
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #0369a1; margin-top: 0;">☀️ Morning 3-Cook Line</h4>
+                    <div style="margin-bottom: 6px;"><label style="font-size: 0.85rem; font-weight: bold;">Range Open:</label><select id="sel-range_open" class="form-control" style="width: 100%;"><option value="">-- Select --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <div style="margin-bottom: 6px;"><label style="font-size: 0.85rem; font-weight: bold;">Mid Open:</label><select id="sel-mid_open" class="form-control" style="width: 100%;"><option value="">-- Select --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <div style="margin-bottom: 6px;"><label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry Open:</label><select id="sel-grill_fry_open" class="form-control" style="width: 100%;"><option value="">-- Select --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 4px;" onclick="assignCooksGroup(['sel-range_open', 'sel-mid_open', 'sel-grill_fry_open'])">Assign 3-Cook Line 📌</button>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div><h4 style="color: #c2410c; margin-top: 0;">🌙 Night Shift 2-Cook Closing</h4>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Range / Mid-Split Close:</label><select id="sel-range_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                        <div style="margin-bottom: 12px;"><label style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">Grill/Fry / Mid-Split Close:</label><select id="sel-grill_fry_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
-                    </div>
-                    <div style="margin-top: 1rem;"><button class="btn btn-primary" style="width: 100%; background: #c2410c; border-color: #c2410c;" onclick="assignCooksGroup(['sel-range_mid_split_close', 'sel-grill_fry_mid_split_close'])">Assign Closing Line 📌</button></div>
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h4 style="color: #c2410c; margin-top: 0;">🌙 Night Closing Line</h4>
+                    <div style="margin-bottom: 8px;"><label style="font-size: 0.85rem; font-weight: bold;">Range / Mid-Split Close:</label><select id="sel-range_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <div style="margin-bottom: 8px;"><label style="font-size: 0.85rem; font-weight: bold;">Grill/Fry / Mid-Split Close:</label><select id="sel-grill_fry_mid_split_close" class="form-control" style="width: 100%;"><option value="">-- Select Closer --</option>${Store.employees.map(e => `<option value="${e.id || e.ID}">${e.name || e.Name}</option>`).join('')}</select></div>
+                    <button class="btn btn-primary" style="width: 100%; background: #c2410c; border-color: #c2410c; margin-top: 8px;" onclick="assignCooksGroup(['sel-range_mid_split_close', 'sel-grill_fry_mid_split_close'])">Assign Closing Line 📌</button>
                 </div>
             </div>
         </div>`;
@@ -778,8 +775,8 @@ function assignCooksGroup(selectIds) {
         const emp = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
         if (emp) { emp.station = stationKey; ApiService.request('saveEmployee', { employee: emp }); assignedCount++; }
     });
-    if (assignedCount > 0) alert(`✅ Successfully assigned ${assignedCount} cook(s)! Dashboards updated.`);
-    else alert("Please select at least one cook in this block before assigning.");
+    if (assignedCount > 0) alert(`✅ Successfully assigned ${assignedCount} cook(s)!`);
+    else alert("Please select at least one cook.");
 }
 
 function submitManagerShiftChecklist() {
@@ -796,7 +793,7 @@ function submitManagerShiftChecklist() {
     };
     Store.shifts.push(shiftRecord);
     ApiService.request('saveShift', { shift: shiftRecord }).then(res => {
-        if (res && res.success) { alert(`🎉 Shift checklist submitted! Score: ${pct}%`); switchTab('manager-dashboard', document.querySelector('.tab-btn')); }
+        if (res && res.success) { alert(`🎉 Shift submitted! Score: ${pct}%`); switchTab('manager-dashboard', document.querySelector('.tab-btn')); }
         else alert("Error saving shift record.");
     });
 }
@@ -805,10 +802,10 @@ function renderMessageBoard() {
     const container = document.getElementById('message-board-container');
     if (!container) return;
     const categories = ["Maintenance", "Injuries", "Customers", "Employees", "86 Items", "General"];
-    let html = `<div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #1e3a8a; margin-top: 0;">💬 Management Message Board</h3><p style="font-size: 0.85rem; color: #64748b;">Post operational updates across dedicated categories.</p><form onsubmit="postMessage(event)" style="display: flex; flex-direction: column; gap: 10px; margin-top: 1rem;"><select id="msg-category" class="form-control" required><option value="">-- Select Channel --</option>${categories.map(c => `<option value="${c}">${c}</option>`).join('')}</select><textarea id="msg-text" class="form-control" rows="3" placeholder="Type operational update..." required></textarea><button type="submit" class="btn btn-primary" style="align-self: flex-start;">Post Message 📢</button></form></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">`;
+    let html = `<div class="card" style="margin-bottom: 1.5rem;"><h3 style="color: #1e3a8a; margin-top: 0;">💬 Management Message Board</h3><p style="font-size: 0.85rem; color: #64748b;">Post operational updates across categories.</p><form onsubmit="postMessage(event)" style="display: flex; flex-direction: column; gap: 10px; margin-top: 1rem;"><select id="msg-category" class="form-control" required><option value="">-- Select Channel --</option>${categories.map(c => `<option value="${c}">${c}</option>`).join('')}</select><textarea id="msg-text" class="form-control" rows="3" placeholder="Type operational update..." required></textarea><button type="submit" class="btn btn-primary" style="align-self: flex-start;">Post Message 📢</button></form></div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">`;
     categories.forEach(cat => {
         const catMessages = Store.messages.filter(m => String(m.category).trim().toLowerCase() === cat.toLowerCase());
-        html += `<div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;"><h4 style="color: #1e3a8a; margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px;">📌 ${cat}</h4><div style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">${catMessages.length === 0 ? `<p style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">No posts.</p>` : catMessages.map(m => `<div style="background: white; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem;"><div style="display: flex; justify-content: space-between; font-weight: bold; color: #334155; margin-bottom: 4px;"><span>${m.authorName || m.author || 'Staff'}</span><span style="font-size: 0.75rem; color: #94a3b8;">${m.timestamp || ''}</span></div><p style="margin: 0; color: #475569;">${m.messageText || m.text || ''}</p></div>`).join('')}</div></div>`;
+        html += `<div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;"><h4 style="color: #1e3a8a; margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px;">📌 ${cat}</h4><div style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">${catMessages.length === 0 ? `<p style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">No posts.</p>` : catMessages.map(m => `<div style="background: white; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem;"><div style="display: flex; justify-content: space-between; font-weight: bold; color: #334155; margin-bottom: 4px;"><span>${m.authorName || 'Staff'}</span><span style="font-size: 0.75rem; color: #94a3b8;">${m.timestamp || ''}</span></div><p style="margin: 0; color: #475569;">${m.messageText || m.text || ''}</p></div>`).join('')}</div></div>`;
     });
     html += `</div>`;
     container.innerHTML = html;
@@ -824,30 +821,105 @@ function postMessage(e) {
     ApiService.request('saveMessage', { message: payload }).then(() => { document.getElementById('msg-text').value = ''; renderMessageBoard(); });
 }
 
+// ==========================================
+// 6. ALPHABETIZED RECIPE BOOK (JUMP BAR & GM PERMISSIONS)
+// ==========================================
 let activeBookTab = 'recipes';
+let activeAlphaFilter = 'ALL';
+
 function renderRecipeBook() {
     const container = document.getElementById('recipe-book-container');
     if (!container) return;
+
+    const isGM = Store.role === 'gm';
     const sortedRecipes = [...Store.recipes].filter(r => r.type !== 'prep').sort((a, b) => (a.menuItem || '').localeCompare(b.menuItem || ''));
     const sortedPrep = [...Store.recipes].filter(r => r.type === 'prep').sort((a, b) => (a.menuItem || '').localeCompare(b.menuItem || ''));
-
-    let html = `<div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem;"><div><h3 style="color: #1e3a8a; margin: 0 0 4px 0;">📖 Recipe & Prep Spec Book</h3><p style="font-size: 0.85rem; color: #64748b; margin: 0;">Alphabetized master database.</p></div><div style="display: flex; gap: 8px;"><button class="btn ${activeBookTab === 'recipes' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('recipes')">🍽️ Recipes (${sortedRecipes.length})</button><button class="btn ${activeBookTab === 'prep' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('prep')">📋 Prep Spec Sheets (${sortedPrep.length})</button></div></div>${Store.role === 'gm' ? `<div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 1rem;"><h4 id="book-form-title" style="color: #1e3a8a; margin-top: 0;">➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}</h4><form onsubmit="handleInlineBookSubmit(event)" style="display: flex; flex-direction: column; gap: 10px;"><input type="hidden" id="book-item-id" value=""><input type="hidden" id="book-item-type" value="${activeBookTab}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;"><input type="text" id="book-item-name" class="form-control" placeholder="Name" required><input type="text" id="book-item-category" class="form-control" placeholder="Category" required>${activeBookTab === 'recipes' ? `<input type="text" id="book-item-portions" class="form-control" placeholder="Portion Size"><input type="text" id="book-item-time-temp" class="form-control" placeholder="Time / Temp">` : ''}</div>${activeBookTab === 'recipes' ? `<textarea id="book-item-ingredients" class="form-control" rows="2" placeholder="Ingredients"></textarea>` : ''}<textarea id="book-item-details" class="form-control" rows="2" placeholder="Details" required></textarea><div style="display: flex; gap: 8px;"><button type="submit" id="book-submit-btn" class="btn btn-primary">Save 💾</button><button type="button" id="book-cancel-btn" class="btn btn-secondary" style="display: none;" onclick="resetBookForm()">Cancel ❌</button></div></form></div>` : ''}</div><div style="display: flex; flex-direction: column; gap: 1rem;">`;
-
     const activeList = activeBookTab === 'recipes' ? sortedRecipes : sortedPrep;
-    if (activeList.length === 0) { html += `<div class="card"><p style="color: #64748b; font-style: italic;">No items found.</p></div>`; }
-    else {
-        activeList.forEach(r => {
+
+    const filteredList = activeAlphaFilter === 'ALL' ? activeList : activeList.filter(r => (r.menuItem || r.title || '').toUpperCase().startsWith(activeAlphaFilter));
+    const alphabet = ['ALL', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+    let html = `
+        <div class="card" style="margin-bottom: 1.5rem; background: #f8fafc; border: 1px solid #cbd5e1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="color: #1e3a8a; margin: 0 0 4px 0;">📖 Recipe & Prep Spec Book</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Master alphabetized database (${isGM ? 'GM Full Access' : 'Read-Only Reference'}).</p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn ${activeBookTab === 'recipes' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('recipes')">🍽️ Recipes (${sortedRecipes.length})</button>
+                    <button class="btn ${activeBookTab === 'prep' ? 'btn-primary' : 'btn-secondary'}" onclick="setBookTab('prep')">📋 Prep Spec Sheets (${sortedPrep.length})</button>
+                </div>
+            </div>
+
+            <!-- ALPHABET JUMP BAR -->
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 1rem; background: white; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; justify-content: center;">
+                ${alphabet.map(letter => `<button class="btn ${activeAlphaFilter === letter ? 'btn-primary' : 'btn-secondary'}" style="padding: 4px 10px; font-size: 0.8rem; min-width: 32px;" onclick="setAlphaFilter('${letter}')">${letter}</button>`).join('')}
+            </div>
+
+            ${isGM ? `
+                <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 1rem;">
+                    <h4 id="book-form-title" style="color: #1e3a8a; margin-top: 0;">➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}</h4>
+                    <form onsubmit="handleInlineBookSubmit(event)" style="display: flex; flex-direction: column; gap: 10px;">
+                        <input type="hidden" id="book-item-id" value="">
+                        <input type="hidden" id="book-item-type" value="${activeBookTab}">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+                            <input type="text" id="book-item-name" class="form-control" placeholder="Name" required>
+                            <input type="text" id="book-item-category" class="form-control" placeholder="Category" required>
+                            ${activeBookTab === 'recipes' ? `<input type="text" id="book-item-portions" class="form-control" placeholder="Portion Size"><input type="text" id="book-item-time-temp" class="form-control" placeholder="Time / Temp">` : ''}
+                        </div>
+                        ${activeBookTab === 'recipes' ? `<textarea id="book-item-ingredients" class="form-control" rows="2" placeholder="Ingredients"></textarea>` : ''}
+                        <textarea id="book-item-details" class="form-control" rows="2" placeholder="Details" required></textarea>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="submit" id="book-submit-btn" class="btn btn-primary">Save 💾</button>
+                            <button type="button" id="book-cancel-btn" class="btn btn-secondary" style="display: none;" onclick="resetBookForm()">Cancel ❌</button>
+                        </div>
+                    </form>
+                </div>
+            ` : ''}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+    `;
+
+    if (filteredList.length === 0) {
+        html += `<div class="card"><p style="color: #64748b; font-style: italic;">No items found for letter "${activeAlphaFilter}".</p></div>`;
+    } else {
+        filteredList.forEach(r => {
             const rId = r.id || r.ID || r.menuItem;
-            html += `<div class="card" style="border-left: 4px solid #1e3a8a;"><div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;"><h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>${Store.role === 'gm' ? `<div style="display: flex; gap: 6px;"><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="modifyRecipe('${rId}')">Modify ✏️</button><button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button></div>` : ''}</div>${r.type === 'recipes' || !r.type ? `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 8px 0; font-size: 0.9rem; background: #f8fafc; padding: 8px; border-radius: 4px;">${r.portionSize ? `<div><strong>Portion:</strong> ${r.portionSize}</div>` : ''}${r.cookTimeTemp ? `<div><strong>Time/Temp:</strong> ${r.cookTimeTemp}</div>` : ''}</div>${r.ingredients ? `<p style="font-size: 0.9rem; color: #334155; margin: 6px 0;"><strong>Ingredients:</strong> ${r.ingredients}</p>` : ''}` : ''}<p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>Details:</strong> ${r.prepSpecs || r.buildDetails || r.details || ''}</p></div>`;
+            html += `
+                <div class="card" style="border-left: 4px solid #1e3a8a;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+                        <h4 style="color: #1e3a8a; margin: 0 0 6px 0;">🍽️ ${r.menuItem || r.title} <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${r.category || 'General'}</span></h4>
+                        ${isGM ? `
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="modifyRecipe('${rId}')">Modify ✏️</button>
+                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${rId}')">Delete 🗑️</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${r.type === 'recipes' || !r.type ? `
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 8px 0; font-size: 0.9rem; background: #f8fafc; padding: 8px; border-radius: 4px;">
+                            ${r.portionSize ? `<div><strong>Portion:</strong> ${r.portionSize}</div>` : ''}
+                            ${r.cookTimeTemp ? `<div><strong>Time/Temp:</strong> ${r.cookTimeTemp}</div>` : ''}
+                        </div>
+                        ${r.ingredients ? `<p style="font-size: 0.9rem; color: #334155; margin: 6px 0;"><strong>Ingredients:</strong> ${r.ingredients}</p>` : ''}
+                    ` : ''}
+                    <p style="font-size: 0.9rem; color: #334155; margin-bottom: 0;"><strong>Details:</strong> ${r.prepSpecs || r.buildDetails || r.details || ''}</p>
+                </div>
+            `;
         });
     }
     html += `</div>`;
     container.innerHTML = html;
 }
 
-function setBookTab(tab) { activeBookTab = tab; resetBookForm(); renderRecipeBook(); }
+function setBookTab(tab) { activeBookTab = tab; activeAlphaFilter = 'ALL'; resetBookForm(); renderRecipeBook(); }
+function setAlphaFilter(letter) { activeAlphaFilter = letter; renderRecipeBook(); }
+
 function resetBookForm() {
-    document.getElementById('book-item-id').value = '';
+    const idEl = document.getElementById('book-item-id');
+    if (!idEl) return;
+    idEl.value = '';
     document.getElementById('book-item-name').value = '';
     document.getElementById('book-item-category').value = '';
     document.getElementById('book-item-details').value = '';
@@ -855,10 +927,12 @@ function resetBookForm() {
     if (document.getElementById('book-item-portions')) document.getElementById('book-item-portions').value = '';
     if (document.getElementById('book-item-time-temp')) document.getElementById('book-item-time-temp').value = '';
     document.getElementById('book-form-title').textContent = `➕ Add New ${activeBookTab === 'recipes' ? 'Recipe' : 'Prep Spec Sheet'}`;
-    document.getElementById('book-submit-btn').textContent = 'Save to Master Book 💾';
+    document.getElementById('book-submit-btn').textContent = 'Save 💾';
     document.getElementById('book-cancel-btn').style.display = 'none';
 }
+
 function modifyRecipe(recId) {
+    if (Store.role !== 'gm') return;
     const item = Store.recipes.find(r => String(r.id || r.ID || r.menuItem).trim() === String(recId).trim());
     if (!item) return;
     activeBookTab = item.type || 'recipes';
@@ -875,9 +949,10 @@ function modifyRecipe(recId) {
     document.getElementById('book-cancel-btn').style.display = 'inline-block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 function handleInlineBookSubmit(e) {
     e.preventDefault();
-    if (!Store.user) return;
+    if (Store.role !== 'gm') return;
     const itemId = document.getElementById('book-item-id').value;
     const type = document.getElementById('book-item-type').value;
     const recipeObj = {
@@ -896,7 +971,9 @@ function handleInlineBookSubmit(e) {
     } else { Store.recipes.push(recipeObj); }
     ApiService.request('saveRecipe', { recipe: recipeObj }).then(() => { resetBookForm(); renderRecipeBook(); });
 }
+
 function deleteRecipe(recId) {
+    if (Store.role !== 'gm') return;
     if (!confirm("Delete item?")) return;
     Store.recipes = Store.recipes.filter(r => String(r.id || r.menuItem).trim() !== String(recId).trim());
     renderRecipeBook();
@@ -1075,6 +1152,7 @@ function renderRosterView() {
 }
 
 function openEmployeeModal(empId) {
+    if (Store.role !== 'gm') return;
     let existing = null;
     if (empId) { existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim()); }
     const name = prompt("Enter employee name:", existing ? (existing.name || existing.Name || '') : '');
@@ -1094,6 +1172,7 @@ function openEmployeeModal(empId) {
 }
 
 function deleteEmployee(empId) {
+    if (Store.role !== 'gm') return;
     if (!confirm("Remove this employee?")) return;
     Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
     renderRosterView();
