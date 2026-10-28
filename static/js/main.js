@@ -152,7 +152,7 @@ function t(key) {
 }
 
 // ==========================================
-// 2. DATA SPECS: CHECKLISTS (BILINGUAL)
+// 2. DATA SPECS: COMPLETE OPENING & CLOSING CHECKLISTS (BILINGUAL)
 // ==========================================
 const MANAGER_STATIC_CHECKLIST = [
     { id: 'mc1', title: "Check safe and drawer count for accuracy", desc: "Ensure cash drawers and safe reconcile correctly." },
@@ -232,36 +232,36 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Night Closing (Range Station Procedures)",
                 tasks: [
-                    { id: 'rcl1', title: "Break down veg and poach pans", desc: "One hour prior to close, break down veg. and poach pans and bring to dish." },
-                    { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners." },
-                    { id: 'rcl3', title: "Clean traps for range and small grill", desc: "Clean traps for range and small grill. Shut down one oven." },
-                    { id: 'rcl4', title: "Clean interior of egg station & oven doors", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table." },
-                    { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks." },
-                    { id: 'rcl6', title: "Restock traulsen & rotate product", desc: "Restock traulsen, ensuring that all product is rotated and covered." },
-                    { id: 'rcl7', title: "Change foil in oven & wipe/scup interior doors", desc: "Change foil in oven and wipe/scup interior doors of ovens." },
-                    { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed." },
-                    { id: 'rcl9', title: "Restock bread and rotate product", desc: "Restock bread as necessary, rotating product." },
-                    { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in." },
-                    { id: 'rcl11', title: "Check thaw pull for frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product." },
-                    { id: 'rcl12', title: "Sweep, deck brush, and mop line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor." },
-                    { id: 'rcl13', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" }
+                    { id: 'rcl1', title: "One hour prior to close, break down veg. and poach pans and bring to dish", desc: "Break down veg. and poach pans and bring to dish[cite: 3]." },
+                    { id: 'rcl2', title: "Brush down range tops and clean under burners", desc: "Brush down range tops and clean under burners[cite: 3]." },
+                    { id: 'rcl3', title: "Clean traps for range and small grill. Shut down one oven", desc: "Clean traps for range and small grill. Shut down one oven[cite: 3]." },
+                    { id: 'rcl4', title: "Clean all stainless in egg station, including oven doors, traulsens, and table", desc: "Clean all stainless in egg station, including oven doors, traulsens, and table[cite: 3]." },
+                    { id: 'rcl5', title: "Clean interior of traulsen, including wire racks", desc: "Clean interior of traulsen, including wire racks[cite: 3]." },
+                    { id: 'rcl6', title: "Restock traulsen, ensuring that all product is rotated and covered", desc: "Restock traulsen, ensuring that all product is rotated and covered[cite: 3]." },
+                    { id: 'rcl7', title: "Change foil in oven and wipe/scup interior doors of ovens", desc: "Change foil in oven and wipe/scup interior doors of ovens[cite: 3]." },
+                    { id: 'rcl8', title: "Change foil liners on top shelves as needed", desc: "Change foil liners on top shelves as needed[cite: 3]." },
+                    { id: 'rcl9', title: "Restock bread as necessary, rotating product", desc: "Restock bread as necessary, rotating product[cite: 3]." },
+                    { id: 'rcl10', title: "Drain and ice fish in the walk-in", desc: "Drain and ice fish in the walk-in[cite: 3]." },
+                    { id: 'rcl11', title: "Check thaw pull including all meats, fish, and other frozen product", desc: "Check thaw pull including all meats, fish, and other frozen product[cite: 3]." },
+                    { id: 'rcl12', title: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor", desc: "Assist other cooks to thoroughly sweep, deck brush, and mop the line floor[cite: 3]." },
+                    { id: 'rcl13', title: "Check with a manager prior to clocking out and leaving your shift!", desc: "Manager sign-off before leaving[cite: 3]." }
                 ]
             },
             {
                 phase: "🌙 Night Closing (Mid Station Procedures)",
                 tasks: [
-                    { id: 'mcl1', title: "Remove utensils from sandwich unit", desc: "One hour prior to close, remove all utensils from the sandwich unit." },
-                    { id: 'mcl2', title: "Clean interior (top) of unit under pans", desc: "Clean interior (top) of unit under pans and around housing." },
-                    { id: 'mcl3', title: "Clean interior of lower portion of unit", desc: "Clean interior of lower portion of the unit, including the upper shelf inside." },
-                    { id: 'mcl4', title: "Pull out unit and clean back & floor", desc: "Pull out the unit and clean the back of the unit and the floor behind it." },
-                    { id: 'mcl5', title: "Flip all pans and restock all items", desc: "Flip all pans and restock all items, making sure to properly rotate product." },
-                    { id: 'mcl6', title: "Verify stock levels", desc: "DO NOT double stock product. There should be one full pan of every item." },
-                    { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out." },
-                    { id: 'mcl8', title: "Clean microwave inside and out", desc: "Clean the microwave inside and out, including the microwave shelf." },
-                    { id: 'mcl9', title: "Restock plates and to-go containers", desc: "Restock all plates and to go containers as needed." },
-                    { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
-                    { id: 'mcl11', title: "Ensure sandwich items are covered", desc: "Ensure that all sandwich items are covered at the end of your shift." },
-                    { id: 'mcl12', title: "Manager sign-off before leaving", desc: "Check with a manager prior to clocking out and leaving your shift!" }
+                    { id: 'mcl1', title: "One hour prior to close, remove all utensils from the sandwich unit", desc: "Remove all utensils from the sandwich unit[cite: 1]." },
+                    { id: 'mcl2', title: "Clean interior (top) of unit under pans and around housing", desc: "Clean interior (top) of unit under pans and around housing[cite: 1]." },
+                    { id: 'mcl3', title: "Clean interior of lower portion of the unit, including the upper shelf inside", desc: "Clean interior of lower portion of the unit, including the upper shelf inside[cite: 1]." },
+                    { id: 'mcl4', title: "Pull out the unit and clean the back of the unit and the floor behind it", desc: "Pull out the unit and clean the back of the unit and the floor behind it[cite: 1]." },
+                    { id: 'mcl5', title: "Flip all pans and restock all items, making sure to properly rotate product", desc: "Flip all pans and restock all items, making sure to properly rotate product[cite: 1]." },
+                    { id: 'mcl6', title: "DO NOT double stock product. There should be one full pan of every item", desc: "Verify stock levels[cite: 1]." },
+                    { id: 'mcl7', title: "Clean the lid of the unit inside and out", desc: "Clean the lid of the unit inside and out[cite: 1]." },
+                    { id: 'mcl8', title: "Clean the microwave inside and out, including the microwave shelf", desc: "Clean the microwave inside and out, including the microwave shelf[cite: 1]." },
+                    { id: 'mcl9', title: "Restock all plates and to go containers as needed", desc: "Restock all plates and to go containers as needed[cite: 1]." },
+                    { id: 'mcl10', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 1]." },
+                    { id: 'mcl11', title: "Ensure that all sandwich items are covered at the end of your shift", desc: "Ensure that all sandwich items are covered at the end of your shift[cite: 1]." },
+                    { id: 'mcl12', title: "Check with a manager prior to clocking out and leaving your shift", desc: "Check with a manager prior to clocking out and leaving your shift[cite: 1]." }
                 ]
             }
         ],
@@ -269,24 +269,25 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Night Closing (Grill/Fry Station Procedures)",
                 tasks: [
-                    { id: 'gcl1', title: "Flip pancake batter to 6th pan", desc: "One hour prior to close, flip pancake batter to a 6th pan with a ladle." },
-                    { id: 'gcl2', title: "Bring batter gun to dish", desc: "Bring the batter gun to dish." },
-                    { id: 'gcl3', title: "Wipe and scrub lower shelf of grill", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials." },
-                    { id: 'gcl4', title: "Strain fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles." },
-                    { id: 'gcl5', title: "Wipe down stainless dividers and front of fryers", desc: "Wipe down the stainless dividers and the front of the fryers." },
-                    { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator." },
-                    { id: 'gcl7', title: "Sift fry flour into a new pan", desc: "Sift fry flour into a new pan and top off if necessary." },
-                    { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables." },
-                    { id: 'gcl9', title: "Break down and thoroughly clean steam tables", desc: "Break down and thoroughly clean the steam tables." },
-                    { id: 'gcl10', title: "Place product from steam tables into cambros", desc: "Place product from steam tables in ten (10) palstic cambros and place on cart." },
-                    { id: 'gcl11', title: "Cover sausage and bacon with foil and label", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart." },
-                    { id: 'gcl12', title: "Note fryolators needing oil change", desc: "Make note if the fryolators need to be changed on the dry erase board." },
-                    { id: 'gcl13', title: "Clean the grease trap for the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill, clean the grease trap into a metal German pan." },
-                    { id: 'gcl14', title: "Brush down char broiler and clean trap", desc: "Brush down the char broiler and clean the trap." },
-                    { id: 'gcl15', title: "Run grease to outside grease trap", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight!." },
-                    { id: 'gcl16', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors." },
-                    { id: 'gcl17', title: "Restock freezer (French fries, chicken, etc.)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)." },
-                    { id: 'gcl18', title: "Manager sign-off before leaving", desc: "Check with manager prior to clocking out and leaving your shift!" }
+                    { id: 'gcl1', title: "One hour prior to close, flip pancake batter to a 6th pan with a ladle", desc: "Flip pancake batter to a 6th pan with a ladle[cite: 2]." },
+                    { id: 'gcl2', title: "Bring the batter gun to dish", desc: "Bring the batter gun to dish[cite: 2]." },
+                    { id: 'gcl3', title: "Wipe and scrub lower shelf of the grill and clean temperature dials", desc: "Wipe and scrub lower shelf of the grill and clean temperature dials[cite: 2]." },
+                    { id: 'gcl4', title: "Strain the fryers of excess crumbs and food particles", desc: "Strain the fryers of excess crumbs and food particles[cite: 2]." },
+                    { id: 'gcl5', title: "Wipe down the stainless dividers and the front of the fryers", desc: "Wipe down the stainless dividers and the front of the fryers[cite: 2]." },
+                    { id: 'gcl6', title: "Close down one fryolator", desc: "Close down one fryolator[cite: 2]." },
+                    { id: 'gcl7', title: "Sift fry flour into a new pan and top off if necessary", desc: "Sift fry flour into a new pan and top off if necessary[cite: 2]." },
+                    { id: 'gcl8', title: "Clean the sink by the steam tables", desc: "Clean the sink by the steam tables[cite: 2]." },
+                    { id: 'gcl9', title: "Break down and thoroughly clean the steam tables", desc: "Break down and thoroughly clean the steam tables[cite: 2]." },
+                    { id: 'gcl10', title: "Place product from steam tables in ten (10) plastic cambros and place on cart", desc: "Place product from steam tables in ten (10) plastic cambros and place on cart[cite: 2]." },
+                    { id: 'gcl11', title: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart", desc: "Wrap left over sausage and bacon with foil, label, and place on lower rack of cart[cite: 2]." },
+                    { id: 'gcl12', title: "Make note if the fryolators need to be changed on the dry erase board", desc: "Make note if the fryolators need to be changed on the dry erase board[cite: 2]." },
+                    { id: 'gcl13', title: "At close, clean the grill, grill rails, and wall behind the grill", desc: "At close, clean the grill, grill rails, and wall behind the grill[cite: 2]." },
+                    { id: 'gcl14', title: "Clean the grease trap for the grill into a metal German pan", desc: "Clean the grease trap for the grill into a metal German pan[cite: 2]." },
+                    { id: 'gcl15', title: "Brush down the char broiler and clean the trap", desc: "Brush down the char broiler and clean the trap[cite: 2]." },
+                    { id: 'gcl16', title: "Run grease to outside grease trap. DO NOT leave grease inside overnight!", desc: "Run grease to outside grease trap. DO NOT leave grease inside overnight![cite: 2]." },
+                    { id: 'gcl17', title: "Assist with thaw pull and floors", desc: "Assist with thaw pull and floors[cite: 2]." },
+                    { id: 'gcl18', title: "Restock freezer (French Fries, chicken, mac and cheese, etc)", desc: "Restock freezer (French Fries, chicken, mac and cheese, etc)[cite: 2]." },
+                    { id: 'gcl19', title: "Check with manager prior to clocking out and leaving your shift!", desc: "Check with manager prior to clocking out and leaving your shift![cite: 2]." }
                 ]
             }
         ]
@@ -350,36 +351,36 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Cierre Nocturno (Procedimientos Estación Hornallas)",
                 tasks: [
-                    { id: 'rcl1', title: "Desarmar verduras y ollas de escalfado", desc: "Una hora antes del cierre, desmontar verduras y llevar a platos." },
-                    { id: 'rcl2', title: "Cepillar parte superior de hornallas y limpiar quemadores", desc: "Cepillar la parte superior y limpiar debajo de los quemadores." },
-                    { id: 'rcl3', title: "Limpiar trampas de hornallas y parrilla pequeña", desc: "Limpiar trampas y apagar un horno." },
-                    { id: 'rcl4', title: "Limpiar interior de estación de huevos y puertas de horno", desc: "Limpiar acero inoxidable incluyendo puertas de horno y traulsens." },
-                    { id: 'rcl5', title: "Limpiar interior de traulsen y rejillas", desc: "Limpiar el interior del traulsen, incluyendo rejillas de alambre." },
-                    { id: 'rcl6', title: "Reabastecer traulsen y rotar producto", desc: "Reabastecer el traulsen asegurando que todo esté rotado y cubierto." },
-                    { id: 'rcl7', title: "Cambiar papel aluminio en hornos y limpiar puertas", desc: "Cambiar aluminio en hornos y limpiar puertas interiores." },
-                    { id: 'rcl8', title: "Cambiar revestimientos de aluminio en estantes superiores", desc: "Cambiar revestimientos de aluminio según sea necesario." },
-                    { id: 'rcl9', title: "Reabastecer pan y rotar producto", desc: "Reabastecer pan según sea necesario, rotando producto." },
-                    { id: 'rcl10', title: "Drenar y poner hielo en pescado en cámara frigorífica", desc: "Drenar y poner hielo en el pescado en la cámara." },
-                    { id: 'rcl11', title: "Revisar extracción de congelados", desc: "Revisar extracción de carnes, pescado y otros congelados." },
-                    { id: 'rcl12', title: "Barrer, cepillar y trapear el piso de la línea", desc: "Ayudar a barrer, cepillar y trapear el piso de la línea." },
-                    { id: 'rcl13', title: "Aprobación del gerente antes de salir", desc: "Consulte con un gerente antes de fichar la salida!" }
+                    { id: 'rcl1', title: "Una hora antes del cierre, desmontar verduras, ollas de escalfado y llevar a platos", desc: "Desarmar verduras y ollas[cite: 3]." },
+                    { id: 'rcl2', title: "Cepillar parte superior de hornallas y limpiar debajo de los quemadores", desc: "Cepillar parte superior y limpiar debajo de quemadores[cite: 3]." },
+                    { id: 'rcl3', title: "Limpiar trampas de hornallas y parrilla pequeña. Apagar un horno", desc: "Limpiar trampas y apagar un horno[cite: 3]." },
+                    { id: 'rcl4', title: "Limpiar todo el acero inoxidable en estación de huevos, incluyendo puertas de horno, traulsens y mesa", desc: "Limpiar acero inoxidable[cite: 3]." },
+                    { id: 'rcl5', title: "Limpiar interior de traulsen, incluyendo rejillas de alambre", desc: "Limpiar interior de traulsen[cite: 3]." },
+                    { id: 'rcl6', title: "Reabastecer traulsen, asegurando que todo esté rotado y cubierto", desc: "Reabastecer traulsen y rotar producto[cite: 3]." },
+                    { id: 'rcl7', title: "Cambiar papel aluminio en horno y limpiar puertas interiores de hornos", desc: "Cambiar papel aluminio en horno[cite: 3]." },
+                    { id: 'rcl8', title: "Cambiar revestimientos de aluminio en estantes superiores según sea necesario", desc: "Cambiar revestimientos de aluminio[cite: 3]." },
+                    { id: 'rcl9', title: "Reabastecer pan según sea necesario, rotando producto", desc: "Reabastecer pan y rotar producto[cite: 3]." },
+                    { id: 'rcl10', title: "Drenar y poner hielo en pescado en la cámara frigorífica", desc: "Drenar y poner hielo en el pescado[cite: 3]." },
+                    { id: 'rcl11', title: "Revisar extracción de congelados incluyendo carnes, pescado y otros", desc: "Revisar extracción de congelados[cite: 3]." },
+                    { id: 'rcl12', title: "Ayudar a otros cocineros a barrer, cepillar y trapear el piso de la línea", desc: "Barrer y trapear el piso[cite: 3]." },
+                    { id: 'rcl13', title: "¡Consulte con el gerente antes de fichar la salida y abandonar su turno!", desc: "Aprobación del gerente[cite: 3]." }
                 ]
             },
             {
                 phase: "🌙 Cierre Nocturno (Procedimientos Estación Media)",
                 tasks: [
-                    { id: 'mcl1', title: "Retirar utensilios de unidad de sándwiches", desc: "Una hora antes del cierre, retirar todos los utensilios de la unidad." },
-                    { id: 'mcl2', title: "Limpiar interior superior de la unidad bajo bandejas", desc: "Limpiar el interior superior debajo de las bandejas y alrededor." },
-                    { id: 'mcl3', title: "Limpiar parte inferior de la unidad", desc: "Limpiar el interior de la porción inferior, incluyendo estante superior." },
-                    { id: 'mcl4', title: "Sacar la unidad y limpiar parte trasera y piso", desc: "Sacar la unidad y limpiar la parte trasera y el piso." },
-                    { id: 'mcl5', title: "Voltear bandejas y reabastecer artículos", desc: "Voltear bandejas y reabastecer rotando correctamente." },
-                    { id: 'mcl6', title: "Verificar niveles de stock", desc: "NO duplique stock. Debe haber una bandeja llena por artículo." },
-                    { id: 'mcl7', title: "Limpiar tapa de la unidad por dentro y por fuera", desc: "Limpiar la tapa de la unidad por dentro y por fuera." },
-                    { id: 'mcl8', title: "Limpiar microondas por dentro y por fuera", desc: "Limpiar el microondas y su estante correspondiente." },
-                    { id: 'mcl9', title: "Reabastecer platos y recipientes para llevar", desc: "Reabastecer platos y recipientes según sea necesario." },
-                    { id: 'mcl10', title: "Ayudar con extracción de congelados y pisos", desc: "Ayudar con extracción y pisos." },
-                    { id: 'mcl11', title: "Asegurar que los artículos estén cubiertos", desc: "Asegúrese de que los artículos estén cubiertos al finalizar." },
-                    { id: 'mcl12', title: "Aprobación del gerente antes de salir", desc: "Consulte con el gerente antes de fichar la salida!" }
+                    { id: 'mcl1', title: "Una hora antes del cierre, retirar todos los utensilios de la unidad de sándwiches", desc: "Retirar utensilios[cite: 1]." },
+                    { id: 'mcl2', title: "Limpiar el interior superior de la unidad debajo de las bandejas y alrededor de la carcasa", desc: "Limpiar interior superior[cite: 1]." },
+                    { id: 'mcl3', title: "Limpiar el interior de la porción inferior de la unidad, incluyendo el estante superior adentro", desc: "Limpiar porción inferior[cite: 1]." },
+                    { id: 'mcl4', title: "Sacar la unidad y limpiar la parte trasera de la unidad y el piso detrás de ella", desc: "Sacar unidad y limpiar piso[cite: 1]." },
+                    { id: 'mcl5', title: "Voltear todas las bandejas y reabastecer todos los artículos, asegurando rotación adecuada", desc: "Voltear bandejas y rotar[cite: 1]." },
+                    { id: 'mcl6', title: "NO duplique stock de producto. Debe haber una bandeja llena de cada artículo", desc: "Verificar niveles de stock[cite: 1]." },
+                    { id: 'mcl7', title: "Limpiar la tapa de la unidad por dentro y por fuera", desc: "Limpiar la tapa[cite: 1]." },
+                    { id: 'mcl8', title: "Limpiar el microondas por dentro y por fuera, incluyendo su estante", desc: "Limpiar el microondas[cite: 1]." },
+                    { id: 'mcl9', title: "Reabastecer todos los platos y recipientes para llevar según sea necesario", desc: "Reabastecer platos y recipientes[cite: 1]." },
+                    { id: 'mcl10', title: "Ayudar con la extracción de congelados y pisos", desc: "Ayudar con extracción y pisos[cite: 1]." },
+                    { id: 'mcl11', title: "Asegurarse de que los artículos de la unidad de sándwiches estén cubiertos al final del turno", desc: "Cubrir artículos al final del turno[cite: 1]." },
+                    { id: 'mcl12', title: "¡Consulte con un gerente antes de fichar la salida y abandonar su turno!", desc: "Aprobación del gerente[cite: 1]." }
                 ]
             }
         ],
@@ -387,24 +388,25 @@ const CHECKLIST_SPECS = {
             {
                 phase: "🌙 Cierre Nocturno (Procedimientos Estación Parrilla/Fritura)",
                 tasks: [
-                    { id: 'gcl1', title: "Volcar mezcla de panqueques a recipiente", desc: "Una hora antes del cierre, pasar la mezcla a un recipiente con cucharón." },
-                    { id: 'gcl2', title: "Llevar pistola de mezcla a lavado", desc: "Llevar la pistola de mezcla al área de lavado." },
-                    { id: 'gcl3', title: "Limpiar estante inferior de parrilla y perillas", desc: "Limpiar y fregar el estante inferior y los diales de temperatura." },
-                    { id: 'gcl4', title: "Colar freidoras de migajas y residuos de alimentos", desc: "Colar las freidoras de exceso de migajas y partículas." },
-                    { id: 'gcl5', title: "Limpiar divisores de acero y frente de freidoras", desc: "Limpiar divisores y el frente de las freidoras." },
-                    { id: 'gcl6', title: "Cerrar una freidora", desc: "Cerrar una freidora." },
-                    { id: 'gcl7', title: "Tamizar harina de freír en un recipiente nuevo", desc: "Tamizar la harina en un recipiente limpio y completar si es necesario." },
-                    { id: 'gcl8', title: "Limpiar el fregadero junto a las mesas de vapor", desc: "Limpiar el fregadero junto a las mesas de vapor." },
-                    { id: 'gcl9', title: "Desarmar y limpiar mesas de vapor a fondo", desc: "Desarmar y limpiar a fondo las mesas de vapor." },
-                    { id: 'gcl10', title: "Colocar producto de mesas de vapor en cambros", desc: "Colocar producto en diez (10) cambros plásticos y llevar al carrito." },
-                    { id: 'gcl11', title: "Cubrir salchichas y tocino con aluminio y etiquetar", desc: "Envolver sobrantes con papel aluminio, etiquetar y colocar en el carrito." },
-                    { id: 'gcl12', title: "Anotar freidoras que necesiten cambio de aceite", desc: "Anotar en la pizarra si las freidoras necesitan cambio de aceite." },
-                    { id: 'gcl13', title: "Limpiar trampa de grasa de la parrilla", desc: "Al cerrar, limpiar parrilla, rieles y trampa de grasa en bandeja alemana." },
-                    { id: 'gcl14', title: "Cepillar asador de carbón y limpiar trampa", desc: "Cepillar el asador de carbón y limpiar su trampa." },
-                    { id: 'gcl15', title: "Llevar grasa a trampa exterior", desc: "Llevar la grasa a la trampa exterior. NO deje grasa dentro por la noche!." },
-                    { id: 'gcl16', title: "Ayudar con extracción de congelados y pisos", desc: "Ayudar con extracción y pisos." },
-                    { id: 'gcl17', title: "Reabastecer congelador", desc: "Reabastecer el congelador (papas fritas, pollo, macarrones, etc.)." },
-                    { id: 'gcl18', title: "Aprobación del gerente antes de salir", desc: "Consulte con el gerente antes de fichar la salida!" }
+                    { id: 'gcl1', title: "Una hora antes del cierre, pasar la mezcla de panqueques a un recipiente de 6 con cucharón", desc: "Volcar mezcla de panqueques[cite: 2]." },
+                    { id: 'gcl2', title: "Llevar la pistola de mezcla al área de lavado", desc: "Llevar pistola a lavado[cite: 2]." },
+                    { id: 'gcl3', title: "Limpiar y fregar el estante inferior de la parrilla y los diales de temperatura", desc: "Limpiar estante inferior[cite: 2]." },
+                    { id: 'gcl4', title: "Colar las freidoras de exceso de migajas y partículas de comida", desc: "Colar freidoras[cite: 2]." },
+                    { id: 'gcl5', title: "Limpiar los divisores de acero inoxidable y el frente de las freidoras", desc: "Limpiar divisores[cite: 2]." },
+                    { id: 'gcl6', title: "Cerrar una freidora", desc: "Cerrar una freidora[cite: 2]." },
+                    { id: 'gcl7', title: "Tamizar harina de freír en un recipiente nuevo y completar si es necesario", desc: "Tamizar harina[cite: 2]." },
+                    { id: 'gcl8', title: "Limpiar el fregadero junto a las mesas de vapor", desc: "Limpiar fregadero[cite: 2]." },
+                    { id: 'gcl9', title: "Desarmar y limpiar a fondo las mesas de vapor", desc: "Limpiar mesas de vapor[cite: 2]." },
+                    { id: 'gcl10', title: "Colocar producto de mesas de vapor en diez (10) cambros plásticos y poner en el carrito", desc: "Colocar producto en cambros[cite: 2]." },
+                    { id: 'gcl11', title: "Envolver salchichas y tocino sobrantes con papel aluminio, etiquetar y colocar en la rejilla inferior", desc: "Envolver salchichas y tocino[cite: 2]." },
+                    { id: 'gcl12', title: "Anotar en la pizarra si las freidoras necesitan cambio de aceite", desc: "Anotar cambio de aceite[cite: 2]." },
+                    { id: 'gcl13', title: "Al cerrar, limpiar parrilla, rieles y pared detrás de la parrilla", desc: "Limpiar parrilla y rieles[cite: 2]." },
+                    { id: 'gcl14', title: "Limpiar la trampa de grasa de la parrilla en una bandeja alemana metálica", desc: "Limpiar trampa de grasa[cite: 2]." },
+                    { id: 'gcl15', title: "Cepillar el asador de carbón y limpiar la trampa", desc: "Cepillar asador[cite: 2]." },
+                    { id: 'gcl16', title: "Llevar grasa a la trampa exterior. ¡NO deje grasa dentro durante la noche!", desc: "Llevar grasa al exterior[cite: 2]." },
+                    { id: 'gcl17', title: "Ayudar con la extracción de congelados y pisos", desc: "Ayudar con congelados y pisos[cite: 2]." },
+                    { id: 'gcl18', title: "Reabastecer congelador (papas fritas, pollo, macarrones con queso, etc.)", desc: "Reabastecer congelador[cite: 2]." },
+                    { id: 'gcl19', title: "¡Consulte con el gerente antes de fichar la salida y abandonar su turno!", desc: "Aprobación del gerente[cite: 2]." }
                 ]
             }
         ]
@@ -679,7 +681,6 @@ function switchTab(viewId, btnEl) {
     btnEl?.classList.add('active');
     UIController.refreshActiveView();
 }
-
 // ==========================================
 // 5. RENDER CHECKLISTS, ASSIGNMENTS & DASHBOARDS
 // ==========================================
@@ -800,9 +801,6 @@ function submitManagerShiftChecklist() {
     });
 }
 
-// ==========================================
-// 6. MESSAGE BOARD, RECIPE BOOK, TRAINING & DASHBOARDS
-// ==========================================
 function renderMessageBoard() {
     const container = document.getElementById('message-board-container');
     if (!container) return;
