@@ -5,7 +5,7 @@
 const CONFIG = {
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxLUl-5Fx1XvJT6jVUURqSeGXT0sFgOB64kESRw4OIC9hxP0hTA4wG46SVV5Ym_UvHJ/exec",
     GM_MASTER_PASSCODE: "9999",
-    PROGRAM_START_DATE: "2026-10-01"
+    PROGRAM_START_DATE: "2026-10-01" // Customizable GM Program Launch Start Date
 };
 
 const Store = {
@@ -467,7 +467,7 @@ function updateGreetingLabel() {
     const label = document.getElementById('logged-in-user-label');
     if (label && Store.user) {
         const certified = isCertifiedTeamLeader(Store.user.id);
-        const badge = certified ? ' ⭐️ CERTIFIED TEAM LEADER' : '';
+        const badge = certified ? (Store.lang === 'es' ? ' ⭐️ LÍDER DE EQUIPO CERTIFICADO' : ' ⭐️ CERTIFIED TEAM LEADER') : '';
         label.textContent = `${Store.user.name}${badge} (${Store.role.toUpperCase()})`;
     }
 }
@@ -492,7 +492,17 @@ const TRANSLATIONS = {
         messageBoard: "💬 Message Board",
         recipeBook: "📖 Recipe & Prep Book",
         staffRoster: "👥 Staff Roster",
-        printSheet: "🖨️ Print Sheet"
+        printSheet: "🖨️ Print Sheet",
+        cookDashTitle: "⭐ My Completed Shifts & Performance Log",
+        cookDashSub: "Review your past shift checklist history and compliance scores.",
+        tblDate: "Date",
+        tblStation: "Station",
+        tblCompletedTasks: "Completed Tasks",
+        tblScore: "Score",
+        tblStatus: "Status",
+        noShifts: "No shifts logged yet.",
+        goalMet: "✅ Goal Met",
+        missed: "❌ Missed"
     },
     es: {
         myChecklist: "📝 Lista de Estación",
@@ -503,7 +513,17 @@ const TRANSLATIONS = {
         messageBoard: "💬 Tablero de Mensajes",
         recipeBook: "📖 Libro de Recetas",
         staffRoster: "👥 Plantilla de Personal",
-        printSheet: "🖨️ Imprimir Hoja"
+        printSheet: "🖨️ Imprimir Hoja",
+        cookDashTitle: "⭐ Mis Turnos Completados y Registro de Rendimiento",
+        cookDashSub: "Revise su historial pasado de listas de verificación de turnos y calificaciones de cumplimiento.",
+        tblDate: "Fecha",
+        tblStation: "Estación",
+        tblCompletedTasks: "Tareas Completadas",
+        tblScore: "Calificación",
+        tblStatus: "Estado",
+        noShifts: "Aún no hay turnos registrados.",
+        goalMet: "✅ Meta Cumplida",
+        missed: "❌ Incumplido"
     }
 };
 
@@ -1188,29 +1208,29 @@ function renderCookDashboard() {
 
     container.innerHTML = `
         <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">⭐ My Completed Shifts & Performance Log</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">Review your past shift checklist history and compliance scores.</p>
+            <h3 style="color: #1e3a8a; margin-top: 0;">${t('cookDashTitle')}</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">${t('cookDashSub')}</p>
         </div>
         <div class="card">
             <table class="data-table" style="width: 100%;">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Station</th>
-                        <th>Completed Tasks</th>
-                        <th>Score</th>
-                        <th>Status</th>
+                        <th>${t('tblDate')}</th>
+                        <th>${t('tblStation')}</th>
+                        <th>${t('tblCompletedTasks')}</th>
+                        <th>${t('tblScore')}</th>
+                        <th>${t('tblStatus')}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">No shifts logged yet.</td></tr>` :
+                    ${myShifts.length === 0 ? `<tr><td colspan="5" style="text-align: center; color: #64748b;">${t('noShifts')}</td></tr>` :
                         myShifts.map(s => `
                             <tr>
                                 <td>${s.date}</td>
                                 <td>${s.station || 'General'}</td>
                                 <td>${s.tasksCompleted} / ${s.totalTasks}</td>
                                 <td>${s.scorePct}%</td>
-                                <td>${Number(s.scorePct) >= 85 ? '✅ Goal Met' : '❌ Missed'}</td>
+                                <td>${Number(s.scorePct) >= 85 ? t('goalMet') : t('missed')}</td>
                             </tr>
                         `).join('')}
                 </tbody>
@@ -1274,281 +1294,4 @@ function renderGMDashboard() {
     // --- 14-DAY COMPLIANCE CALCULATION ---
     const startDate = new Date(CONFIG.PROGRAM_START_DATE);
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 13);
-
-    const cycleShifts = Store.shifts.filter(s => {
-        const d = new Date(s.date);
-        return d >= startDate && d <= endDate;
-    });
-
-    // Group compliance by day
-    const dailyCompliance = {};
-    for (let i = 0; i < 14; i++) {
-        const curr = new Date(startDate);
-        curr.setDate(curr.getDate() + i);
-        const dateStr = curr.toISOString().split('T')[0];
-        dailyCompliance[dateStr] = { total: 0, sum: 0 };
-    }
-
-    cycleShifts.forEach(s => {
-        if (dailyCompliance[s.date]) {
-            dailyCompliance[s.date].total += 1;
-            dailyCompliance[s.date].sum += Number(s.scorePct || 0);
-        }
-    });
-
-    // --- BONUS TIER CALCULATIONS ---
-    const employeeAverages = {};
-    Store.employees.forEach(emp => {
-        const eId = emp.id || emp.ID;
-        const eShifts = cycleShifts.filter(s => String(s.empId).trim() === String(eId).trim());
-        if (eShifts.length > 0) {
-            const totalScore = eShifts.reduce((acc, s) => acc + Number(s.scorePct || 0), 0);
-            employeeAverages[eId] = {
-                name: emp.name || emp.Name,
-                avg: Math.round(totalScore / eShifts.length),
-                shiftsCount: eShifts.length
-            };
-        }
-    });
-
-    let bronzeCount = 0, silverCount = 0, goldCount = 0;
-    const accountingRows = [];
-
-    Object.values(employeeAverages).forEach(data => {
-        let tier = 'None';
-        if (data.avg >= 100) { tier = 'Gold 🥇'; goldCount++; }
-        else if (data.avg >= 95) { tier = 'Silver 🥈'; silverCount++; }
-        else if (data.avg >= 85) { tier = 'Bronze 🥉'; bronzeCount++; }
-
-        if (tier !== 'None') {
-            accountingRows.push(`
-                <tr>
-                    <td><strong>${data.name}</strong></td>
-                    <td>${data.shiftsCount}</td>
-                    <td>${data.avg}%</td>
-                    <td><span style="font-weight: bold; color: #1e3a8a;">${tier}</span></td>
-                </tr>
-            `);
-        }
-    });
-
-    container.innerHTML = `
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #1e3a8a; margin-top: 0;">📈 General Manager Executive Suite & Bonus Program</h3>
-            <p style="font-size: 0.85rem; color: #64748b;">14-Day compliance tracking cycle (Launch Date: ${CONFIG.PROGRAM_START_DATE} to ${endDate.toISOString().split('T')[0]}).</p>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Active Team Members</span>
-                <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${Store.employees.length}</h2>
-            </div>
-            <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Total Shifts Logged (Cycle)</span>
-                <h2 style="color: #1e3a8a; margin: 5px 0 0 0;">${cycleShifts.length}</h2>
-            </div>
-            <div class="card" style="text-align: center;">
-                <span style="font-size: 0.85rem; color: #64748b;">Pending Cert Sign-Offs</span>
-                <h2 style="color: #dc2626; margin: 5px 0 0 0;">${pendingCerts.length}</h2>
-            </div>
-        </div>
-
-        <!-- 14-DAY COMPLIANCE LINE CHART & METRICS -->
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">📊 14-Day Compliance Tracking Trend</h4>
-            <p style="font-size: 0.85rem; color: #64748b;">Daily average compliance score across the active pay cycle.</p>
-            <div style="display: flex; gap: 6px; align-items: flex-end; height: 180px; padding: 20px 10px 10px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow-x: auto; margin-top: 1rem;">
-                ${Object.entries(dailyCompliance).map(([date, stats]) => {
-                    const avg = stats.total > 0 ? Math.round(stats.sum / stats.total) : 0;
-                    const heightPct = Math.max(avg, 5);
-                    return `
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 35px; height: 100%; justify-content: flex-end;">
-                            <span style="font-size: 0.7rem; font-weight: bold; color: #1e3a8a; margin-bottom: 4px;">${avg}%</span>
-                            <div style="width: 100%; background: #2563eb; border-radius: 4px 4px 0 0; height: ${heightPct}%; transition: height 0.3s;"></div>
-                            <span style="font-size: 0.65rem; color: #64748b; margin-top: 6px; transform: rotate(-35deg);">${date.slice(5)}</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        </div>
-
-        <!-- BONUS PROGRAM ALLOCATION PIE & ACCOUNTING SHEET -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-            
-            <div class="card">
-                <h4 style="color: #1e3a8a; margin-top: 0;">🥧 Bonus Tier Allocation Distribution</h4>
-                <p style="font-size: 0.85rem; color: #64748b;">Active employee distribution across Bronze (85%+), Silver (95%+), and Gold (100%).</p>
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 1.5rem;">
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #ca8a04;">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Gold Tier (100%):</span> <span>${goldCount} Employee(s)</span></div>
-                    </div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #64748b;">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Silver Tier (95%+):</span> <span>${silverCount} Employee(s)</span></div>
-                    </div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #b45309;">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Bronze Tier (85%+):</span> <span>${bronzeCount} Employee(s)</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h4 style="color: #1e3a8a; margin-top: 0;">📑 Bonus Program Accounting Sheet</h4>
-                <p style="font-size: 0.85rem; color: #64748b;">Qualified employees meeting 14-day compliance program thresholds.</p>
-                <div style="max-height: 240px; overflow-y: auto; margin-top: 1rem;">
-                    <table class="data-table" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Shifts</th>
-                                <th>Avg Score</th>
-                                <th>Tier</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${accountingRows.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No employees have met bonus thresholds yet.</td></tr>` : accountingRows.join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
-        <div id="manager-assignment-widget-container" style="margin-bottom: 1.5rem;"></div>
-
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">🎓 Pending Training Certifications for Approval</h4>
-            <table class="data-table" style="width: 100%; margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Employee ID</th>
-                        <th>Module ID</th>
-                        <th>Score</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${pendingCerts.length === 0 ? `<tr><td colspan="4" style="text-align: center; color: #64748b;">No pending certifications to approve.</td></tr>` :
-                        pendingCerts.map(c => `
-                            <tr>
-                                <td>${c.empId || c.EMPID}</td>
-                                <td>${c.modId || c.MODID}</td>
-                                <td>${c.score}%</td>
-                                <td><button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="gmSignOffCert('${c.empId || c.EMPID}', '${c.modId || c.MODID}')">Approve Sign-Off ✅</button></td>
-                            </tr>
-                        `).join('')}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h4 style="color: #1e3a8a; margin-top: 0;">🛠️ GM Quick Actions & System Controls</h4>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem;">
-                <button class="btn btn-primary" onclick="openEmployeeModal()">+ Add New Employee</button>
-                <button class="btn btn-primary" onclick="switchTab('recipe-book', document.querySelector('.tab-btn'))">+ Manage Recipe Book</button>
-                <button class="btn btn-secondary" style="background: #fee2e2; color: #dc2626; border-color: #fca5a5;" onclick="triggerMasterReset()">⚠️ Master Reset (Clear Shifts, Certs & Msgs)</button>
-            </div>
-        </div>
-    `;
-    renderManagerAssignmentWidget();
-}
-
-function gmSignOffCert(empId, modId) {
-    const cert = Store.certifications.find(c => String(c.empId || c.EMPID).trim() === String(empId).trim() && String(c.modId || c.MODID).trim() === String(modId).trim());
-    if (!cert) return;
-    cert.managerSignOff = true;
-    ApiService.request('saveCert', { cert }).then(() => {
-        renderGMDashboard();
-        alert("Certification approved and signed off!");
-    });
-}
-
-function triggerMasterReset() {
-    if (!confirm("WARNING: This will clear all logged shifts, certifications, and message board posts across the system. Your Recipe & Spec Book will remain completely untouched. Do you wish to proceed?")) return;
-    
-    Store.shifts = [];
-    Store.certifications = [];
-    Store.messages = [];
-    
-    alert("Master Reset complete! Operational shift logs, certifications, and messages have been cleared.");
-    UIController.refreshActiveView();
-}
-
-// ==========================================
-// 10. GM CRUD: EMPLOYEES & RECIPES (DEDUPLICATED ROSTER)
-// ==========================================
-function renderRosterView() {
-    const tbody = document.getElementById('roster-table-body');
-    if (!tbody) return;
-
-    // Deduplicate employees by ID
-    const uniqueEmployees = Array.from(
-        new Map(Store.employees.map(emp => [String(emp.id || emp.ID).trim(), emp])).values()
-    );
-
-    tbody.innerHTML = uniqueEmployees.length === 0 ? `<tr><td colspan="6" style="text-align: center; color: #64748b;">No employees found.</td></tr>` :
-        uniqueEmployees.map(emp => {
-            const eId = emp.id || emp.ID;
-            return `
-                <tr>
-                    <td>${eId}</td>
-                    <td><strong>${emp.name || emp.Name}</strong></td>
-                    <td>${String(emp.role || emp.Role || 'cook').toUpperCase()}</td>
-                    <td>${emp.station || emp.Station || 'General'}</td>
-                    <td>$${emp.hourlyRate || emp.HourlyRate || '0.00'}</td>
-                    <td>
-                        ${Store.role === 'gm' ? `
-                            <div style="display: flex; gap: 6px;">
-                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="openEmployeeModal('${eId}')">Edit ✏️</button>
-                                <button class="btn btn-secondary" style="color: #dc2626; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteEmployee('${eId}')">Delete 🗑️</button>
-                            </div>
-                        ` : ''}
-                    </td>
-                </tr>
-            `;
-        }).join('');
-}
-
-function openEmployeeModal(empId = null) {
-    let existing = null;
-    if (empId) {
-        existing = Store.employees.find(e => String(e.id || e.ID).trim() === String(empId).trim());
-    }
-
-    const name = prompt("Enter employee name:", existing ? (existing.name || existing.Name || '') : '');
-    if (!name) return;
-    const role = prompt("Enter role (cook, manager, gm):", existing ? (existing.role || existing.Role || 'cook') : 'cook');
-    const pin = prompt("Enter 4-digit PIN code:", existing ? (existing.pin || existing.PIN || '1234') : '1234');
-    const station = prompt("Enter default station:", existing ? (existing.station || existing.Station || 'range_open') : 'range_open');
-    const hourlyRate = prompt("Enter hourly rate:", existing ? (existing.hourlyRate || existing.HourlyRate || '18.00') : '18.00');
-
-    const empObj = {
-        id: existing ? (existing.id || existing.ID) : `EMP-${Date.now()}`,
-        name,
-        role,
-        station,
-        hourlyRate,
-        pin,
-        active: true
-    };
-
-    if (existing) {
-        const index = Store.employees.findIndex(e => String(e.id || e.ID).trim() === String(empId).trim());
-        if (index > -1) Store.employees[index] = empObj;
-        else Store.employees.push(empObj);
-    } else {
-        Store.employees.push(empObj);
-    }
-
-    ApiService.request('saveEmployee', { employee: empObj }).then(() => {
-        alert("Employee saved successfully!");
-        renderRosterView();
-    });
-}
-
-function deleteEmployee(empId) {
-    if (!confirm("Are you sure you want to remove this employee?")) return;
-    Store.employees = Store.employees.filter(e => String(e.id || e.ID).trim() !== String(empId).trim());
-    renderRosterView();
-    alert("Employee removed from active view.");
-}
+    endDate.setDate(endDate.getDate()
